@@ -1,22 +1,13 @@
-import { getWord } from '@/api/api';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Audio } from 'expo-av';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
 import { RootState } from '@/redux/store';
-import { setTargetWord } from '@/redux/translated';
 import { useAppSelector } from '@/hooks/useAppSelector';
-import { useAppDispatch } from '@/hooks/useAppDispatch';
 
 const Target = () => {
-    const dispatch = useAppDispatch();
     const { targetWord, isCorrect, targetAudioUrl, targetTranscription } = useAppSelector((state: RootState) => state.translated);
 
-    const [recordingUri, setRecordingUri] = useState<string | null>(null);
     const [sound, setSound] = useState<Audio.Sound | null>(null);
-
-    const [wordHeight, setWordHeight] = useState(0);
 
     // useEffect(() => {
     //     const fetchWord = async () => {

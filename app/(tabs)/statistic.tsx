@@ -1,3 +1,4 @@
+import TagStatistic from "@/components/tagStatistic";
 import { router } from "expo-router";
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
@@ -8,7 +9,7 @@ const Statistic = () => {
             <TouchableOpacity onPress={() => router.back()}>
                 <Text>← Назад</Text>
             </TouchableOpacity>
-            <Text>Статистика</Text>
+            <TagStatistic tag='tag1' accuracy={10}></TagStatistic>
         </View>
     )
 }
