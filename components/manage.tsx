@@ -216,7 +216,7 @@ const Manage = () => {
             
             <View style={styles.textContainer}>
                 {translatedAudio ? 
-                    <Text style={styles.recognizedText}>{translatedAudio}</Text>
+                    <Text style={styles.recognizedText}>Распознано {translatedAudio}</Text>
                     :
                     <Text style={styles.recognizedText}>{isRecording ? 'Нажмите для остановки записи':'Нажмите для записи'}</Text>
                     }

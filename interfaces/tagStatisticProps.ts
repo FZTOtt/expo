@@ -1,4 +1,4 @@
 interface TagStatisticProps {
     tag: string;
-    accuracy: number;
+    // accuracy: number;
 }
