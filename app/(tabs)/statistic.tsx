@@ -1,3 +1,5 @@
+import BackButton from "@/components/backButton";
+import GridTable from "@/components/gridTable";
 import TagStatistic from "@/components/tagStatistic";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -113,67 +115,78 @@ const tags: TagStatisticProps[] = [
 
 const Statistic = () => {
 
-    const { width: screenWidth } = useWindowDimensions();
+    // const { width: screenWidth } = useWindowDimensions();
 
-    const getNumColumns = useCallback(() => {
-        if (Platform.OS === 'web') {
-          if (screenWidth > 1024) return 4;
-          if (screenWidth > 768) return 3;
-          return 2;
-        }
-        return screenWidth > 600 ? 3 : 2;
-      }, [screenWidth]);
+    // const getNumColumns = useCallback(() => {
+    //     if (Platform.OS === 'web') {
+    //       if (screenWidth > 1024) return 4;
+    //       if (screenWidth > 768) return 3;
+    //       return 2;
+    //     }
+    //     return screenWidth > 600 ? 3 : 2;
+    //   }, [screenWidth]);
 
-    const numColumns = useMemo(getNumColumns, [getNumColumns]);
+    // const numColumns = useMemo(getNumColumns, [getNumColumns]);
 
-    const renderItem = ({ item }: { item: { tag: string} }) => {
+    // const renderItem = ({ item }: { item: { tag: string} }) => {
 
-        return (
-            <View style={[styles.tagWrapper,
-                { width: `${100 / numColumns}%` as `${number}%` }
-            ]}>
-                <TagStatistic tag={item.tag} />
-            </View>
-        );
-    };
+    //     return (
+    //         <TouchableOpacity style={[styles.tagWrapper,
+    //             { width: `${100 / numColumns}%` as `${number}%` }                
+    //         ]}
+    //         onPress={() => router.push({
+    //             pathname: "/statistic/[tag]",
+    //             params: { tag: item.tag }
+    //           })}>
+    //             <TagStatistic tag={item.tag} />
+    //         </TouchableOpacity>
+    //     );
+    // };
 
+    // return (
+    //     <View>
+    //         <BackButton/>
+    //         {/* <View style={styles.tagsGrid}>
+    //             <TagStatistic tag='Автомобили' accuracy={58}></TagStatistic>
+    //             {tags.map((tag, index) => (
+
+    //                 <TagStatistic 
+    //                     // key={index},
+    //                     tag={tag.tag}
+    //                 />
+    //             ))}
+    //         </View> */}
+    //         <FlatList
+    //             key={numColumns}
+    //             data={tags}
+    //             renderItem={renderItem}
+    //             keyExtractor={(item, index) => index.toString()}
+    //             numColumns={numColumns}
+    //             contentContainerStyle={styles.listContent}
+    //             columnWrapperStyle={styles.columnWrapper}
+    //         />
+    //     </View>
+    // )
     return (
-        <View>
-            <TouchableOpacity onPress={() => router.back()}>
-                <Text>← Назад</Text>
-            </TouchableOpacity>
-            {/* <View style={styles.tagsGrid}>
-                <TagStatistic tag='Автомобили' accuracy={58}></TagStatistic>
-                {tags.map((tag, index) => (
-
-                    <TagStatistic 
-                        // key={index},
-                        tag={tag.tag}
-                    />
-                ))}
-            </View> */}
-            <FlatList
-                key={numColumns}
+        <View style={styles.container}>
+            <BackButton/>
+        
+            <GridTable
                 data={tags}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
-                numColumns={numColumns}
-                contentContainerStyle={styles.listContent}
-                columnWrapperStyle={styles.columnWrapper}
+                renderItem={({ tag }) => (
+                <TouchableOpacity 
+                    onPress={() => router.push({ pathname: "/statistic/[tag]", params: { tag } })}
+                    style={styles.tagWrapper}
+                >
+                    <TagStatistic tag={tag} />
+                </TouchableOpacity>
+                )}
+                maxColumns={4}
+                itemSpacing={10}
             />
         </View>
     )
 }
-
-// const styles = StyleSheet.create({
-//     tagsGrid: {
-//         flexDirection: 'row',
-//         flexWrap: 'wrap',
-//         justifyContent: 'space-between',
-//         padding: 40,
-//         gap: 10,
-//     },
-// })
 
 const styles = StyleSheet.create({
     container: {
@@ -184,7 +197,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'space-between',
         marginBottom: 10,
-        // padding: 20
     },
     listContent: {
         paddingBottom: 20,
@@ -193,8 +205,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     tagWrapper: {
-        // flex: 1,
-        // width: `${100 / numColumns}%`,
         padding: 8
     },
     emptyItem: {
