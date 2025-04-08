@@ -1,3 +1,4 @@
+import { getAllTags } from "@/api/api";
 import BackButton from "@/components/backButton";
 import GridTable from "@/components/gridTable";
 import TagStatistic from "@/components/tagStatistic";
@@ -5,7 +6,7 @@ import { router } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, Platform, useWindowDimensions } from "react-native";
 
-const tags: TagStatisticProps[] = [
+const tags1: TagStatisticProps[] = [
     {
         tag: 'Автомобили1',
     },
@@ -167,23 +168,47 @@ const Statistic = () => {
     //         />
     //     </View>
     // )
+
+    const [tags, setTags] = useState<TagStatisticProps[]>()
+
+    useEffect(() => {
+        const fetchTags = async () => {
+            try {
+                const [status, response] = await getAllTags();
+                console.log(status, response)
+                const parsedTags = response.tags.map( (tag: string) => {
+                    const pasrName = tag.split(',')
+                    return { tag: pasrName[1].replace(/\)/g, '')}
+                })
+                console.log(parsedTags)
+                setTags(parsedTags)
+            } catch(error) {
+                console.log('error fetch tags', error)
+            }
+        }
+        
+        fetchTags()
+    }, [])
+
     return (
         <View style={styles.container}>
             <BackButton/>
-        
-            <GridTable
-                data={tags}
-                renderItem={({ tag }) => (
-                <TouchableOpacity 
-                    onPress={() => router.push({ pathname: "/statistic/[tag]", params: { tag } })}
-                    style={styles.tagWrapper}
-                >
-                    <TagStatistic tag={tag} />
-                </TouchableOpacity>
-                )}
-                maxColumns={4}
-                itemSpacing={10}
-            />
+            {tags &&
+                <GridTable
+                    data={tags}
+                    renderItem={({ tag }) => (
+                    <TouchableOpacity 
+                        onPress={() => router.push({ pathname: "/statistic/[tag]", params: { tag } })}
+                        style={styles.tagWrapper}
+                    >
+                        <TagStatistic tag={tag} />
+                    </TouchableOpacity>
+                    )}
+                    maxColumns={4}
+                    itemSpacing={10}
+                />
+            }
+            
         </View>
     )
 }

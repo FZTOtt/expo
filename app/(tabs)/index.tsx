@@ -1,4 +1,5 @@
 import Manage from "@/components/manage";
+import TagFilter from "@/components/tagFilter";
 import Target from "@/components/target";
 import { Text, View, StyleSheet, Dimensions } from "react-native";
 
@@ -9,6 +10,7 @@ export default function Index() {
   
   return (
     <View style={[styles.container, { paddingTop }]}>
+      <TagFilter/>
       <Target />
       <Manage />
     </View>
@@ -21,6 +23,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     gap: 300,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    position: 'relative'
   },
 });

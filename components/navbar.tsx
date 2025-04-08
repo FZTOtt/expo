@@ -1,32 +1,21 @@
 import { Link } from 'expo-router';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 
 const Navbar = () => {
 
     // useEffect(() => {
-    //     // const checkNetwork = async () => {
-    //     //     try {
-    //     //         console.log('try network');
-    //     //         const response = await fetch('https://ouzistudy.ru/api/word/get_word/hello');
+    //     const checkNetwork = async () => {
+    //         try {
+    //             console.log('try network');
+    //             const [response, payload] = await getWord('hello');
                 
-    //     //         if (!response.ok) {
-    //     //             throw new Error('Ошибка при получении аудио');
-    //     //         }
+    //             console.log(response, payload)
+    //         } catch (error) {
+    //             console.error('ошибка в checkNetwork:', error);
+    //         }
+    //     };
 
-    //     //         const answer = await response.formData();
-    //     //         console.log('Аудио успешно получено:', answer);
-
-    //     //         const { sound } = await Audio.Sound.createAsync(
-    //     //             { uri: audioBlob } // Загружаем аудиофайл напрямую с URL
-    //     //         );
-
-    //     //         setSound(sound);
-    //     //     } catch (error) {
-    //     //         console.error('ошибка в checkNetwork:', error);
-    //     //     }
-    //     // };
-
-    //     // checkNetwork();
+    //     checkNetwork();
         
     // }, []);
 

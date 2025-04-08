@@ -3,11 +3,11 @@ import { useEffect, useRef, useState } from 'react';
 import React from 'react';
 import { Audio } from 'expo-av';
 import { AndroidAudioEncoder, AndroidOutputFormat, IOSOutputFormat } from 'expo-av/build/Audio';
-import { getWord, translateAudio } from '@/api/api';
+import { getRandomWord, getWord, translateAudio } from '@/api/api';
 import MicOn from '@/assets/icons/micon.svg';
 import MicOff from '@/assets/icons/micoff.svg';
 import NextWord from '@/assets/icons/next_word.svg';
-import { setTranslatedAudio, setTargetWord, setTargetAudioUrl } from '@redux/translated';
+import { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setReloadTargetWord } from '@redux/translated';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { RootState } from '@/redux/store';
 import TargetWord from '@/interfaces/targetWord';
@@ -15,7 +15,7 @@ import TargetWord from '@/interfaces/targetWord';
 const Manage = () => {
 
     const dispatch = useAppDispatch();
-    const { translatedAudio, isCorrect, targetWord, targetTranscription } = useAppSelector((state: RootState) => state.translated);
+    const { translatedAudio, isCorrect, targetWord, reloadWord, tags } = useAppSelector((state: RootState) => state.translated);
 
 
     const [recording, setRecording] = useState<Audio.Recording | undefined>();
@@ -47,6 +47,8 @@ const Manage = () => {
                     const [status, response] = await translateAudio(audioBlob);
                     if (status === 200) {
                         dispatch(setTranslatedAudio(response.payload.transcription));
+                    } else {
+                        dispatch(setTranslatedAudio('hello1'))
                     }
                     
                     audioChunksRef.current = [];
@@ -167,8 +169,15 @@ const Manage = () => {
         }
     }
 
-    const fetchWord = async (word: string) => {
-        const [status, response] = await getWord(word);
+    const fetchRandomWord = async (tags: string = "", random: boolean = true) => {
+        console.log('random', random)
+        let status, response
+        if (random) {
+            [status, response] = await getRandomWord(tags);
+        } else {
+            [status, response] = await getWord(tags);
+        }
+        
         console.log(status, response)
 
         if (status === 200) {
@@ -177,21 +186,33 @@ const Manage = () => {
             url = url.replace(/&/g, '\\u0026');
             const targetWord: TargetWord = {
                 'targetWord': response.word,
-                'targetTranscription': response.transcription
+                'targetTranscription': response.transcription,
+                'wordId': response.word_id
             }
+            console.log(targetWord)
             dispatch(setTargetWord(targetWord));
             console.log('url', url)
             dispatch(setTargetAudioUrl(url));
         } else {
-            console.error('Ошибка в запросе fetchWord', response);
+            console.error('Ошибка в запросе fetchRandomWord', response);
         }
     }
 
     useEffect(() => {
         if (!targetWord) {
-            fetchWord('hello')
+            fetchRandomWord(tags)
         }
-    }, [])
+    }, [targetWord])
+
+    useEffect(() => {
+        if (reloadWord) {
+            fetchRandomWord(reloadWord, false)
+        }
+    }, [reloadWord])
+
+    function handleNextWord() {
+        fetchRandomWord(tags)
+    }
 
     return (
         <View style={styles.container}>
@@ -207,7 +228,7 @@ const Manage = () => {
                     {isRecording ? <MicOff width={90} height={90}/> : <MicOn width={90} height={90}/>}
                 </TouchableOpacity>
                 
-                <TouchableOpacity style={[styles.button, styles.disabledButton]}>
+                <TouchableOpacity style={[styles.button, styles.disabledButton]} onPress={handleNextWord}>
                     <NextWord width={90} height={90}/>
                 </TouchableOpacity>
 

@@ -22,25 +22,23 @@ export const getRequestFormData = async (url:string): Promise<[number, any]> => 
     }
 };
 
-export const postRequestFormData = async (
+export const postRequest = async (
     url: string,
-    data: FormData,
+    data: BodyInit,
     headers: Record<string, string> = {}
 ): Promise<[number, any]> => {
-    console.log('data',data.get('file'))
+    
     try {
         const response = await fetch(url, {
             method: "POST",
             mode: "cors",
             credentials: "include",
-            headers: {
-                ...headers,
-            },
+            headers: headers,
             body: data,
         });
 
         if (!response.ok) {
-            console.log(response.status)
+            console.log(response)
             if (response.status === 504) {
                 return [response.status, { error: "Сервер недоступен, попробуйте позже" }];
             }
@@ -48,12 +46,14 @@ export const postRequestFormData = async (
         }
 
         const body = await response.json();
-        return [response.status, body];
+        return [response.status, body.payload];
     } catch (error) {
         console.error('error', error)
         return [500, { error: "Сервер недоступен" }];
     }
 };
+
+
 
 export const getRequest = async (url:string): Promise<[number, any]> => {
     try {
