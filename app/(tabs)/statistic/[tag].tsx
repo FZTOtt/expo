@@ -97,9 +97,14 @@ export default function TagStatisticPage() {
                         response.map(async (word: TagWordInterface) => {
                             const stat = await getWordStatistic(word.word_id);
                             const accuracy = stat 
-                                ? (stat.minus 
-                                    ? stat.plus / stat.minus 
-                                    : stat.plus / (stat.minus + 1))
+                                ? (stat.plus ?
+                                    stat.minus ?
+                                        stat.plus / (stat.minus + stat.plus) * 100
+                                        :
+                                        0
+                                    :
+                                    0
+                                )
                                 : 0;
                             
                             return {
