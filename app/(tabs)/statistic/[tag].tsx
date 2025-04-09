@@ -99,7 +99,7 @@ export default function TagStatisticPage() {
                             const accuracy = stat 
                                 ? (stat.plus ?
                                     stat.minus ?
-                                        stat.plus / (stat.minus + stat.plus) * 100
+                                        Math.round(stat.plus / (stat.minus + stat.plus) * 100)
                                         :
                                         0
                                     :

@@ -20,7 +20,7 @@ const WordStatistic = ({word, accuracy}: WordStatisticProps) => {
                 {word}
             </Text>
             <Text>
-                {accuracy}
+                {accuracy}%
             </Text>
         </TouchableOpacity>
     )
