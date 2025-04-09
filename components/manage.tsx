@@ -15,7 +15,7 @@ import TargetWord from '@/interfaces/targetWord';
 const Manage = () => {
 
     const dispatch = useAppDispatch();
-    const { translatedAudio, isCorrect, targetWord, reloadWord, tags, wordId } = useAppSelector((state: RootState) => state.translated);
+    const { translatedAudio, isCorrect, targetWord, reloadWord, tags, wordId, sendStat } = useAppSelector((state: RootState) => state.translated);
 
 
     const [recording, setRecording] = useState<Audio.Recording | undefined>();
@@ -45,8 +45,9 @@ const Manage = () => {
                     setRecordingUri(audioUrl);
 
                     const [status, response] = await translateAudio(audioBlob);
+                    console.log(response)
                     if (status === 200) {
-                        dispatch(setTranslatedAudio(response.payload.transcription));
+                        dispatch(setTranslatedAudio(response.transcription));
                     } else {
                         dispatch(setTranslatedAudio('hello1'))
                     }
@@ -221,7 +222,7 @@ const Manage = () => {
             
         }
 
-        if (isCorrect !== null) {
+        if (isCorrect !== null && sendStat) {
 
             const data = {
                 "id": wordId,
@@ -231,7 +232,7 @@ const Manage = () => {
             writeStatistics(data)
             dispatch(setSendStat())
         }
-    }, [isCorrect])
+    }, [sendStat])
 
     function handleNextWord() {
         fetchRandomWord(tags)
@@ -241,7 +242,7 @@ const Manage = () => {
         <View style={styles.container}>
             <View style={styles.buttonsContainer}>
                 <TouchableOpacity style={styles.button} onPress={playRecording}>
-                    <Image source={ recordingUri ? require('../assets/icons/play_own_active.jpg') : require('../assets/icons/play_own_passive.jpg')} style={styles.icon} />
+                    <Image source={ recordingUri ? require('../assets/images/play_own_active.jpg') : require('../assets/icons/play_own_passive.jpg')} style={styles.icon} />
                 </TouchableOpacity>
                 
                 <TouchableOpacity 

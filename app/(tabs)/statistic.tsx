@@ -196,14 +196,18 @@ const Statistic = () => {
             {tags &&
                 <GridTable
                     data={tags}
-                    renderItem={({ tag }) => (
-                    <TouchableOpacity 
-                        onPress={() => router.push({ pathname: "/statistic/[tag]", params: { tag } })}
-                        style={styles.tagWrapper}
-                    >
-                        <TagStatistic tag={tag} />
-                    </TouchableOpacity>
-                    )}
+                    renderItem={({ tag }) => {
+                        const cleanTag = tag.replace(/^"(.*)"$/, '$1');
+
+                        return (
+                            <TouchableOpacity 
+                                onPress={() => router.push({ pathname: "/statistic/[tag]", params: { tag: cleanTag } })}
+                                style={styles.tagWrapper}
+                            >
+                                <TagStatistic tag={cleanTag} />
+                            </TouchableOpacity>
+                        )
+                    }}
                     maxColumns={4}
                     itemSpacing={10}
                 />
