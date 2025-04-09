@@ -3,11 +3,11 @@ import { useEffect, useRef, useState } from 'react';
 import React from 'react';
 import { Audio } from 'expo-av';
 import { AndroidAudioEncoder, AndroidOutputFormat, IOSOutputFormat } from 'expo-av/build/Audio';
-import { getRandomWord, getWord, translateAudio } from '@/api/api';
+import { getRandomWord, getWord, translateAudio, writeStat } from '@/api/api';
 import MicOn from '@/assets/icons/micon.svg';
 import MicOff from '@/assets/icons/micoff.svg';
 import NextWord from '@/assets/icons/next_word.svg';
-import { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setReloadTargetWord } from '@redux/translated';
+import { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setSendStat } from '@redux/translated';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { RootState } from '@/redux/store';
 import TargetWord from '@/interfaces/targetWord';
@@ -15,7 +15,7 @@ import TargetWord from '@/interfaces/targetWord';
 const Manage = () => {
 
     const dispatch = useAppDispatch();
-    const { translatedAudio, isCorrect, targetWord, reloadWord, tags } = useAppSelector((state: RootState) => state.translated);
+    const { translatedAudio, isCorrect, targetWord, reloadWord, tags, wordId } = useAppSelector((state: RootState) => state.translated);
 
 
     const [recording, setRecording] = useState<Audio.Recording | undefined>();
@@ -209,6 +209,29 @@ const Manage = () => {
             fetchRandomWord(reloadWord, false)
         }
     }, [reloadWord])
+
+    useEffect(() => {
+        const writeStatistics = async (data: {"id": number, "plus": number, "minus": number}) => {
+            try {
+                const [status, response] = await writeStat(data)
+                console.log(status, response)
+            } catch (error) {
+                console.log('write statistic error', error)
+            }
+            
+        }
+
+        if (isCorrect !== null) {
+
+            const data = {
+                "id": wordId,
+                "plus": isCorrect ? 1 : 0,
+                "minus": isCorrect ? 0 : 1
+            }
+            writeStatistics(data)
+            dispatch(setSendStat())
+        }
+    }, [isCorrect])
 
     function handleNextWord() {
         fetchRandomWord(tags)

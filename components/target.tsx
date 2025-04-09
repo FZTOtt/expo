@@ -1,19 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Audio } from 'expo-av';
 import { RootState } from '@/redux/store';
 import { useAppSelector } from '@/hooks/useAppSelector';
-import { writeStat } from '@/api/api';
-import { setSendStat } from '@/redux/translated';
-import { useAppDispatch } from '@/hooks';
 
 const Target = () => {
     const { targetWord, isCorrect, targetAudioUrl, targetTranscription, wordId, sendStat } = useAppSelector((state: RootState) => state.translated);
-
-    const prevSendStatRef = useRef(sendStat);
     const [sound, setSound] = useState<Audio.Sound | null>(null);
-
-    const dispatch = useAppDispatch();
 
     // useEffect(() => {
     //     const fetchWord = async () => {
@@ -77,33 +70,6 @@ const Target = () => {
         }
     }
 
-    useEffect(() => {
-        
-        console.log('asdfasdfasf', isCorrect, sendStat)
-        const writeStatistics = async (data: {"id": number, "plus": number, "minus": number}) => {
-            try {
-                const [status, response] = await writeStat(data)
-                console.log(status, response)
-            } catch (error) {
-                console.log('write statistic error', error)
-            }
-            
-        }
-
-        if (isCorrect !== null && sendStat && prevSendStatRef.current !== sendStat) {
-
-            const data = {
-                "id": wordId,
-                "plus": isCorrect ? 1 : 0,
-                "minus": isCorrect ? 0 : 1
-            }
-            writeStatistics(data)
-            dispatch(setSendStat())
-        }
-        prevSendStatRef.current = sendStat;
-
-    }, [sendStat])
-
     return (
         <View style={styles.container}>
             <View style={styles.wordContainer}>
@@ -163,7 +129,3 @@ const styles = StyleSheet.create({
 
 
 export default Target;
-
-function debounce(writeStatistics: (data: { "id": number; "plus": number; "minus": number; }) => Promise<void>, arg1: number) {
-    throw new Error('Function not implemented.');
-}

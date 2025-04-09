@@ -31,6 +31,7 @@ const translatedSlice = createSlice({
     reducers: {
         setTranslatedAudio: (state, action: PayloadAction<string>) => {
             state.translatedAudio = action.payload;
+            state.isCorrect = null
             state.isCorrect = state.translatedAudio?.toLowerCase() === state.targetWord?.toLowerCase();
             state.sendStat = true;
             console.log('setCorrect')
