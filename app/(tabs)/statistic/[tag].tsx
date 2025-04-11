@@ -126,7 +126,7 @@ export default function TagStatisticPage() {
     const handleContinueWithTag = () => {
         if (typeof tag === 'string') {
             dispatch(setTag(tag))
-            router.push('/');
+            router.navigate('/')
         }
     }
 

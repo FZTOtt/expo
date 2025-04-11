@@ -116,59 +116,6 @@ const tags1: TagStatisticProps[] = [
 
 const Statistic = () => {
 
-    // const { width: screenWidth } = useWindowDimensions();
-
-    // const getNumColumns = useCallback(() => {
-    //     if (Platform.OS === 'web') {
-    //       if (screenWidth > 1024) return 4;
-    //       if (screenWidth > 768) return 3;
-    //       return 2;
-    //     }
-    //     return screenWidth > 600 ? 3 : 2;
-    //   }, [screenWidth]);
-
-    // const numColumns = useMemo(getNumColumns, [getNumColumns]);
-
-    // const renderItem = ({ item }: { item: { tag: string} }) => {
-
-    //     return (
-    //         <TouchableOpacity style={[styles.tagWrapper,
-    //             { width: `${100 / numColumns}%` as `${number}%` }                
-    //         ]}
-    //         onPress={() => router.push({
-    //             pathname: "/statistic/[tag]",
-    //             params: { tag: item.tag }
-    //           })}>
-    //             <TagStatistic tag={item.tag} />
-    //         </TouchableOpacity>
-    //     );
-    // };
-
-    // return (
-    //     <View>
-    //         <BackButton/>
-    //         {/* <View style={styles.tagsGrid}>
-    //             <TagStatistic tag='Автомобили' accuracy={58}></TagStatistic>
-    //             {tags.map((tag, index) => (
-
-    //                 <TagStatistic 
-    //                     // key={index},
-    //                     tag={tag.tag}
-    //                 />
-    //             ))}
-    //         </View> */}
-    //         <FlatList
-    //             key={numColumns}
-    //             data={tags}
-    //             renderItem={renderItem}
-    //             keyExtractor={(item, index) => index.toString()}
-    //             numColumns={numColumns}
-    //             contentContainerStyle={styles.listContent}
-    //             columnWrapperStyle={styles.columnWrapper}
-    //         />
-    //     </View>
-    // )
-
     const [tags, setTags] = useState<TagStatisticProps[]>()
 
     useEffect(() => {

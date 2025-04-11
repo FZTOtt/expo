@@ -1,3 +1,4 @@
+import { Platform } from "react-native";
 import { postRequest, getRequest } from "./ajax";
 
 const API_BASE_URL = "https://ouzistudy.ru/api";
@@ -6,13 +7,33 @@ const API_BASE_URL = "https://ouzistudy.ru/api";
 /*
     Запрос для распознавания аудио
 */
-export const translateAudio = async (audioBlob: Blob | any): Promise<[number, any]> => {
+// export const translateAudio = async (audioBlob: Blob | any): Promise<[number, any]> => {
+//     const formData = new FormData();
+//     formData.append("file", audioBlob, "recording.wav");
+//     console.log('FormData content:', formData.get('file'));
+//     const headers = {
+//         // "Content-Type": "audio/wav",
+//     }
+  
+//     return postRequest(`${API_BASE_URL}/audio/translate_audio`, formData, headers);
+// };
+
+export const translateAudio = async (audioData: string | Blob): Promise<[number, any]> => {
     const formData = new FormData();
-    formData.append("file", audioBlob, "recording.wav");
-    console.log('FormData content:', formData.get('file'));
-    const headers = {
-        // "Content-Type": "audio/wav",
+    
+    if (typeof audioData === 'string') {
+        const filename = audioData.split('/').pop() || 'audio.wav';
+        formData.append('file', {
+            uri: audioData,
+            name: filename,
+            type: 'audio/wav'
+        } as any);
+    } else {
+    formData.append('file', audioData, 'audio.wav');
     }
+    const headers: Record<string, string> = Platform.OS === 'web' ? {} : {
+        'Content-Type': 'multipart/form-data'
+    };
   
     return postRequest(`${API_BASE_URL}/audio/translate_audio`, formData, headers);
 };
