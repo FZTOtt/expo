@@ -76,6 +76,11 @@ export default function TagStatisticPage() {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
+        console.log('MOUNTED Component tags');
+        return () => console.log('UNMOUNTED Component tags');
+        }, []);
+
+    useEffect(() => {
 
         const getWordStatistic = async (id: number) => {
             try {

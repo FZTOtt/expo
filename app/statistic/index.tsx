@@ -114,9 +114,14 @@ const tags1: TagStatisticProps[] = [
     },
 ]
 
-const Statistic = () => {
+const StatisticPage = () => {
 
     const [tags, setTags] = useState<TagStatisticProps[]>()
+
+    useEffect(() => {
+        console.log('MOUNTED Component Statistic');
+        return () => console.log('UNMOUNTED Component Statistic');
+        }, []);
 
     useEffect(() => {
         const fetchTags = async () => {
@@ -188,4 +193,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Statistic;
+export default StatisticPage;
