@@ -58,6 +58,12 @@ const Manage = () => {
             dispatch(setTargetAudioUrl(url));
         } else {
             console.error('Ошибка в запросе fetchRandomWord', response);
+            const targetWord: TargetWord = {
+                'targetWord': 'hello',
+                'targetTranscription': 'prɪˌsɪpɪˈteɪʃən',
+                'wordId': 1
+            }
+            dispatch(setTargetWord(targetWord));
         }
     }
 
