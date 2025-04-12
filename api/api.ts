@@ -31,18 +31,15 @@ export const getPhonemeReference = async (phoneme: string): Promise<[number, any
     console.log(`[API] Запрос подсказки для фонемы: "${phoneme}"`);
     const data = JSON.stringify({ phonema: phoneme})
     
-    await new Promise(resolve => setTimeout(resolve, 300));
+    return postRequest(`${API_BASE_URL}/tip/get_tip`, data)
 
-    if (phoneme === 'p') {
-        return postRequest(`${API_BASE_URL}/tip/get_tip`, data)
-    }
 
-    return [200, {
-            phonema: `${phoneme}`,
-            tipText: 'adsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
-            tipAudio: '',
-            tipPicture: ''
-    }]
+    // return [200, {
+    //         phonema: `${phoneme}`,
+    //         tipText: 'adsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+    //         tipAudio: '',
+    //         tipPicture: ''
+    // }]
 }
 
 /*

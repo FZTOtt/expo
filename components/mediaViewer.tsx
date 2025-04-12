@@ -178,6 +178,6 @@ const styles = StyleSheet.create({
         // Для Android нужно добавить alignSelf: 'center'
         alignSelf: 'center',
     },
-  });
+});
   
-  export default MediaViewer;
+export default MediaViewer;

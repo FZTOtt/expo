@@ -5,7 +5,7 @@ import { RootState } from '@/redux/store';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Platform } from 'react-native';
 import AudioPlayer from './audioPlayer';
-import MediaViewer from './mediadViewer';
+import MediaViewer from './mediaViewer';
 
 interface PhonemeInfo {
     symbol: string;
