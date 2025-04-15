@@ -1,17 +1,16 @@
-import { Stack } from "expo-router";
-import './globals.css';
+import { Slot, Stack } from "expo-router";
+import React from "react";
+// import './globals.css';
 import Navbar from "@/components/navbar";
-import { Provider } from "react-redux";
+import { Provider as ReduxProvider } from "react-redux";
+import { Provider as PaperProvider } from "react-native-paper";
 import store from "@/redux/store";
 
 export default function RootLayout() {
-  return <Provider store={store}>
-        <Stack 
-        screenOptions={{
-            header: () => <Navbar />,
-        }}
-        >
-        {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
-      </Stack>
-    </Provider>
+  return <ReduxProvider store={store}>
+        <PaperProvider>
+            <Navbar />
+            <Slot />
+        </PaperProvider>
+    </ReduxProvider>
 }

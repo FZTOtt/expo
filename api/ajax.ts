@@ -1,6 +1,5 @@
 export const getRequestFormData = async (url:string): Promise<[number, any]> => {
     try {
-        // console.log('get')
         const response = await fetch(url, {
             method: 'GET',
             mode: 'cors',
@@ -17,7 +16,6 @@ export const getRequestFormData = async (url:string): Promise<[number, any]> => 
         return [response.status, { text, audioBlob }];
 
     } catch (error) {
-        console.error('error', error)
         return [500, error];
     }
 };
@@ -38,7 +36,6 @@ export const postRequest = async (
         });
 
         if (!response.ok) {
-            console.log(response)
             if (response.status === 504) {
                 return [response.status, { error: "Сервер недоступен, попробуйте позже" }];
             }
@@ -48,7 +45,6 @@ export const postRequest = async (
         const body = await response.json();
         return [response.status, body.payload];
     } catch (error) {
-        console.error('error', error)
         return [500, { error: "Сервер недоступен" }];
     }
 };

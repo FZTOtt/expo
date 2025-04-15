@@ -3,10 +3,16 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Audio } from 'expo-av';
 import { RootState } from '@/redux/store';
 import { useAppSelector } from '@/hooks/useAppSelector';
+import Regerence from '@/assets/icons/reference.svg';
+import { useAppDispatch } from '@/hooks';
+import { setVisible } from '@/redux/modal';
+import AudioPlayer from './audioPlayer';
 
 const Target = () => {
-    const { targetWord, isCorrect, targetAudioUrl, targetTranscription, wordId, sendStat } = useAppSelector((state: RootState) => state.translated);
+    const { targetWord, isCorrect, targetAudioUrl, targetTranscription } = useAppSelector((state: RootState) => state.translated);
+    const { isVisible } = useAppSelector((state: RootState) => state.modal);
     const [sound, setSound] = useState<Audio.Sound | null>(null);
+    const dispatch = useAppDispatch();
 
     // useEffect(() => {
     //     const fetchWord = async () => {
@@ -53,35 +59,20 @@ const Target = () => {
     //     // };
     // }, [])
 
-    async function playRecording() {
-        try {
-            if (targetAudioUrl) {
-                if (sound) {
-                    await sound.unloadAsync();
-                }
-                const { sound: newSound } = await Audio.Sound.createAsync(
-                    { uri: targetAudioUrl }
-                );
-                setSound(newSound);
-                await newSound.playAsync();
-                }
-        } catch (err) {
-            console.error('Failed to play recording', err);
-        }
+    function openReference() {
+        dispatch(setVisible(!isVisible))
     }
 
     return (
         <View style={styles.container}>
             <View style={styles.wordContainer}>
+                <TouchableOpacity style={styles.referenceButton} onPress={openReference}>
+                    <Regerence width={30} height={30}></Regerence>
+                </TouchableOpacity>
                 <Text style={[styles.word, isCorrect === null ? {} : isCorrect ? styles.wordCorrect : styles.wordIncorrect]}>
                     {targetWord ? targetWord.charAt(0).toUpperCase() + targetWord.slice(1) : ''}
                 </Text>
-                <TouchableOpacity style={styles.audioButton} onPress={playRecording}>
-                    <Image 
-                        source={require('../assets/icons/play_target_audio.jpg')} 
-                        style={styles.playButton}
-                    />
-                </TouchableOpacity>
+                <AudioPlayer buttonStyle={styles.audioButton} imgStyle={styles.playButton} audioUrl={targetAudioUrl}/>
             </View>
             <Text style={styles.transcription}>
                 {targetTranscription}
@@ -114,6 +105,12 @@ const styles = StyleSheet.create({
         position: 'absolute',
         height: 60,
         right: -40,
+        justifyContent: 'center',
+    },
+    referenceButton: {
+        position: 'absolute',
+        height: 60,
+        left: -40,
         justifyContent: 'center',
     },
     playButton: {

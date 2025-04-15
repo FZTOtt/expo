@@ -11,6 +11,7 @@ interface TranslatedState {
     tags: string;
     wordId: number;
     sendStat: boolean;
+    usersRecord: string | null;
 }
 
 const initialState: TranslatedState = {
@@ -22,7 +23,8 @@ const initialState: TranslatedState = {
     reloadWord: null,
     tags: '',
     wordId: -1,
-    sendStat: false
+    sendStat: false,
+    usersRecord: null
 }
 
 const translatedSlice = createSlice({
@@ -34,7 +36,6 @@ const translatedSlice = createSlice({
             state.isCorrect = null
             state.isCorrect = state.translatedAudio?.toLowerCase() === state.targetWord?.toLowerCase();
             state.sendStat = true;
-            console.log('setCorrect')
         },
         setTargetWord: (state, action: PayloadAction<TargetWord>) => {
             state.targetWord = action.payload.targetWord;
@@ -53,10 +54,12 @@ const translatedSlice = createSlice({
         },
         setSendStat: (state) => {
             state.sendStat = false
-            console.log(state.sendStat)
+        },
+        setUsersRecording: (state, action: PayloadAction<string | null>) => {
+            state.usersRecord = action.payload;
         }
     },
 });
 
-export const { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setReloadTargetWord, setTag, setSendStat } = translatedSlice.actions;
+export const { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setReloadTargetWord, setTag, setSendStat, setUsersRecording } = translatedSlice.actions;
 export default translatedSlice.reducer;
