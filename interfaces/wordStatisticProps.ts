@@ -1,6 +1,6 @@
 interface WordStatisticProps {
     word: string,
-    accuracy: number
+    completed: number
 }
 
 export default WordStatisticProps;
