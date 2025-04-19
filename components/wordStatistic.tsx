@@ -3,10 +3,10 @@ import WordStatisticProps from "@/interfaces/wordStatisticProps";
 import { setReloadTargetWord } from "@/redux/translated";
 import { router } from "expo-router";
 import React from "react";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 
-const WordStatistic = ({word, accuracy}: WordStatisticProps) => {
+const WordStatistic = ({word, completed}: WordStatisticProps) => {
 
     const dispatch = useAppDispatch();
     
@@ -15,12 +15,9 @@ const WordStatistic = ({word, accuracy}: WordStatisticProps) => {
         router.push('/');
     };
     return(
-        <TouchableOpacity style={styles.container} onPress = {handlePress}>
+        <TouchableOpacity style={[styles.container, completed == 1 ? styles.completed : completed == -1 ? styles.passed : '']} onPress = {handlePress}>
             <Text>
                 {word}
-            </Text>
-            <Text>
-                {accuracy}%
             </Text>
         </TouchableOpacity>
     )
@@ -32,11 +29,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         borderRadius: 5,
-        borderColor: '#000',
         borderWidth: 1,
         paddingVertical: 10,
         paddingHorizontal: 15
     },
+    completed: {
+        borderColor: 'green',
+    },
+    passed: {
+        borderColor: 'red',
+    }
 })
 
 export default WordStatistic;

@@ -20,7 +20,7 @@ const GridTable = <T,>({
   
     const numColumns = useMemo(() => {
       if (Platform.OS === 'web') {
-        if (screenWidth > 1024) return Math.min(4, maxColumns);
+        if (screenWidth > 1024) return Math.min(7, maxColumns);
         if (screenWidth > 768) return Math.min(3, maxColumns);
         return Math.min(2, maxColumns);
       }

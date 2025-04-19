@@ -1,4 +1,8 @@
-interface TagStatisticProps {
+import { ImageSourcePropType } from "react-native";
+
+export interface TagStatisticProps {
     tag: string;
-    // accuracy: number;
+    completedCount: number;
+    totalCount: number;
+    backgroundImage: ImageSourcePropType;
 }

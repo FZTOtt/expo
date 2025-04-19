@@ -1,9 +1,7 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Audio } from 'expo-av';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { RootState } from '@/redux/store';
 import { useAppSelector } from '@/hooks/useAppSelector';
-import Regerence from '@/assets/icons/reference.svg';
+import Reference from '@/assets/icons/reference.svg';
 import { useAppDispatch } from '@/hooks';
 import { setVisible } from '@/redux/modal';
 import AudioPlayer from './audioPlayer';
@@ -11,53 +9,7 @@ import AudioPlayer from './audioPlayer';
 const Target = () => {
     const { targetWord, isCorrect, targetAudioUrl, targetTranscription } = useAppSelector((state: RootState) => state.translated);
     const { isVisible } = useAppSelector((state: RootState) => state.modal);
-    const [sound, setSound] = useState<Audio.Sound | null>(null);
     const dispatch = useAppDispatch();
-
-    // useEffect(() => {
-    //     const fetchWord = async () => {
-    //         console.log('fetchWord')
-    //         try {
-    //             const response = await fetch('https://ouzistudy.ru/api/word/get_word/hello')
-    //             // const ans = await response.formData()
-    //             // dispatch(setTargetWord(ans.get('word') as string));
-                
-    //         } catch (err) {
-    //             console.error('Failed to fetch word', err);
-    //         }
-    //         console.log('end fetch')
-    //     }
-    //     // fetchWord()
-
-    //     const loadAudio = async () => {
-    //         const audioUrl = 'http://178.57.244.113:5000/audio';
-
-    //         const { sound } = await Audio.Sound.createAsync(
-    //             { uri: audioUrl }
-    //         );
-
-    //         setSound(sound);
-    //     };
-
-    //     // loadAudio();
-
-    //     return () => {
-    //         if (sound) {
-    //             sound.unloadAsync();
-    //         }
-    //     };
-
-    //     // const togglePlayback = async () => {
-    //     //     if (sound) {
-    //     //         if (isPlaying) {
-    //     //             await sound.stopAsync();
-    //     //         } else {
-    //     //             await sound.playAsync();
-    //     //         }
-    //     //         setIsPlaying(!isPlaying);
-    //     //     }
-    //     // };
-    // }, [])
 
     function openReference() {
         dispatch(setVisible(!isVisible))
@@ -67,7 +19,7 @@ const Target = () => {
         <View style={styles.container}>
             <View style={styles.wordContainer}>
                 <TouchableOpacity style={styles.referenceButton} onPress={openReference}>
-                    <Regerence width={30} height={30}></Regerence>
+                    <Reference width={30} height={30}></Reference>
                 </TouchableOpacity>
                 <Text style={[styles.word, isCorrect === null ? {} : isCorrect ? styles.wordCorrect : styles.wordIncorrect]}>
                     {targetWord ? targetWord.charAt(0).toUpperCase() + targetWord.slice(1) : ''}

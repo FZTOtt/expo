@@ -58,12 +58,6 @@ const Manage = () => {
             dispatch(setTargetAudioUrl(url));
         } else {
             console.error('Ошибка в запросе fetchRandomWord', response);
-            const targetWord: TargetWord = {
-                'targetWord': 'hello',
-                'targetTranscription': 'prɪˌsɪpɪˈteɪʃən',
-                'wordId': 1
-            }
-            dispatch(setTargetWord(targetWord));
         }
     }
 
@@ -103,16 +97,7 @@ const Manage = () => {
                 <TouchableOpacity style={styles.button} onPress={playRecording}>
                     <Image source={ usersRecord ? playOwnActive : playOwnPassive} style={styles.icon} />
                 </TouchableOpacity>
-                {/* <IconButton
-                    icon={() => (
-                        <View style={{ width: 60, height: 60 }}>
-                          {usersRecord ? playOwnPassive : playOwnActive}
-                        </View>
-                      )}
-                    size={100}
-                    onPress={playRecording}
-                    style={styles.button}
-                /> */}
+                
                 <AudioRecorder onState={MicOn} offState={MicOff} size={90} onRecordComplete={handleRecordingComplete}></AudioRecorder>
                 
                 <TouchableOpacity style={[styles.button, styles.disabledButton]} onPress={handleNextWord}>
@@ -121,14 +106,6 @@ const Manage = () => {
 
                 
             </View >
-            
-            {/* <View style={styles.textContainer}>
-                {translatedAudio ? 
-                    <Text style={styles.recognizedText}>Распознано {translatedAudio}</Text>
-                    :
-                    <Text style={styles.recognizedText}>{isRecording ? 'Нажмите для остановки записи':'Нажмите для записи'}</Text>
-                    }
-            </View> */}
         </View>
     );
 }

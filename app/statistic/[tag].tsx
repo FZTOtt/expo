@@ -12,51 +12,51 @@ import { setTag } from '@/redux/translated';
 const words1: WordStatisticProps[] = [
     {
         word: 'aa',
-        accuracy: 10
+        completed: 1
     },
     {
         word: 'aa',
-        accuracy: 10
+        completed: 0
     },
     {
         word: 'aa',
-        accuracy: 10
+        completed: 1
     },
     {
         word: 'aa',
-        accuracy: 10
+        completed: 1
     },
     {
         word: 'aa',
-        accuracy: 10
+        completed: 1
     },
     {
         word: 'aa',
-        accuracy: 10
+        completed: 1
     },
     {
         word: 'aa',
-        accuracy: 10
+        completed: -1
     },
     {
         word: 'aa',
-        accuracy: 10
+        completed: -1
     },
     {
         word: 'aa',
-        accuracy: 10
+        completed: -1
     },
     {
         word: 'aa',
-        accuracy: 10
+        completed: -1
     },
     {
         word: 'aa',
-        accuracy: 10
+        completed: -1
     },
     {
         word: 'aa',
-        accuracy: 10
+        completed: -1
     },
 ]
 
@@ -65,7 +65,8 @@ interface TagWordInterface {
     tags: string,
     transcription: string,
     word: string,
-    word_id: number
+    word_id: number,
+    completed: number,
 }
 
 export default function TagStatisticPage() {
@@ -100,21 +101,10 @@ export default function TagStatisticPage() {
                     console.log(status, response)
                     const parsedWords = await Promise.all(
                         response.map(async (word: TagWordInterface) => {
-                            const stat = await getWordStatistic(word.word_id);
-                            const accuracy = stat 
-                                ? (stat.plus ?
-                                    stat.minus ?
-                                        Math.round(stat.plus / (stat.minus + stat.plus) * 100)
-                                        :
-                                        0
-                                    :
-                                    0
-                                )
-                                : 0;
                             
                             return {
                                 word: word.word,
-                                accuracy: accuracy
+                                completed: word.completed
                             };
                         })
                     );
@@ -147,8 +137,8 @@ export default function TagStatisticPage() {
                 { words &&
                     <GridTable
                         data={words}
-                        renderItem={({ word, accuracy }) => (
-                            <WordStatistic word={word} accuracy={accuracy} />
+                        renderItem={({ word, completed }) => (
+                            <WordStatistic word={word} completed={completed} />
                         )}
                         maxColumns={4}
                         itemSpacing={10}
