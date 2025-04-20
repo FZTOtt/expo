@@ -1,22 +1,57 @@
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { TagStatisticProps } from '@interfaces/tagStatisticProps';
+import { Circle, G, Svg } from "react-native-svg";
 
-const TagStatistic = ({ tag, completedCount, totalCount, backgroundImage }: TagStatisticProps) => {
+const TagStatistic = (props: TagStatisticProps & { isStatistic?: boolean }) => {
 
-    const progress = completedCount / totalCount;
+    const { 
+        tag, 
+        completedCount, 
+        totalCount, 
+        backgroundImage,
+        isStatistic = true 
+    } = props;
 
-    // Цвета тени: от серого к зелёному
-    const shadowColors: [string, string] = [
-        `rgba(128, 128, 128, ${1 - progress})`, // Серый (уменьшается с прогрессом)
-        `rgba(0, 255, 0, ${progress})`, // Зелёный (увеличивается с прогрессом)
-    ];
+    const progress = totalCount > 0 ? (completedCount / totalCount) : 0;
+    const radius = 15;
+    const circumference = 2 * Math.PI * radius;
+    let strokeDashoffset = circumference - (progress * circumference) + 10;
+    // strokeDashoffset = 20
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, progress == 1 && isStatistic && styles.completeShadow]}>
             <View style={styles.imageContainer}>
                 <Image source={backgroundImage} style={styles.tagImage}/>
+                {isStatistic}
+
+                { isStatistic &&
+                    <View style={styles.progressRingContainer}>
+                        <Svg width={radius*2} height={radius*2}>
+                            <G rotation="-90" origin={`${radius}, ${radius}`}>
+                                <Circle
+                                    cx={radius}
+                                    cy={radius}
+                                    r={radius - 3}
+                                    stroke="#e0e0e0"
+                                    strokeWidth={3}
+                                    fill="transparent"
+                                />
+                                <Circle
+                                    cx={radius}
+                                    cy={radius}
+                                    r={radius - 3}
+                                    stroke="#4CAF50"
+                                    strokeWidth={3}
+                                    fill="transparent"
+                                    strokeDasharray={circumference}
+                                    strokeDashoffset={strokeDashoffset}
+                                    strokeLinecap="round"
+                                />
+                            </G>
+                        </Svg>
+                    </View>
+                }
             </View>
             <View style={styles.statistics}>
                 <Text style={styles.tag}>
@@ -41,22 +76,12 @@ const styles = StyleSheet.create({
         borderColor: '#000',
         borderWidth: 1,
         width: '100%',
+    },
+    completeShadow: {
         shadowColor: 'green',
         shadowOffset: {width: 0, height: 0},
         shadowOpacity: 1,
         shadowRadius: 20,
-    },
-    shadowContainer: {
-        position: "relative",
-        marginBottom: 10,
-    },
-    shadow: {
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        borderRadius: 10, // Радиус тени
     },
     tag: {
         fontSize: 16,
@@ -78,7 +103,17 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         width: '100%',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        position: 'relative'
+    },
+    progressRingContainer: {
+        position: 'absolute',
+        top: 10,
+        left: 10,
+        zIndex: 1,
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: 15,
+        padding: 3,
     },
     statistics: {
         display: 'flex',

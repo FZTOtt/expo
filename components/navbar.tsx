@@ -3,28 +3,11 @@ import { View, StyleSheet } from 'react-native';
 
 const Navbar = () => {
 
-    // useEffect(() => {
-    //     const checkNetwork = async () => {
-    //         try {
-    //             console.log('try network');
-    //             const [response, payload] = await getWord('hello');
-                
-    //             console.log(response, payload)
-    //         } catch (error) {
-    //             console.error('ошибка в checkNetwork:', error);
-    //         }
-    //     };
-
-    //     checkNetwork();
-        
-    // }, []);
-
-    
-
     return (
         <View style={styles.navbar}>
-            <Link href="/" style={styles.logo}>OUZI</Link>
             <Link href="/statistic" style={styles.link}>Статистика</Link>
+            <Link href="/" style={styles.logo}>OUZI</Link>
+            <Link href="/themes" style={styles.link}>Темы</Link>
         </View>
     )
 }
@@ -33,9 +16,12 @@ const styles = StyleSheet.create({
     navbar: {
         width: '100%',
         height: 60,
+        display: 'flex',
+        flexDirection: 'row',
         backgroundColor: '#555',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         alignItems: 'center',
+        paddingHorizontal: 20,
     },
     logo: {
         color: '#fff',
@@ -46,8 +32,8 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 14,
         fontWeight: 'bold',
-        position: 'absolute',
-        left: 20,
+        // position: 'absolute',
+        // left: 20,
     }
 });
 

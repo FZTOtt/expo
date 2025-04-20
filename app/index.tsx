@@ -1,5 +1,6 @@
 import Manage from "@/components/manage";
 import ReferenceModal from "@/components/referenceModal";
+import StatusBar from "@/components/statusBar";
 import TagFilter from "@/components/tagFilter";
 import Target from "@/components/target";
 import { useEffect, useState } from "react";
@@ -17,6 +18,7 @@ export default function Index() {
 
     return (
         <View style={[styles.container, { paddingTop }]}>
+            <StatusBar style={styles.status}/>
             <TagFilter/>
             <Target />
             <Manage />
@@ -27,11 +29,16 @@ export default function Index() {
 
 const styles = StyleSheet.create({
     container: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    gap: 300,
-    backgroundColor: '#fff',
-    position: 'relative'
+        flex: 1,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        gap: 300,
+        backgroundColor: '#fff',
+        position: 'relative'
+    },
+    status: {
+        position: 'absolute',
+        top: 10,
+        borderRadius: 7
     },
 });
