@@ -9,6 +9,8 @@ interface TranslatedState {
     targetAudioUrl: string | null;
     reloadWord: string | null;
     tags: string;
+    completedWords: number | null;
+    totalWords: number | null;
     wordId: number;
     sendStat: boolean;
     usersRecord: string | null;
@@ -22,6 +24,8 @@ const initialState: TranslatedState = {
     targetAudioUrl: null,
     reloadWord: null,
     tags: '',
+    completedWords: null,
+    totalWords: null,
     wordId: -1,
     sendStat: false,
     usersRecord: null

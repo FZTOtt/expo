@@ -7,7 +7,7 @@ interface StatusBarProps {
     style?: object;
   }
 
-const StatusBar = ({ current=10, goal=30, style }: StatusBarProps) => {
+const StatusBar = ({ current=15, goal=30, style }: StatusBarProps) => {
 
     const progress = Math.min(current / goal, 1);
     const progressPercent = `${progress * 100}%`;
@@ -37,7 +37,6 @@ const styles = StyleSheet.create({
     },
     backgroundBar: {
       height: 28,
-      width: 1000,
       backgroundColor: 'white',
       borderRadius: 5,
       overflow: 'hidden',
@@ -56,7 +55,6 @@ const styles = StyleSheet.create({
     progressText: {
       fontSize: 14,
       fontWeight: 'bold',
-      color: '#333',
     },
 });
 
