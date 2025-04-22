@@ -50,7 +50,7 @@ const translatedSlice = createSlice({
         setTargetAudioUrl: (state, action: PayloadAction<string>) => {
             state.targetAudioUrl = action.payload;
         },
-        setReloadTargetWord: (state, action: PayloadAction<string>) => {
+        setReloadTargetWord: (state, action: PayloadAction<string | null>) => {
             state.reloadWord = action.payload
         },
         setTag: (state, action: PayloadAction<string>) => {
@@ -61,9 +61,13 @@ const translatedSlice = createSlice({
         },
         setUsersRecording: (state, action: PayloadAction<string | null>) => {
             state.usersRecord = action.payload;
+        },
+        setTopicStatistic: (state, action) => {
+            state.completedWords = action.payload.complitedWords;
+            state.totalWords = action.payload.totalWords;
         }
     },
 });
 
-export const { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setReloadTargetWord, setTag, setSendStat, setUsersRecording } = translatedSlice.actions;
+export const { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setReloadTargetWord, setTag, setSendStat, setUsersRecording, setTopicStatistic } = translatedSlice.actions;
 export default translatedSlice.reducer;

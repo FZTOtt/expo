@@ -1,31 +1,36 @@
+import { useAppSelector } from "@/hooks";
+import { RootState } from "@/redux/store";
 import React from "react"
 import { View, StyleSheet, Text } from "react-native"
 
 interface StatusBarProps {
-    current?: number;
-    goal?: number;
     style?: object;
   }
 
-const StatusBar = ({ current=15, goal=30, style }: StatusBarProps) => {
+const StatusBar = ({ style }: StatusBarProps) => {
 
-    const progress = Math.min(current / goal, 1);
-    const progressPercent = `${progress * 100}%`;
-    
-    return (
-        <View style={[styles.container, style]}>
-            <View style={styles.backgroundBar}>
-                <View style={[styles.progressBar, { width: progressPercent }]} />
-            </View>
-            
-            {/* Текст с прогрессом по центру */}
-            <View style={styles.textContainer}>
-                <Text style={styles.progressText}>
-                    {current}/{goal}
-                </Text>
-            </View>
-      </View>
-    )
+    const { completedWords, totalWords } = useAppSelector((state: RootState) => state.translated);
+    if (!completedWords && !totalWords) {
+      return null
+    } else {
+      const progress = Math.min(completedWords / totalWords, 1);
+      const progressPercent = `${progress * 100}%`;
+      
+      return (
+          <View style={[styles.container, style]}>
+              <View style={styles.backgroundBar}>
+                  <View style={[styles.progressBar, { width: progressPercent }]} />
+              </View>
+              
+              <View style={styles.textContainer}>
+                  <Text style={styles.progressText}>
+                      {completedWords}/{totalWords}
+                  </Text>
+              </View>
+        </View>
+      )
+    }
+
 }
 
 const styles = StyleSheet.create({

@@ -1,6 +1,7 @@
+import { getAllTags } from "@/api/api";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { RootState } from "@/redux/store";
-import { setTag } from "@/redux/translated";
+import { setReloadTargetWord, setTag } from "@/redux/translated";
 import React from "react";
 import { TouchableOpacity, StyleSheet, Text, View, FlatList } from "react-native";
 
@@ -8,30 +9,32 @@ const TagFilter = () => {
     const { tags } = useAppSelector((state: RootState) => state.translated);
     const dispatch = useAppDispatch()
 
-    // const handleResetTags = () => {
-    //     dispatch(setTag(''))
-    // }
-
     const [isVisible, setIsVisible] = React.useState(false);
-    const [selectedTag, setSelectedTag] = React.useState('');
     const [allTags, setAllTags] = React.useState<string[]>([])
-
-    const [modalVisible, setModalVisible] = React.useState(false);
 
     const toggleDropdown = () => setIsVisible(!isVisible);
 
     const handleSelectTag = (tag: string) => {
-        setSelectedTag(tag);
         dispatch(setTag(tag));
+        dispatch(setReloadTargetWord(null));
         setIsVisible(false);
     };
 
-    const handleReset = () => {
-        setSelectedTag('');
-        dispatch(setTag(''));
-    };
     React.useEffect(() => {
+        const getTags = async () => {
+            const [status, response] = await getAllTags()
+            if (status === 200) {
+                const allTopics = response.topics.map((topic: any) => {
+                    return topic.topic
+                })
+                setAllTags(allTopics)
+            } else {
+                console.log('Error fetch all tags in tagFilter')
+            }
+            
+        } 
 
+        getTags()
     }, [])
 
     return (
@@ -52,6 +55,7 @@ const TagFilter = () => {
                                 onPress={() => {
                                     if (item === 'Сбросить тему') {
                                         handleSelectTag('');
+                                        // dispatch(setReloadTargetWord(null));
                                     } else {
                                         handleSelectTag(item);
                                     }
@@ -67,12 +71,6 @@ const TagFilter = () => {
                     />
                 </View>
             )}
-
-            {/* {selectedTag ? (
-                <TouchableOpacity onPress={handleReset} style={styles.resetButton}>
-                    <Text style={styles.resetText}>×</Text>
-                </TouchableOpacity>
-            ) : null} */}
         </View>
     )
 }

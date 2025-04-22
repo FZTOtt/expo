@@ -6,7 +6,7 @@ import { getRandomWord, getWord, translateAudio, writeStat } from '@/api/api';
 import MicOn from '@/assets/icons/micon.svg';
 import MicOff from '@/assets/icons/micoff.svg';
 import NextWord from '@/assets/icons/next_word.svg';
-import { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setSendStat, setReloadTargetWord } from '@redux/translated';
+import { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setSendStat, setReloadTargetWord, setTopicStatistic } from '@redux/translated';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { RootState } from '@/redux/store';
 import TargetWord from '@/interfaces/targetWord';
@@ -17,7 +17,7 @@ import playOwnPassive from '@/assets/images/play_own_passive.jpg';
 const Manage = () => {
 
     const dispatch = useAppDispatch();
-    const { targetWord, reloadWord, tags, usersRecord } = useAppSelector((state: RootState) => state.translated);
+    const { targetWord, reloadWord, tags, usersRecord, completedWords, totalWords } = useAppSelector((state: RootState) => state.translated);
     const [sound, setSound] = useState<Audio.Sound | null>(null);
 
     async function playRecording() {
@@ -46,16 +46,24 @@ const Manage = () => {
         }
         
         if (status === 200) {
-            let url = response.link;
+            let url = response.audio_link;
             url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
             url = url.replace(/&/g, '\\u0026');
             const targetWord: TargetWord = {
                 'targetWord': response.word,
                 'targetTranscription': response.transcription,
-                'wordId': response.word_id
+                'wordId': response.id
             }
             dispatch(setTargetWord(targetWord));
             dispatch(setTargetAudioUrl(url));
+            if (!random) {
+                dispatch(setTopicStatistic({
+                    // complitedWords: response.true_words,
+                    // totalWords: response.all_words
+                    complitedWords: 5,
+                    totalWords: 10
+                }))
+            }
         } else {
             console.error('Ошибка в запросе fetchRandomWord', response);
         }
@@ -70,11 +78,11 @@ const Manage = () => {
         }
     }
 
-    useEffect(() => {
-        if (!targetWord) {
-            fetchRandomWord(tags)
-        }
-    })
+    // useEffect(() => {
+    //     if (!targetWord) {
+    //         fetchRandomWord(tags)
+    //     }
+    // }, [tags])
 
     useEffect(() => {
         console.log('MOUNTED Component');
@@ -84,8 +92,10 @@ const Manage = () => {
     useEffect(() => {
         if (reloadWord) {
             fetchRandomWord(reloadWord, false)
+        } else {
+            fetchRandomWord(tags)
         }
-    }, [reloadWord])
+    }, [reloadWord, tags])
 
     function handleNextWord() {
         fetchRandomWord(tags)

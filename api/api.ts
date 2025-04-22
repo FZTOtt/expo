@@ -33,13 +33,6 @@ export const getPhonemeReference = async (phoneme: string): Promise<[number, any
     
     return postRequest(`${API_BASE_URL}/tip/get_tip`, data)
 
-
-    // return [200, {
-    //         phonema: `${phoneme}`,
-    //         tipText: 'adsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
-    //         tipAudio: '',
-    //         tipPicture: ''
-    // }]
 }
 
 /*
@@ -68,7 +61,7 @@ export const getRandomWord = async (tags: string): Promise<[number, any]> => {
 */
 export const getAllTags = async () => {
 
-    return getRequest(`${API_BASE_URL}/word/get_tags`)
+    return getRequest(`${API_BASE_URL}/topic/all_topics`)
 }
 
 /*
@@ -76,9 +69,9 @@ export const getAllTags = async () => {
 */
 export const getWordsWithTags = async (tag: string): Promise<[number, any]> => {
 
-    const data = JSON.stringify({ tag: tag })
+    const data = JSON.stringify({ topic: tag })
 
-    return postRequest(`${API_BASE_URL}/word/words_with_tag`, data)
+    return postRequest(`${API_BASE_URL}/word/words_with_topic`, data)
 }
 
 /* 

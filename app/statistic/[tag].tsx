@@ -61,12 +61,12 @@ const words1: WordStatisticProps[] = [
 ]
 
 interface TagWordInterface {
-    link: string,
-    tags: string,
+    audio_link: string,
+    id: number,
+    progress: number,
+    topic: string,
     transcription: string,
     word: string,
-    word_id: number,
-    completed: number,
 }
 
 export default function TagStatisticPage() {
@@ -99,15 +99,13 @@ export default function TagStatisticPage() {
                 try {
                     const [status, response] = await getWordsWithTags(tag);
                     console.log(status, response)
-                    const parsedWords = await Promise.all(
-                        response.map(async (word: TagWordInterface) => {
-                            
-                            return {
-                                word: word.word,
-                                completed: word.completed
-                            };
-                        })
-                    );
+                    const parsedWords = response.map((word: TagWordInterface) => {
+                        console.log(word)
+                        return {
+                            word: word.word,
+                            completed: word.progress
+                        };
+                    })
                     console.log('статистика', parsedWords)
                     setWords(parsedWords)
                 } catch(error){

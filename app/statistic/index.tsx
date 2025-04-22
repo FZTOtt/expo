@@ -233,9 +233,15 @@ const StatisticPage = () => {
             try {
                 const [status, response] = await getAllTags();
                 console.log(status, response)
-                const parsedTags = response.tags.map( (tag: string) => {
-                    const pasrName = tag.split(',')
-                    return { tag: pasrName[1].replace(/\)/g, '')}
+                const parsedTags = response.topics.map( (topic: any) => {
+                    // console.log(topic)
+                    // const pasrName = topic.topic.split(' ')
+                    // tag: pasrName[1].replace(/\)/g, '')
+                    return { tag: topic.topic,
+                        completedCount: topic.true_words,
+                        totalCount: topic.all_words,
+                        backgroundImage: exampleTag
+                    }
                 })
                 console.log(parsedTags)
                 setTags(parsedTags)
