@@ -4,7 +4,7 @@ import { postRequest, getRequest } from "./ajax";
 const API_BASE_URL = "https://ouzistudy.ru/api";
 // localhost:8080
 
-export const translateAudio = async (audioData: string | Blob): Promise<[number, any]> => {
+export const translateAudio = async (audioData: string | Blob, word: boolean = true): Promise<[number, any]> => {
     const formData = new FormData();
     
     if (typeof audioData === 'string') {
@@ -22,7 +22,12 @@ export const translateAudio = async (audioData: string | Blob): Promise<[number,
     };
     
     // return postRequest(`${API_BASE_URL}/audio/translate_audio`, formData, headers);
-    return postRequest(`http://localhost:3001/audio/translate_audio`, formData, headers);
+    if (word) {
+        return postRequest(`http://localhost:3001/audio/translate_audio_word`, formData, headers);
+    } else {
+        return postRequest(`http://localhost:3001/audio/translate_audio_phoneme`, formData, headers);      
+    }
+
 };
 
 /*
@@ -91,4 +96,14 @@ export const writeStat = async (reqData: {"id": number, "plus": number, "minus":
     const data = JSON.stringify(reqData)
 
     return postRequest(`${API_BASE_URL}/word/stat/write_stat`, data)
+}
+
+export const getPhoneme = async (): Promise<[number, any]> => {
+
+    return getRequest(`http://localhost:3001/node/random_phoneme`)
+}
+
+export const getWordNode = async (): Promise<[number, any]> => {
+
+    return getRequest(`http://localhost:3001/word/random`)
 }

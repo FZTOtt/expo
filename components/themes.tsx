@@ -4,13 +4,17 @@ import { TouchableOpacity, View, StyleSheet } from "react-native";
 import GridTable from "./gridTable";
 import { router } from "expo-router";
 import TagStatistic from "./tagStatistic";
+import { useAppDispatch } from "@/hooks";
+import { setTag } from "@/redux/translated";
 
 interface ThemesProps {
     tags: TagStatisticProps[];
     isStatistic: boolean;
 }
 
+
 const Themes = ({tags, isStatistic}: ThemesProps) => {
+    const dispatch = useAppDispatch()
     return (
         <>
             {tags &&
@@ -21,7 +25,10 @@ const Themes = ({tags, isStatistic}: ThemesProps) => {
 
                         return (
                             <TouchableOpacity 
-                                onPress={() => router.push({ pathname: "/statistic/[tag]", params: { tag: cleanTag } })}
+                                onPress={() => {
+                                    dispatch(setTag(cleanTag))
+                                    router.navigate('/')
+                                }}
                                 style={styles.tagWrapper}
                             >
                                 <TagStatistic tag={cleanTag} completedCount={tag.completedCount} 

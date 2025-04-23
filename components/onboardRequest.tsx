@@ -1,5 +1,8 @@
 import { useAppDispatch, useAppSelector } from '@/hooks';
+import { setOnboarding, setRequestOnboard } from '@/redux/onboard';
 import { RootState } from '@/redux/store';
+import { setReloadTargetWord } from '@/redux/translated';
+import { router } from 'expo-router';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
 
 const OnboardRequest = () => {
@@ -8,23 +11,34 @@ const OnboardRequest = () => {
     if (!requestOnboard) {
         return null
     }
+
+    const rejectOnboard = () => {
+        dispatch(setRequestOnboard(false))
+    }
+
+    const acceptOnboard = () => {
+        dispatch(setRequestOnboard(false))
+        dispatch(setReloadTargetWord('hello'))
+        dispatch(setOnboarding(true))
+        router.navigate('/onboarding')
+    }
     return (
         <View style={styles.container}>
             <View style={styles.requestContainer}>
-                <Text>
+                <Text style={{fontSize: 20}}>
                     Впервые на сайте?
                 </Text>
-                <Text>
+                <Text style={{fontSize: 20}}>
                     Пройдите обучение!
                 </Text>
             </View>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.rejectButton}>
-                    <Text >
-                        не  
+                    <Text style={styles.rejectText} onPress={rejectOnboard}>
+                        Нет 
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.acceptButton}>
+                <TouchableOpacity style={styles.acceptButton} onPress={acceptOnboard}>
                     <Text style={styles.acceptText}>
                         Да!
                     </Text>
@@ -61,15 +75,20 @@ const styles = StyleSheet.create({
         borderRadius: 5
     },
     acceptText: {
-        fontSize: 16,
+        fontSize: 20,
         color: 'white',
         fontWeight: '400'
     },
     rejectButton: {
         paddingHorizontal: 10,
         paddingVertical: 5,
-        fontSize: 16,
-        color: 'red'
+        backgroundColor: 'red',
+        borderRadius: 5
+    },
+    rejectText: {
+        fontSize: 20,
+        color: 'white',
+        fontWeight: '400'
     }
 })
 

@@ -7,6 +7,7 @@ import { TouchableOpacity, StyleSheet, Text, View, FlatList } from "react-native
 
 const TagFilter = () => {
     const { tags } = useAppSelector((state: RootState) => state.translated);
+    const { isOnboarding } = useAppSelector((state: RootState) => state.onboard)
     const dispatch = useAppDispatch()
 
     const [isVisible, setIsVisible] = React.useState(false);
@@ -38,7 +39,7 @@ const TagFilter = () => {
     }, [])
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, isOnboarding && {position: 'relative'}]}>
             <TouchableOpacity onPress={toggleDropdown} style={styles.dropdownHeader}>
                 <Text style={styles.headerText}>
                     {tags || 'Выбор Темы'}

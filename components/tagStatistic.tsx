@@ -57,9 +57,9 @@ const TagStatistic = (props: TagStatisticProps & { isStatistic?: boolean }) => {
                 <Text style={styles.tag}>
                     {tag}
                 </Text>
-                <Text style={styles.countText}>
+                {isStatistic && <Text style={styles.countText}>
                     {completedCount}/{totalCount}
-                </Text>
+                </Text>}
             </View>
         </View>
     )

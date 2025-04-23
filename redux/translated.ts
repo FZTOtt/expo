@@ -38,7 +38,11 @@ const translatedSlice = createSlice({
         setTranslatedAudio: (state, action: PayloadAction<string>) => {
             state.translatedAudio = action.payload;
             state.isCorrect = null
-            state.isCorrect = state.translatedAudio?.toLowerCase() === state.targetWord?.toLowerCase();
+            if (state.targetTranscription) {
+                console.log(state.targetTranscription.replace(/[ˈˌ]/g, ''), state.translatedAudio.replace(/[ˈˌ]/g, ''))
+                state.isCorrect = state.targetTranscription.replace(/[ˈˌ]/g, '') === 
+                 state.translatedAudio.replace(/[ˈˌ]/g, '');
+            }
             state.sendStat = true;
         },
         setTargetWord: (state, action: PayloadAction<TargetWord>) => {
