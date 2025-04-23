@@ -27,7 +27,7 @@ const OnboardingPage = () => {
         {
             target: 'Target',
             title: 'Целевое слово и подсказки',
-            description: 'Здесь будет отображаться слово, которое надо произнести и подсказки: справка, воспроизведение произношения слова, транскрипция',
+            description: 'Здесь отображаются слово, которое надо произнести и подсказки: справка, воспроизведение произношения слова, транскрипция. \nВ случае верного ответа целевое слово окрасится в зелёный, иначе - в красный.',
         },
         {
             target: 'Manage',
@@ -38,6 +38,11 @@ const OnboardingPage = () => {
             target: 'TagFilter',
             title: 'Темы',
             description: 'Фильтруйте слова по темам для удобного изучения',
+        },
+        {
+            target: 'ShowFinish',
+            title: 'Что делать?',
+            description: 'Сейчас вы попробуете произнести звуки. Как будете готовы перейти к словам - жмите кнопку. Удачи!',
         },
     ];
 
@@ -82,6 +87,10 @@ const OnboardingPage = () => {
                 {currentStepData.target === 'Target' && <Target />}
                 {currentStepData.target === 'Manage' && <Manage />}
                 {currentStepData.target === 'TagFilter' && <TagFilter />}
+                {currentStepData.target === 'ShowFinish' && 
+                    <TouchableOpacity style={styles.finishShow}>
+                        Завершить обучение
+                    </TouchableOpacity>}
             </View>
 
             {/* Подсказка */}
@@ -159,6 +168,17 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 40,
         bottom: 50,
+        fontSize: 20,
+        backgroundColor: 'green',
+        paddingVertical: 8,
+        paddingHorizontal: 15,
+        color: 'white',
+        borderRadius: 8
+    },
+    finishShow: {
+        // position: 'absolute',
+        // right: 40,
+        // bottom: 50,
         fontSize: 20,
         backgroundColor: 'green',
         paddingVertical: 8,
