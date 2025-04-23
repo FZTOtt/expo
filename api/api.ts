@@ -21,7 +21,8 @@ export const translateAudio = async (audioData: string | Blob): Promise<[number,
         'Content-Type': 'multipart/form-data'
     };
     
-    return postRequest(`${API_BASE_URL}/audio/translate_audio`, formData, headers);
+    // return postRequest(`${API_BASE_URL}/audio/translate_audio`, formData, headers);
+    return postRequest(`http://localhost:3001/audio/translate_audio`, formData, headers);
 };
 
 /*

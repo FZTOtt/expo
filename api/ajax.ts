@@ -30,7 +30,7 @@ export const postRequest = async (
         const response = await fetch(url, {
             method: "POST",
             mode: "cors",
-            credentials: "include",
+            // credentials: "include",
             headers: headers,
             body: data,
         });
