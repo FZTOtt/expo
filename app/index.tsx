@@ -1,4 +1,5 @@
 import Manage from "@/components/manage";
+import OnboardRequest from "@/components/onboardRequest";
 import ReferenceModal from "@/components/referenceModal";
 import StatusBar from "@/components/statusBar";
 import TagFilter from "@/components/tagFilter";
@@ -22,6 +23,7 @@ export default function Index() {
 
     return (
         <View style={[styles.container, { paddingTop }]}>
+            <OnboardRequest />
             {tags && <StatusBar style={styles.status}/>}
             <TagFilter/>
             <Target />
