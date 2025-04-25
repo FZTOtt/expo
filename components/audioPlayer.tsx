@@ -1,5 +1,4 @@
-import { useAppSelector } from "@/hooks";
-import { RootState } from "@/redux/store";
+
 import { Audio } from "expo-av";
 import React, { useState } from "react";
 import { TouchableOpacity, Image, StyleProp, ViewStyle, ImageStyle } from "react-native";

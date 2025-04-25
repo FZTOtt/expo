@@ -2,11 +2,11 @@ import { View, TouchableOpacity, StyleSheet, Image, Text, Platform } from 'react
 import { useEffect, useState } from 'react';
 import React from 'react';
 import { Audio } from 'expo-av';
-import { getRandomWord, getWord, translateAudio, writeStat } from '@/api/api';
+import { getPhoneme, getRandomWord, getWord, getWordNode, translateAudio, writeStat } from '@/api/api';
 import MicOn from '@/assets/icons/micon.svg';
 import MicOff from '@/assets/icons/micoff.svg';
 import NextWord from '@/assets/icons/next_word.svg';
-import { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setSendStat, setReloadTargetWord } from '@redux/translated';
+import { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setSendStat, setReloadTargetWord, setTopicStatistic, setTag } from '@redux/translated';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { RootState } from '@/redux/store';
 import TargetWord from '@/interfaces/targetWord';
@@ -17,7 +17,8 @@ import playOwnPassive from '@/assets/images/play_own_passive.jpg';
 const Manage = () => {
 
     const dispatch = useAppDispatch();
-    const { targetWord, reloadWord, tags, usersRecord } = useAppSelector((state: RootState) => state.translated);
+    const { reloadWord, tags, usersRecord, targetWord } = useAppSelector((state: RootState) => state.translated);
+    const { finished } = useAppSelector((state: RootState) => state.onboard);
     const [sound, setSound] = useState<Audio.Sound | null>(null);
 
     async function playRecording() {
@@ -46,13 +47,90 @@ const Manage = () => {
         }
         
         if (status === 200) {
-            let url = response.link;
+            let url = response.audio_link;
             url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
             url = url.replace(/&/g, '\\u0026');
             const targetWord: TargetWord = {
                 'targetWord': response.word,
                 'targetTranscription': response.transcription,
-                'wordId': response.word_id
+                'wordId': response.id
+            }
+            dispatch(setTargetWord(targetWord));
+            dispatch(setTargetAudioUrl(url));
+            if (!random) {
+                dispatch(setTopicStatistic({
+                    complitedWords: response.true_words,
+                    totalWords: response.all_words
+                    // complitedWords: 5,
+                    // totalWords: 10
+                }))
+                dispatch(setTag(tags))
+            }
+        } else {
+            console.error('Ошибка в запросе fetchRandomWord', response);
+        }
+
+        // if (!random) {
+        //     [status, response] = await getWord(tags);
+        //     if (status === 200) {
+        //         let url = response.audio_link;
+        //         url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
+        //         url = url.replace(/&/g, '\\u0026');
+        //         const targetWord: TargetWord = {
+        //             'targetWord': response.word,
+        //             'targetTranscription': response.transcription,
+        //             'wordId': response.id
+        //         }
+        //         dispatch(setTargetWord(targetWord));
+        //         dispatch(setTargetAudioUrl(url));
+        //         if (!random) {
+        //             dispatch(setTopicStatistic({
+        //                 // complitedWords: response.true_words,
+        //                 // totalWords: response.all_words
+        //                 complitedWords: 5,
+        //                 totalWords: 10
+        //             }))
+        //         }
+        //     } else {
+        //         console.error('Ошибка в запросе fetchRandomWord', response);
+        //     }
+        // } else {
+        //     [status, response] = await getWordNode();
+
+        //     if (status === 200) {
+        //         let url = response.audioUrl;
+        //         const targetWord: TargetWord = {
+        //             'targetWord': response.word,
+        //             'targetTranscription': response.transcription,
+        //             'wordId': 1
+        //         }
+        //         dispatch(setTargetWord(targetWord));
+        //         dispatch(setTargetAudioUrl(url));
+        //     } else {
+        //         console.error('Ошибка в запросе fetchRandomWord', response);
+        //     }            
+        // }
+    }
+
+    const handleRecordingComplete = async (audio: Blob | string) => {
+        const [status, response] = await translateAudio(audio, targetWord);
+        if (status === 200) {
+            dispatch(setTranslatedAudio(response.transcription));
+        } else {
+            console.error('Ошибка при запросе расшифровке аудио')
+        }
+    }
+
+    const fetchPhoneme = async () => {
+
+        const [status, response] = await getPhoneme()
+        
+        if (status === 200) {
+            let url = response.audioUrl;
+            const targetWord: TargetWord = {
+                'targetWord': response.phoneme,
+                'targetTranscription': response.phoneme,
+                'wordId': 1
             }
             dispatch(setTargetWord(targetWord));
             dispatch(setTargetAudioUrl(url));
@@ -61,31 +139,13 @@ const Manage = () => {
         }
     }
 
-    const handleRecordingComplete = async (audio: Blob | string) => {
-        const [status, response] = await translateAudio(audio);
-        if (status === 200) {
-            dispatch(setTranslatedAudio(response.transcription));
-        } else {
-            console.error('Ошибка при запросе расшифровке аудио')
-        }
-    }
-
-    useEffect(() => {
-        if (!targetWord) {
-            fetchRandomWord(tags)
-        }
-    })
-
-    useEffect(() => {
-        console.log('MOUNTED Component');
-        return () => console.log('UNMOUNTED Component');
-      }, []);
-
     useEffect(() => {
         if (reloadWord) {
             fetchRandomWord(reloadWord, false)
+        } else {
+            fetchRandomWord(tags)
         }
-    }, [reloadWord])
+    }, [reloadWord, tags])
 
     function handleNextWord() {
         fetchRandomWord(tags)

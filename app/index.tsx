@@ -1,11 +1,17 @@
 import Manage from "@/components/manage";
+import OnboardRequest from "@/components/onboardRequest";
 import ReferenceModal from "@/components/referenceModal";
+import StatusBar from "@/components/statusBar";
 import TagFilter from "@/components/tagFilter";
 import Target from "@/components/target";
-import { useEffect, useState } from "react";
-import { Text, View, StyleSheet, Dimensions } from "react-native";
+import { useAppSelector } from "@/hooks";
+import { RootState } from "@/redux/store";
+import { useEffect } from "react";
+import { View, StyleSheet, Dimensions } from "react-native";
 
 export default function Index() {
+
+    const { tags } = useAppSelector((state: RootState) => state.translated)
 
     useEffect(() => {
     console.log('MOUNTED Component index');
@@ -17,21 +23,31 @@ export default function Index() {
 
     return (
         <View style={[styles.container, { paddingTop }]}>
+            <OnboardRequest />
+            {tags && <StatusBar style={styles.status}/>}
             <TagFilter/>
             <Target />
             <Manage />
             <ReferenceModal />
         </View>
     );
-    }
+}
 
 const styles = StyleSheet.create({
     container: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    gap: 300,
-    backgroundColor: '#fff',
-    position: 'relative'
+        flex: 1,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        gap: 300,
+        backgroundColor: '#fff',
+        position: 'relative'
+    },
+    status: {
+        position: 'absolute',
+        top: '5%',
+        left: '5%',
+        width: '20%',
+        minWidth: 200,
+        borderRadius: 7
     },
 });

@@ -4,8 +4,10 @@ import { postRequest, getRequest } from "./ajax";
 const API_BASE_URL = "https://ouzistudy.ru/api";
 // localhost:8080
 
-export const translateAudio = async (audioData: string | Blob): Promise<[number, any]> => {
+export const translateAudio = async (audioData: string | Blob, word: string): Promise<[number, any]> => {
     const formData = new FormData();
+    
+    formData.append('word', word);
     
     if (typeof audioData === 'string') {
         const filename = audioData.split('/').pop() || 'audio.wav';
@@ -33,13 +35,6 @@ export const getPhonemeReference = async (phoneme: string): Promise<[number, any
     
     return postRequest(`${API_BASE_URL}/tip/get_tip`, data)
 
-
-    // return [200, {
-    //         phonema: `${phoneme}`,
-    //         tipText: 'adsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffadsfaaaaadaaaaaaaaaaaaaaaaaaaaaaaaaaafffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
-    //         tipAudio: '',
-    //         tipPicture: ''
-    // }]
 }
 
 /*
@@ -58,7 +53,7 @@ export const getRandomWord = async (tags: string): Promise<[number, any]> => {
     const headers = {
         // "Content-Type": "application/json",
     }
-    const data = JSON.stringify({ tag: tags })
+    const data = JSON.stringify({ topic: tags })
 
     return postRequest(`${API_BASE_URL}/word/rand/word`, data, headers)
 }
@@ -68,7 +63,7 @@ export const getRandomWord = async (tags: string): Promise<[number, any]> => {
 */
 export const getAllTags = async () => {
 
-    return getRequest(`${API_BASE_URL}/word/get_tags`)
+    return getRequest(`${API_BASE_URL}/topic/all_topics`)
 }
 
 /*
@@ -76,9 +71,9 @@ export const getAllTags = async () => {
 */
 export const getWordsWithTags = async (tag: string): Promise<[number, any]> => {
 
-    const data = JSON.stringify({ tag: tag })
+    const data = JSON.stringify({ topic: tag })
 
-    return postRequest(`${API_BASE_URL}/word/words_with_tag`, data)
+    return postRequest(`${API_BASE_URL}/word/words_with_topic`, data)
 }
 
 /* 
@@ -97,4 +92,14 @@ export const writeStat = async (reqData: {"id": number, "plus": number, "minus":
     const data = JSON.stringify(reqData)
 
     return postRequest(`${API_BASE_URL}/word/stat/write_stat`, data)
+}
+
+export const getPhoneme = async (): Promise<[number, any]> => {
+
+    return getRequest(`http://localhost:3001/node/random_phoneme`)
+}
+
+export const getWordNode = async (): Promise<[number, any]> => {
+
+    return getRequest(`http://localhost:3001/word/random`)
 }

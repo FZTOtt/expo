@@ -1,11 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import translatedReducer from "./translated";
 import modalReducer from './modal';
+import onboardReducer from './onboard';
 
 const store = configureStore({
     reducer: {
         translated: translatedReducer,
-        modal: modalReducer
+        modal: modalReducer,
+        onboard: onboardReducer,
     },
 });
 

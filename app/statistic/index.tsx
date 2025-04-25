@@ -1,229 +1,227 @@
 import { getAllTags } from "@/api/api";
 import BackButton from "@/components/backButton";
-import GridTable from "@/components/gridTable";
-import TagStatistic from "@/components/tagStatistic";
 import { TagStatisticProps } from "@/interfaces/tagStatisticProps";
-import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
-import ecampleTag from '@/assets/images/exampleTag.jpg';
+import { View, StyleSheet } from "react-native";
+import exampleTag from '@/assets/images/exampleTag.jpg';
+import Themes from "@/components/themes";
 
 const tags1: TagStatisticProps[] = [
     {
         tag: 'Автомобasdasdas b fdsfsdffd asdasda',
-        completedCount: 10,
+        completedCount: 30,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Квартира',
-        completedCount: 10,
+        completedCount: 20,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Дом',
-        completedCount: 10,
+        completedCount: 0,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Погода',
-        completedCount: 10,
+        completedCount: 15,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Улица',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Интерьер',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Метро',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Автомобили2',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Квартира',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Дом',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Погода',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Улица',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Интерьер',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Метро',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Автомобили3',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Квартира',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Дом',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Погода',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Улица',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Интерьер',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Метро',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Автомобили4',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Квартира',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Дом',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Погода',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Улица',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Интерьер',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Метро',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Автомобили5',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Квартира',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Дом',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Погода',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Улица',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Интерьер',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
     {
         tag: 'Метро',
         completedCount: 10,
         totalCount: 30,
-        backgroundImage: ecampleTag,
+        backgroundImage: exampleTag,
     },
 ]
 
 const StatisticPage = () => {
 
-    const [tags, setTags] = useState<TagStatisticProps[]>()
+    const [tags, setTags] = useState<TagStatisticProps[]>([])
 
     useEffect(() => {
         console.log('MOUNTED Component Statistic');
@@ -235,9 +233,15 @@ const StatisticPage = () => {
             try {
                 const [status, response] = await getAllTags();
                 console.log(status, response)
-                const parsedTags = response.tags.map( (tag: string) => {
-                    const pasrName = tag.split(',')
-                    return { tag: pasrName[1].replace(/\)/g, '')}
+                const parsedTags = response.topics.map( (topic: any) => {
+                    // console.log(topic)
+                    // const pasrName = topic.topic.split(' ')
+                    // tag: pasrName[1].replace(/\)/g, '')
+                    return { tag: topic.topic,
+                        completedCount: topic.true_words,
+                        totalCount: topic.all_words,
+                        backgroundImage: exampleTag
+                    }
                 })
                 console.log(parsedTags)
                 setTags(parsedTags)
@@ -252,45 +256,19 @@ const StatisticPage = () => {
     return (
         <View style={styles.container}>
             <BackButton/>
-            {tags &&
-                <GridTable
-                    data={tags1}
-                    renderItem={( tag ) => {
-                        const cleanTag = tag.tag.replace(/^"(.*)"$/, '$1');
-
-                        return (
-                            <TouchableOpacity 
-                                onPress={() => router.push({ pathname: "/statistic/[tag]", params: { tag: cleanTag } })}
-                                style={styles.tagWrapper}
-                            >
-                                <TagStatistic tag={cleanTag} completedCount={tag.completedCount} 
-                                totalCount={tag.totalCount} backgroundImage={tag.backgroundImage}/>
-                            </TouchableOpacity>
-                        )
-                    }}
-                    maxColumns={10}
-                    itemSpacing={10}
-                />
-            }
-            
+            <Themes tags={tags} isStatistic={true}/>
         </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        padding: 10,
+        margin: 10,
         flex: 1
-    },
-    columnWrapper: {
-        justifyContent: 'flex-start',
     },
     tagWrapper: {
         padding: 8
     },
-    emptyItem: {
-        opacity: 0,
-    }
 });
 
 export default StatisticPage;

@@ -61,12 +61,12 @@ const words1: WordStatisticProps[] = [
 ]
 
 interface TagWordInterface {
-    link: string,
-    tags: string,
+    audio_link: string,
+    id: number,
+    progress: number,
+    topic: string,
     transcription: string,
     word: string,
-    word_id: number,
-    completed: number,
 }
 
 export default function TagStatisticPage() {
@@ -99,15 +99,13 @@ export default function TagStatisticPage() {
                 try {
                     const [status, response] = await getWordsWithTags(tag);
                     console.log(status, response)
-                    const parsedWords = await Promise.all(
-                        response.map(async (word: TagWordInterface) => {
-                            
-                            return {
-                                word: word.word,
-                                completed: word.completed
-                            };
-                        })
-                    );
+                    const parsedWords = response.map((word: TagWordInterface) => {
+                        console.log(word)
+                        return {
+                            word: word.word,
+                            completed: word.progress
+                        };
+                    })
                     console.log('статистика', parsedWords)
                     setWords(parsedWords)
                 } catch(error){
@@ -128,10 +126,6 @@ export default function TagStatisticPage() {
     return (
         <View style={styles.container}>
             <BackButton></BackButton>
-            
-            <TouchableOpacity  onPress={handleContinueWithTag}>
-                <Text style={styles.continue}> Продолжить с данным тегом </Text>
-            </TouchableOpacity>
             <View>
                 <Text style={styles.headerInformation}>Тег: {tag}</Text>
                 { words &&
@@ -140,11 +134,13 @@ export default function TagStatisticPage() {
                         renderItem={({ word, completed }) => (
                             <WordStatistic word={word} completed={completed} />
                         )}
-                        maxColumns={4}
+                        maxColumns={8}
                         itemSpacing={10}
                     />}
             </View>
-            
+            <TouchableOpacity  onPress={handleContinueWithTag} style={styles.continueContainer}>
+                <Text style={styles.continue}> Продолжить с данным тегом </Text>
+            </TouchableOpacity>
         </View>
     );
 }
@@ -158,8 +154,19 @@ const styles = StyleSheet.create({
         padding: 10,
         fontSize: 18
     },
+    continueContainer: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        alignSelf: 'flex-end',
+        backgroundColor: 'green',
+        borderRadius: 5,
+        margin: 20,
+    },
     continue: {
-        padding: 20,
-        color: 'blue'
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        fontSize: 18,
+        color: 'white'
     }
 })
