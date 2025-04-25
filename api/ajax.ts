@@ -3,7 +3,7 @@ export const getRequestFormData = async (url:string): Promise<[number, any]> => 
         const response = await fetch(url, {
             method: 'GET',
             mode: 'cors',
-            // credentials: 'include',
+            credentials: 'include',
         });
         if (!response.ok) {
             return [response.status, { error: "Ошибка при получении данных" }];
@@ -30,7 +30,7 @@ export const postRequest = async (
         const response = await fetch(url, {
             method: "POST",
             mode: "cors",
-            // credentials: "include",
+            credentials: "include",
             headers: headers,
             body: data,
         });
@@ -56,7 +56,7 @@ export const getRequest = async (url:string): Promise<[number, any]> => {
         const response = await fetch(url, {
             method: 'GET',
             mode: 'cors',
-            // credentials: 'include',
+            credentials: 'include',
         });
         if (!response.ok) {
             return [response.status, { error: "Ошибка при получении данных" }];

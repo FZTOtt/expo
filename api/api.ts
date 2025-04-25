@@ -4,8 +4,10 @@ import { postRequest, getRequest } from "./ajax";
 const API_BASE_URL = "https://ouzistudy.ru/api";
 // localhost:8080
 
-export const translateAudio = async (audioData: string | Blob, word: boolean = true): Promise<[number, any]> => {
+export const translateAudio = async (audioData: string | Blob, word: string): Promise<[number, any]> => {
     const formData = new FormData();
+    
+    formData.append('word', word);
     
     if (typeof audioData === 'string') {
         const filename = audioData.split('/').pop() || 'audio.wav';
@@ -21,13 +23,7 @@ export const translateAudio = async (audioData: string | Blob, word: boolean = t
         'Content-Type': 'multipart/form-data'
     };
     
-    // return postRequest(`${API_BASE_URL}/audio/translate_audio`, formData, headers);
-    if (word) {
-        return postRequest(`http://localhost:3001/audio/translate_audio_word`, formData, headers);
-    } else {
-        return postRequest(`http://localhost:3001/audio/translate_audio_phoneme`, formData, headers);      
-    }
-
+    return postRequest(`${API_BASE_URL}/audio/translate_audio`, formData, headers);
 };
 
 /*
@@ -57,7 +53,7 @@ export const getRandomWord = async (tags: string): Promise<[number, any]> => {
     const headers = {
         // "Content-Type": "application/json",
     }
-    const data = JSON.stringify({ tag: tags })
+    const data = JSON.stringify({ topic: tags })
 
     return postRequest(`${API_BASE_URL}/word/rand/word`, data, headers)
 }

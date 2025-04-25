@@ -25,10 +25,11 @@ const Themes = ({tags, isStatistic}: ThemesProps) => {
 
                         return (
                             <TouchableOpacity 
-                                onPress={() => {
-                                    dispatch(setTag(cleanTag))
-                                    router.navigate('/')
-                                }}
+                            onPress={() => router.push({ pathname: "/statistic/[tag]", params: { tag: cleanTag } })}
+                                // onPress={() => {
+                                //     dispatch(setTag(cleanTag))
+                                //     router.navigate('/')
+                                // }}
                                 style={styles.tagWrapper}
                             >
                                 <TagStatistic tag={cleanTag} completedCount={tag.completedCount} 

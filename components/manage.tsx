@@ -6,7 +6,7 @@ import { getPhoneme, getRandomWord, getWord, getWordNode, translateAudio, writeS
 import MicOn from '@/assets/icons/micon.svg';
 import MicOff from '@/assets/icons/micoff.svg';
 import NextWord from '@/assets/icons/next_word.svg';
-import { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setSendStat, setReloadTargetWord, setTopicStatistic } from '@redux/translated';
+import { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setSendStat, setReloadTargetWord, setTopicStatistic, setTag } from '@redux/translated';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { RootState } from '@/redux/store';
 import TargetWord from '@/interfaces/targetWord';
@@ -17,7 +17,7 @@ import playOwnPassive from '@/assets/images/play_own_passive.jpg';
 const Manage = () => {
 
     const dispatch = useAppDispatch();
-    const { reloadWord, tags, usersRecord } = useAppSelector((state: RootState) => state.translated);
+    const { reloadWord, tags, usersRecord, targetWord } = useAppSelector((state: RootState) => state.translated);
     const { finished } = useAppSelector((state: RootState) => state.onboard);
     const [sound, setSound] = useState<Audio.Sound | null>(null);
 
@@ -40,79 +40,80 @@ const Manage = () => {
 
     const fetchRandomWord = async (tags: string = "", random: boolean = true) => {
         let status, response
-        // if (random) {
-        //     [status, response] = await getRandomWord(tags);
-        // } else {
-        //     [status, response] = await getWord(tags);
-        // }
-        
-        // if (status === 200) {
-        //     let url = response.audio_link;
-        //     url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
-        //     url = url.replace(/&/g, '\\u0026');
-        //     const targetWord: TargetWord = {
-        //         'targetWord': response.word,
-        //         'targetTranscription': response.transcription,
-        //         'wordId': response.id
-        //     }
-        //     dispatch(setTargetWord(targetWord));
-        //     dispatch(setTargetAudioUrl(url));
-        //     if (!random) {
-        //         dispatch(setTopicStatistic({
-        //             // complitedWords: response.true_words,
-        //             // totalWords: response.all_words
-        //             complitedWords: 5,
-        //             totalWords: 10
-        //         }))
-        //     }
-        // } else {
-        //     console.error('Ошибка в запросе fetchRandomWord', response);
-        // }
-
-        if (!random) {
+        if (random) {
+            [status, response] = await getRandomWord(tags);
+        } else {
             [status, response] = await getWord(tags);
-            if (status === 200) {
-                let url = response.audio_link;
-                url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
-                url = url.replace(/&/g, '\\u0026');
-                const targetWord: TargetWord = {
-                    'targetWord': response.word,
-                    'targetTranscription': response.transcription,
-                    'wordId': response.id
-                }
-                dispatch(setTargetWord(targetWord));
-                dispatch(setTargetAudioUrl(url));
-                if (!random) {
-                    dispatch(setTopicStatistic({
-                        // complitedWords: response.true_words,
-                        // totalWords: response.all_words
-                        complitedWords: 5,
-                        totalWords: 10
-                    }))
-                }
-            } else {
-                console.error('Ошибка в запросе fetchRandomWord', response);
+        }
+        
+        if (status === 200) {
+            let url = response.audio_link;
+            url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
+            url = url.replace(/&/g, '\\u0026');
+            const targetWord: TargetWord = {
+                'targetWord': response.word,
+                'targetTranscription': response.transcription,
+                'wordId': response.id
+            }
+            dispatch(setTargetWord(targetWord));
+            dispatch(setTargetAudioUrl(url));
+            if (!random) {
+                dispatch(setTopicStatistic({
+                    complitedWords: response.true_words,
+                    totalWords: response.all_words
+                    // complitedWords: 5,
+                    // totalWords: 10
+                }))
+                dispatch(setTag(tags))
             }
         } else {
-            [status, response] = await getWordNode();
-
-            if (status === 200) {
-                let url = response.audioUrl;
-                const targetWord: TargetWord = {
-                    'targetWord': response.word,
-                    'targetTranscription': response.transcription,
-                    'wordId': 1
-                }
-                dispatch(setTargetWord(targetWord));
-                dispatch(setTargetAudioUrl(url));
-            } else {
-                console.error('Ошибка в запросе fetchRandomWord', response);
-            }            
+            console.error('Ошибка в запросе fetchRandomWord', response);
         }
+
+        // if (!random) {
+        //     [status, response] = await getWord(tags);
+        //     if (status === 200) {
+        //         let url = response.audio_link;
+        //         url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
+        //         url = url.replace(/&/g, '\\u0026');
+        //         const targetWord: TargetWord = {
+        //             'targetWord': response.word,
+        //             'targetTranscription': response.transcription,
+        //             'wordId': response.id
+        //         }
+        //         dispatch(setTargetWord(targetWord));
+        //         dispatch(setTargetAudioUrl(url));
+        //         if (!random) {
+        //             dispatch(setTopicStatistic({
+        //                 // complitedWords: response.true_words,
+        //                 // totalWords: response.all_words
+        //                 complitedWords: 5,
+        //                 totalWords: 10
+        //             }))
+        //         }
+        //     } else {
+        //         console.error('Ошибка в запросе fetchRandomWord', response);
+        //     }
+        // } else {
+        //     [status, response] = await getWordNode();
+
+        //     if (status === 200) {
+        //         let url = response.audioUrl;
+        //         const targetWord: TargetWord = {
+        //             'targetWord': response.word,
+        //             'targetTranscription': response.transcription,
+        //             'wordId': 1
+        //         }
+        //         dispatch(setTargetWord(targetWord));
+        //         dispatch(setTargetAudioUrl(url));
+        //     } else {
+        //         console.error('Ошибка в запросе fetchRandomWord', response);
+        //     }            
+        // }
     }
 
     const handleRecordingComplete = async (audio: Blob | string) => {
-        const [status, response] = await translateAudio(audio);
+        const [status, response] = await translateAudio(audio, targetWord);
         if (status === 200) {
             dispatch(setTranslatedAudio(response.transcription));
         } else {
@@ -139,10 +140,6 @@ const Manage = () => {
     }
 
     useEffect(() => {
-        if (!finished) {
-            fetchPhoneme()
-            return
-        }
         if (reloadWord) {
             fetchRandomWord(reloadWord, false)
         } else {
@@ -151,10 +148,6 @@ const Manage = () => {
     }, [reloadWord, tags])
 
     function handleNextWord() {
-        if (!finished) {
-            fetchPhoneme()
-            return 
-        }
         fetchRandomWord(tags)
     }
 

@@ -18,7 +18,6 @@ const OnboardRequest = () => {
 
     const acceptOnboard = () => {
         dispatch(setRequestOnboard(false))
-        dispatch(setReloadTargetWord('hello'))
         dispatch(setOnboarding(true))
         router.navigate('/onboarding')
     }

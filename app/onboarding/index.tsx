@@ -39,11 +39,6 @@ const OnboardingPage = () => {
             title: 'Темы',
             description: 'Фильтруйте слова по темам для удобного изучения',
         },
-        {
-            target: 'ShowFinish',
-            title: 'Что делать?',
-            description: 'Сейчас вы попробуете произнести звуки. Как будете готовы перейти к словам - жмите кнопку. Удачи!',
-        },
     ];
 
     const handleNext = () => {
@@ -52,6 +47,7 @@ const OnboardingPage = () => {
         } else {
             setShowOnboarding(false);
             dispatch(setOnboarding(false))
+            finishInboarding()
         }
     };
 
