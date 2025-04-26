@@ -1,3 +1,4 @@
+import LeftBar from "@/components/leftBar";
 import Manage from "@/components/manage";
 import OnboardRequest from "@/components/onboardRequest";
 import ReferenceModal from "@/components/referenceModal";
@@ -22,13 +23,8 @@ export default function Index() {
     const paddingTop = height * 0.2;
 
     return (
-        <View style={[styles.container, { paddingTop }]}>
-            <OnboardRequest />
-            {tags && <StatusBar style={styles.status}/>}
-            <TagFilter/>
-            <Target />
-            <Manage />
-            <ReferenceModal />
+        <View style={styles.container}>
+            <LeftBar />
         </View>
     );
 }
@@ -37,17 +33,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'flex-start',
-        alignItems: 'center',
-        gap: 300,
-        backgroundColor: '#fff',
-        position: 'relative'
-    },
-    status: {
-        position: 'absolute',
-        top: '5%',
-        left: '5%',
-        width: '20%',
-        minWidth: 200,
-        borderRadius: 7
+        backgroundColor: 'rgba(19, 31, 36, 1)'
     },
 });
