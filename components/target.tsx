@@ -18,16 +18,17 @@ const Target = () => {
     return (
         <View style={styles.container}>
             <View style={styles.wordContainer}>
-                <TouchableOpacity style={styles.referenceButton} onPress={openReference}>
+                {/* <TouchableOpacity style={styles.referenceButton} onPress={openReference}>
                     <Reference width={30} height={30}></Reference>
-                </TouchableOpacity>
-                <Text style={[styles.word, isCorrect === null ? {} : isCorrect ? styles.wordCorrect : styles.wordIncorrect]}>
-                    {targetWord ? targetWord.charAt(0).toUpperCase() + targetWord.slice(1) : ''}
+                </TouchableOpacity> */}
+                <Text style={[styles.transcription, isCorrect === null ? {} : isCorrect ? styles.wordCorrect : styles.wordIncorrect]}>
+                    {targetTranscription}                    
                 </Text>
                 <AudioPlayer buttonStyle={styles.audioButton} imgStyle={styles.playButton} audioUrl={targetAudioUrl}/>
             </View>
-            <Text style={styles.transcription}>
-                {targetTranscription}
+            <Text style={styles.word}>
+                {targetWord ? targetWord.charAt(0).toUpperCase() + targetWord.slice(1) : ''}
+
             </Text>
         </View>
     )
@@ -42,10 +43,15 @@ const styles = StyleSheet.create({
     },
     wordContainer: {
         height: 60,
+        flex: 1,
+        flexDirection: 'row',
+        gap: 20,
+        marginLeft: 50
     },
     word: {
-        fontSize: 60,
-        lineHeight: 60,
+        fontSize: 20,
+        marginTop: 10,
+        color: 'white',
     },
     wordCorrect: {
         color: 'green',
@@ -54,9 +60,9 @@ const styles = StyleSheet.create({
         color: 'red',
     },
     audioButton: {
-        position: 'absolute',
-        height: 60,
-        right: -40,
+        // position: 'absolute',
+        // height: 60,
+        // right: -40,
         justifyContent: 'center',
     },
     referenceButton: {
@@ -70,8 +76,9 @@ const styles = StyleSheet.create({
         height: 30,
     },
     transcription: {
-        fontSize: 20,
-        marginTop: 10,
+        fontSize: 60,
+        lineHeight: 60,
+        color: 'white'
     }
 });
 

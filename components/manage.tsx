@@ -1,24 +1,21 @@
-import { View, TouchableOpacity, StyleSheet, Image, Text, Platform } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
 import React from 'react';
 import { Audio } from 'expo-av';
-import { getPhoneme, getRandomWord, getWord, getWordNode, translateAudio, writeStat } from '@/api/api';
+import { getPhoneme, getRandomWord, getWord, translateAudio } from '@/api/api';
 import MicOn from '@/assets/icons/micon.svg';
 import MicOff from '@/assets/icons/micoff.svg';
-import NextWord from '@/assets/icons/next_word.svg';
-import { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setSendStat, setReloadTargetWord, setTopicStatistic, setTag } from '@redux/translated';
+import { setTranslatedAudio, setTargetWord, setTargetAudioUrl, setTopicStatistic, setTag } from '@redux/translated';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { RootState } from '@/redux/store';
 import TargetWord from '@/interfaces/targetWord';
 import AudioRecorder from './aidoRecorder';
-import playOwnActive from '@/assets/images/play_own_active.jpg';
-import playOwnPassive from '@/assets/images/play_own_passive.jpg';
+import Skip from '@/assets/icons/skip.svg';
 
 const Manage = () => {
 
     const dispatch = useAppDispatch();
     const { reloadWord, tags, usersRecord, targetWord } = useAppSelector((state: RootState) => state.translated);
-    const { finished } = useAppSelector((state: RootState) => state.onboard);
     const [sound, setSound] = useState<Audio.Sound | null>(null);
 
     async function playRecording() {
@@ -61,55 +58,12 @@ const Manage = () => {
                 dispatch(setTopicStatistic({
                     complitedWords: response.true_words,
                     totalWords: response.all_words
-                    // complitedWords: 5,
-                    // totalWords: 10
                 }))
                 dispatch(setTag(tags))
             }
         } else {
             console.error('Ошибка в запросе fetchRandomWord', response);
         }
-
-        // if (!random) {
-        //     [status, response] = await getWord(tags);
-        //     if (status === 200) {
-        //         let url = response.audio_link;
-        //         url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
-        //         url = url.replace(/&/g, '\\u0026');
-        //         const targetWord: TargetWord = {
-        //             'targetWord': response.word,
-        //             'targetTranscription': response.transcription,
-        //             'wordId': response.id
-        //         }
-        //         dispatch(setTargetWord(targetWord));
-        //         dispatch(setTargetAudioUrl(url));
-        //         if (!random) {
-        //             dispatch(setTopicStatistic({
-        //                 // complitedWords: response.true_words,
-        //                 // totalWords: response.all_words
-        //                 complitedWords: 5,
-        //                 totalWords: 10
-        //             }))
-        //         }
-        //     } else {
-        //         console.error('Ошибка в запросе fetchRandomWord', response);
-        //     }
-        // } else {
-        //     [status, response] = await getWordNode();
-
-        //     if (status === 200) {
-        //         let url = response.audioUrl;
-        //         const targetWord: TargetWord = {
-        //             'targetWord': response.word,
-        //             'targetTranscription': response.transcription,
-        //             'wordId': 1
-        //         }
-        //         dispatch(setTargetWord(targetWord));
-        //         dispatch(setTargetAudioUrl(url));
-        //     } else {
-        //         console.error('Ошибка в запросе fetchRandomWord', response);
-        //     }            
-        // }
     }
 
     const handleRecordingComplete = async (audio: Blob | string) => {
@@ -154,14 +108,14 @@ const Manage = () => {
     return (
         <View style={styles.container}>
             <View style={styles.buttonsContainer}>
-                <TouchableOpacity style={styles.button} onPress={playRecording}>
+                {/* <TouchableOpacity style={styles.button} onPress={playRecording}>
                     <Image source={ usersRecord ? playOwnActive : playOwnPassive} style={styles.icon} />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 
                 <AudioRecorder onState={MicOn} offState={MicOff} size={90} onRecordComplete={handleRecordingComplete}></AudioRecorder>
                 
                 <TouchableOpacity style={[styles.button, styles.disabledButton]} onPress={handleNextWord}>
-                    <NextWord width={90} height={90}/>
+                    <Skip width={40} height={40}/>
                 </TouchableOpacity>
 
                 
@@ -182,6 +136,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 30,
+        marginLeft: 70
     },
     recognizedText: {
         marginTop: 20,

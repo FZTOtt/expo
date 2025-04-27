@@ -87,8 +87,8 @@ const Chat = () => {
             renderItem={renderMessage}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.messagesContainer}
-            showsVerticalScrollIndicator={true}
-            indicatorStyle="black"
+            showsVerticalScrollIndicator={false}
+            // indicatorStyle="black"
         />
 
         {/* Поле ввода и кнопка отправки */}

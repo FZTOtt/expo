@@ -3,7 +3,8 @@ import Button from "./button";
 import WordsIcon from '@/assets/icons/words.svg';
 import ChatIcon from '@/assets/icons/chat.svg';
 import AccountIcon from '@/assets/icons/account.svg';
-import Mic from '@/assets/icons/micon.svg'
+import Phrases from '@/assets/icons/phrases.svg';
+
 const LeftBar = () => {
 
     return (
@@ -12,7 +13,7 @@ const LeftBar = () => {
                 OUZI
             </Text>
             <Button mode='navigation' active={true} Icon={WordsIcon}>СЛОВА</Button>
-            <Button mode='navigation' Icon={Mic}>ФРАЗЫ</Button>
+            <Button mode='navigation' Icon={Phrases}>ФРАЗЫ</Button>
             <Button mode='navigation' Icon={ChatIcon}>ОБЩЕНИЕ</Button>
             <Button mode='navigation'Icon={AccountIcon}>АККАУНТ</Button>
         </View>

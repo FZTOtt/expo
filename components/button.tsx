@@ -3,7 +3,6 @@ import { ButtonProps } from "@/interfaces/componentsProps";
 import { StyleSheet, TouchableOpacity, View, Image, Text } from "react-native";
 
 const Button: React.FC<ButtonProps> = ({mode, active=false, size='lg', Icon, onClick, children}) => {
-    console.log(Icon.name);
     return (
         <TouchableOpacity onPress={onClick} style={[styles[size], styles[mode], active && styles[mode+'_active']]}>
             {mode === 'navigation' ?
@@ -15,7 +14,10 @@ const Button: React.FC<ButtonProps> = ({mode, active=false, size='lg', Icon, onC
                     
                 </View>
                 :
-                children
+                <Text style={active ? styles[mode+'_activeText'] : styles[mode+'_passiveText']}>
+                    {children}
+                </Text>
+                
             }
         </TouchableOpacity>
     )
@@ -50,6 +52,23 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: 'white',
         paddingLeft: 10
+    },
+    modules: {
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: 'rgba(63, 133, 167, 1)',
+        width: '100%',
+        height: 50,
+        justifyContent: 'center',
+        marginVertical: 10
+    },
+    modules_activeText: {
+        color: 'rgba(73, 192, 248, 1)',
+        fontSize: 20
+    },
+    modules_passiveText: {
+        color: 'white',
+        fontSize: 20
     }
 })
 

@@ -2,6 +2,7 @@
 import { Audio } from "expo-av";
 import React, { useState } from "react";
 import { TouchableOpacity, Image, StyleProp, ViewStyle, ImageStyle } from "react-native";
+import PlaySound from '@/assets/icons/playSound.svg'
 
 interface AuidoPlayersProps {
     buttonStyle?: StyleProp<ViewStyle>,
@@ -31,9 +32,8 @@ const AudioPlayer: React.FC<AuidoPlayersProps> = ({ buttonStyle, imgStyle, audio
     }
     return (
         <TouchableOpacity style={buttonStyle} onPress={playRecording}>
-            <Image 
-                source={require('../assets/icons/play_target_audio.jpg')} 
-                style={imgStyle}
+            <PlaySound 
+                width={30} height={30}
             />
         </TouchableOpacity>
     )
