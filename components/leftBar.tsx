@@ -1,6 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
 import Button from "./button";
-
+import WordsIcon from '@/assets/icons/words.svg';
+import ChatIcon from '@/assets/icons/chat.svg';
+import AccountIcon from '@/assets/icons/account.svg';
+import Mic from '@/assets/icons/micon.svg'
 const LeftBar = () => {
 
     return (
@@ -8,10 +11,10 @@ const LeftBar = () => {
             <Text style={styles.logo}>
                 OUZI
             </Text>
-            <Button mode='navigation' active={true}>СЛОВА</Button>
-            <Button mode='navigation'>ФРАЗЫ</Button>
-            <Button mode='navigation'>ОБЩЕНИЕ</Button>
-            <Button mode='navigation'>АККАУНТ</Button>
+            <Button mode='navigation' active={true} Icon={WordsIcon}>СЛОВА</Button>
+            <Button mode='navigation' Icon={Mic}>ФРАЗЫ</Button>
+            <Button mode='navigation' Icon={ChatIcon}>ОБЩЕНИЕ</Button>
+            <Button mode='navigation'Icon={AccountIcon}>АККАУНТ</Button>
         </View>
     )
 }

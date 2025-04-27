@@ -5,6 +5,7 @@ import ReferenceModal from "@/components/referenceModal";
 import StatusBar from "@/components/statusBar";
 import TagFilter from "@/components/tagFilter";
 import Target from "@/components/target";
+import WordPage from "@/components/wordPage";
 import { useAppSelector } from "@/hooks";
 import { RootState } from "@/redux/store";
 import { useEffect } from "react";
@@ -25,6 +26,7 @@ export default function Index() {
     return (
         <View style={styles.container}>
             <LeftBar />
+            <WordPage />
         </View>
     );
 }
@@ -33,6 +35,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'flex-start',
-        backgroundColor: 'rgba(19, 31, 36, 1)'
+        backgroundColor: 'rgba(19, 31, 36, 1)',
+        flexDirection: 'row'
     },
 });

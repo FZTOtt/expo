@@ -1,12 +1,22 @@
 import React from "react";
 import { ButtonProps } from "@/interfaces/componentsProps";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Image, Text } from "react-native";
 
-const Button: React.FC<ButtonProps> = ({mode, active=false, size='lg', icon, onClick, children}) => {
-
+const Button: React.FC<ButtonProps> = ({mode, active=false, size='lg', Icon, onClick, children}) => {
+    console.log(Icon.name);
     return (
-        <TouchableOpacity onPress={onClick} style={[styles[size], styles[mode], active && styles.active]}>
-            {children}
+        <TouchableOpacity onPress={onClick} style={[styles[size], styles[mode], active && styles[mode+'_active']]}>
+            {mode === 'navigation' ?
+                <View style={styles.navigationContent}>
+                    {Icon && <Icon width={30} height={30}/>}
+                    <Text style={styles.navigationText}>
+                        {children}
+                    </Text>
+                    
+                </View>
+                :
+                children
+            }
         </TouchableOpacity>
     )
 }
@@ -19,18 +29,27 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20
     },
     navigation: {
-        fontSize: 20,
-        color: 'white',
         borderRadius: 12,
         borderColor: 'rgba(63, 133, 167, 1)',
-        
         width: '100%',
         height: 70,
         justifyContent: 'center',
         marginVertical: 15
     },
-    active: {
+    navigation_active: {
         borderWidth: 2,
+        backgroundColor: 'rgba(32, 47, 54, 1)'
+    },
+    navigationContent: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center'
+    },
+    navigationText: {
+        fontSize: 20,
+        color: 'white',
+        paddingLeft: 10
     }
 })
 
