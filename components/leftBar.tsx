@@ -4,20 +4,35 @@ import WordsIcon from '@/assets/icons/words.svg';
 import ChatIcon from '@/assets/icons/chat.svg';
 import AccountIcon from '@/assets/icons/account.svg';
 import Phrases from '@/assets/icons/phrases.svg';
+import { router, usePathname } from "expo-router";
 
 const LeftBar = () => {
 
+    const pathname = usePathname();
+
+    const navItems = [
+      { path: '/', label: 'СЛОВА', Icon: WordsIcon },
+      { path: '/phrases', label: 'ФРАЗЫ', Icon: Phrases },
+      { path: '/aichat', label: 'ОБЩЕНИЕ', Icon: ChatIcon },
+      { path: '/account', label: 'АККАУНТ', Icon: AccountIcon },
+    ];
+
     return (
         <View style={styles.container}>
-            <Text style={styles.logo}>
-                OUZI
-            </Text>
-            <Button mode='navigation' active={true} Icon={WordsIcon}>СЛОВА</Button>
-            <Button mode='navigation' Icon={Phrases}>ФРАЗЫ</Button>
-            <Button mode='navigation' Icon={ChatIcon}>ОБЩЕНИЕ</Button>
-            <Button mode='navigation'Icon={AccountIcon}>АККАУНТ</Button>
+          <Text style={styles.logo}>OUZI</Text>
+          {navItems.map((item) => (
+            <Button
+              key={item.path}
+              mode="navigation"
+              active={pathname === item.path}
+              Icon={item.Icon}
+              onClick={() => router.push(item.path)}
+            >
+              {item.label}
+            </Button>
+          ))}
         </View>
-    )
+      );
 }
 
 const styles = StyleSheet.create({

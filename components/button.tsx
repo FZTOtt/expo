@@ -14,10 +14,12 @@ const Button: React.FC<ButtonProps> = ({mode, active=false, size='lg', Icon, onC
                     
                 </View>
                 :
-                <Text style={active ? styles[mode+'_activeText'] : styles[mode+'_passiveText']}>
-                    {children}
-                </Text>
-                
+                mode === 'modules' ?
+                    <Text style={active ? styles[mode+'_activeText'] : styles[mode+'_passiveText']}>
+                        {children}
+                    </Text>
+                :
+                children
             }
         </TouchableOpacity>
     )
