@@ -30,7 +30,6 @@ export const translateAudio = async (audioData: string | Blob, word: string): Pr
     Запрос на получение подсказки по фонеме
 */
 export const getPhonemeReference = async (phoneme: string): Promise<[number, any]> => {
-    console.log(`[API] Запрос подсказки для фонемы: "${phoneme}"`);
     const data = JSON.stringify({ phonema: phoneme})
     
     return postRequest(`${API_BASE_URL}/tip/get_tip`, data)

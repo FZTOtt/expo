@@ -69,6 +69,19 @@ const styles = StyleSheet.create({
     modules_passiveText: {
         color: 'white',
         fontSize: 20
+    },
+    references: {
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: 'rgba(63, 133, 167, 1)',
+        width: '100%',
+        height: 50,
+        justifyContent: 'center',
+        marginVertical: 10  
+    },
+    references_passiveText: {
+        color: 'white',
+        fontSize: 20
     }
 })
 
