@@ -1,35 +1,59 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { RootState } from '@/redux/store';
 import { useAppSelector } from '@/hooks/useAppSelector';
-import Reference from '@/assets/icons/reference.svg';
-import { useAppDispatch } from '@/hooks';
-import { setVisible } from '@/redux/modal';
 import AudioPlayer from './audioPlayer';
+import PlaySound from '@/assets/icons/playSound.svg'
 
-const Target = () => {
-    const { targetWord, isCorrect, targetAudioUrl, targetTranscription } = useAppSelector((state: RootState) => state.translated);
-    const { isVisible } = useAppSelector((state: RootState) => state.modal);
-    const dispatch = useAppDispatch();
+interface TargetProps {
+    word: string;
+    transcription: string;
+    audioUrl: string;
+    mode: 'word' | 'phrase';
+}
 
-    function openReference() {
-        dispatch(setVisible(!isVisible))
+const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
+
+    const handleMode = () => {
+        if (mode === 'word') {
+            return (
+                <>
+                    <View style={styles.wordContainer}>
+                        <Text style={[styles.transcription]}>
+                            {transcription} trans              
+                        </Text>
+                        <AudioPlayer buttonStyle={styles.audioButton} audioUrl={audioUrl}>
+                            <PlaySound 
+                                width={30} height={30}
+                            />
+                        </AudioPlayer>
+                    </View>
+                    <Text style={styles.word}>
+                        {word ? word.charAt(0).toUpperCase() + word.slice(1) : ''}
+                    </Text>
+                </>
+            )
+        } else return (
+            <>
+                <View style={styles.wordContainer}>
+                    <Text style={[styles.transcription]}>
+                        {word ? word.charAt(0).toUpperCase() + word.slice(1) : ''} 12            
+                    </Text>
+                    <AudioPlayer buttonStyle={styles.audioButton} audioUrl={audioUrl}>
+                        <PlaySound 
+                            width={30} height={30}
+                        />
+                    </AudioPlayer>
+                </View>
+                <Text style={styles.word}>
+                    {transcription} trans 
+                </Text>
+            </>            
+        )
     }
 
     return (
         <View style={styles.container}>
-            <View style={styles.wordContainer}>
-                {/* <TouchableOpacity style={styles.referenceButton} onPress={openReference}>
-                    <Reference width={30} height={30}></Reference>
-                </TouchableOpacity> */}
-                <Text style={[styles.transcription, isCorrect === null ? {} : isCorrect ? styles.wordCorrect : styles.wordIncorrect]}>
-                    {targetTranscription}                    
-                </Text>
-                <AudioPlayer buttonStyle={styles.audioButton} imgStyle={styles.playButton} audioUrl={targetAudioUrl}/>
-            </View>
-            <Text style={styles.word}>
-                {targetWord ? targetWord.charAt(0).toUpperCase() + targetWord.slice(1) : ''}
-
-            </Text>
+            {handleMode()}
         </View>
     )
 }
@@ -60,9 +84,6 @@ const styles = StyleSheet.create({
         color: 'red',
     },
     audioButton: {
-        // position: 'absolute',
-        // height: 60,
-        // right: -40,
         justifyContent: 'center',
     },
     referenceButton: {

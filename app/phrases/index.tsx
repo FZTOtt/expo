@@ -1,10 +1,27 @@
+// import 'react-native-gesture-handler'
+
+import ExercisePhrasesBlock from "@/components/exercisePhrasesBlock";
 import LeftBar from "@/components/leftBar";
-import { View } from "react-native";
+import RightBar from "@/components/rightBar";
+import { View, StyleSheet } from "react-native";
 
 const Phrases = () => {
     return (
-        <LeftBar />
-    )
+        <View style={styles.container}>
+            <LeftBar />
+            <ExercisePhrasesBlock />
+            <RightBar />
+        </View>
+    );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'flex-start',
+        backgroundColor: 'rgba(19, 31, 36, 1)',
+        flexDirection: 'row'
+    },
+});
 
 export default Phrases;

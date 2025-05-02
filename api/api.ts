@@ -1,5 +1,6 @@
 import { Platform } from "react-native";
 import { postRequest, getRequest } from "./ajax";
+import { PhrasesExerciseApiResponse, WordExerciseApiResponse } from "@/interfaces/apiResponses";
 
 const API_BASE_URL = "https://ouzistudy.ru/api";
 // localhost:8080
@@ -101,4 +102,18 @@ export const getPhoneme = async (): Promise<[number, any]> => {
 export const getWordNode = async (): Promise<[number, any]> => {
 
     return getRequest(`http://localhost:3001/word/random`)
+}
+
+export const getWordExercise = async (module: string): Promise<[number, WordExerciseApiResponse]> => {
+
+    const data = JSON.stringify({ module: module })
+
+    return postRequest(`${API_BASE_URL}/getExrcise/word`, data)
+}
+
+export const getPhraseExercise = async (module: string): Promise<[number, PhrasesExerciseApiResponse]> => {
+
+    const data = JSON.stringify({ module: module })
+
+    return postRequest(`${API_BASE_URL}/getExrcise/phrase`, data)
 }

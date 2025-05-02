@@ -1,20 +1,17 @@
 
 import { Audio } from "expo-av";
 import React, { useState } from "react";
-import { TouchableOpacity, Image, StyleProp, ViewStyle, ImageStyle } from "react-native";
-import PlaySound from '@/assets/icons/playSound.svg'
+import { TouchableOpacity } from "react-native";
+import { AudioPlayerProps } from "@/interfaces/componentsProps";
 
-interface AuidoPlayersProps {
-    buttonStyle?: StyleProp<ViewStyle>,
-    imgStyle: StyleProp<ImageStyle>,
-    audioUrl: string | null,
-}
 
-const AudioPlayer: React.FC<AuidoPlayersProps> = ({ buttonStyle, imgStyle, audioUrl }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ buttonStyle, audioUrl, children, onPress, disabled }) => {
     
     const [sound, setSound] = useState<Audio.Sound | null>(null);
 
     async function playRecording() {
+        console.log('play')
+        onPress?.()
         try {
             if (audioUrl) {
                 if (sound) {
@@ -31,10 +28,8 @@ const AudioPlayer: React.FC<AuidoPlayersProps> = ({ buttonStyle, imgStyle, audio
         }
     }
     return (
-        <TouchableOpacity style={buttonStyle} onPress={playRecording}>
-            <PlaySound 
-                width={30} height={30}
-            />
+        <TouchableOpacity style={buttonStyle} onPress={playRecording} disabled={disabled}>
+            {children}
         </TouchableOpacity>
     )
 }

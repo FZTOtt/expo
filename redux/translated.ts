@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import TargetWord from "@/interfaces/targetWord";
+import TargetWord from "@/interfaces/reduxInterfaces";
 
 interface TranslatedState {
     translatedAudio: string | null;
@@ -49,7 +49,6 @@ const translatedSlice = createSlice({
             state.targetWord = action.payload.targetWord;
             state.targetTranscription = action.payload.targetTranscription;
             state.isCorrect = null;
-            state.wordId = action.payload.wordId
         },
         setTargetAudioUrl: (state, action: PayloadAction<string>) => {
             state.targetAudioUrl = action.payload;

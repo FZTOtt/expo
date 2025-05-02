@@ -1,14 +1,14 @@
 import LeftBar from "@/components/leftBar";
 import RightBar from "@/components/rightBar";
-import WordPage from "@/components/wordPage";
 import { View, StyleSheet } from "react-native";
+import ExerciseWordBlock from "@/components/exerciseWordBlock";
 
 export default function Index() {
 
     return (
         <View style={styles.container}>
             <LeftBar />
-            <WordPage />
+            <ExerciseWordBlock/>
             <RightBar />
         </View>
     );

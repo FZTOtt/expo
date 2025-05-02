@@ -3,9 +3,10 @@ import { useAppSelector } from "@/hooks";
 import { RootState } from "@/redux/store";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, LayoutAnimation } from "react-native"
-import Button from "./button";
 import AudioPlayer from "./audioPlayer";
 import MediaViewer from "./mediaViewer";
+import { usePathname } from "expo-router";
+import PlaySound from '@/assets/icons/playSound.svg'
 
 type PhonemeReference = {
     phonema: string;
@@ -15,8 +16,12 @@ type PhonemeReference = {
 }
 
 const Reference = () => {
+
+    const pathname = usePathname();
+    const { wordExercise, phraseExercise } = useAppSelector((state: RootState) => state.exercise);
     
-    const { targetTranscription, targetWord } = useAppSelector((state: RootState) => state.translated);
+    const { targetWords, targetTranscriptions } = useAppSelector((state: RootState) => state.word);
+    
     const [phonemes, setPhonemes] = useState<string[]>([])
     const [phonemeDetails, setPhonemeDetails] = useState<PhonemeReference[]>([])
     const [selectedPhoneme, setSelectedPhoneme] = useState<string | null>(null);
@@ -57,8 +62,9 @@ const Reference = () => {
     } 
     
     useEffect(() => {
-        parseTranscription(targetTranscription ? targetTranscription : '')
-    }, [targetTranscription])
+        if (wordExercise === 'pronounce')
+            parseTranscription(targetTranscriptions[0] ? targetTranscriptions[0] : '')
+    }, [targetTranscriptions])
 
     async function loadPhonemeDetails (phonemes: string[]) {
         try {
@@ -115,7 +121,6 @@ const Reference = () => {
       };
 
     const RenderReference = ({ item, index } : { item : PhonemeReference, index : number}) => {
-        console.log(item)
         return (
             <View style={styles.references}>
                 <TouchableOpacity onPress={() => handlePhonemePress(item.phonema)}>
@@ -130,7 +135,11 @@ const Reference = () => {
                         </Text>
                         <View style={styles.playPhonemeContainer}>
                             <Text style={styles.playPhonemeText}>{item.phonema}</Text>
-                            <AudioPlayer imgStyle={styles.playButton} audioUrl={item.audio_link}/>
+                            <AudioPlayer audioUrl={item.audio_link}>
+                                <PlaySound 
+                                    width={20} height={20}
+                                />
+                            </AudioPlayer>
                         </View>
                         {item.media_link && (
                             <MediaViewer 
@@ -144,25 +153,79 @@ const Reference = () => {
         )
     }
 
+    const addictiveReference = () => {
+        if (pathname === '/') {
+            if (wordExercise === 'pronounce') {
+                return (
+                    <>
+                        <Text style={styles.wordDescription}>
+                            {`${targetWords[0]} (${targetTranscriptions[0]}) - перевод`}
+                        </Text>
+                        <FlatList 
+                        data={phonemeDetails}
+                        renderItem={RenderReference}
+                        keyExtractor={(item) => item.phonema}
+                        showsVerticalScrollIndicator={false}
+                        onScrollToIndexFailed={({ index }) => {
+                            setTimeout(() => {
+                                flatListRef.current?.scrollToIndex({ index, animated: true });
+                            }, 500);
+                            }}
+                        />
+                    </>
+                )
+            }
+            if (wordExercise === 'guessWord') {
+                return (
+                    <>
+                        <Text style={styles.wordDescription}>
+                            Прослушайте слово и выберите правильный вариант.
+                            {targetWords.map((word, index) => {
+                                return (
+                                    `${targetWords[index]} (${targetTranscriptions[index]}) - перевод`
+                                )
+                            })}
+                        </Text>
+                    </>
+                )
+            }
+            if (wordExercise === 'pronounceFiew') {
+                return (
+                    <>
+                        <Text style={styles.wordDescription}>
+                            Нажмите на слово для выбора и произнесите верно.
+                            {targetWords.map((word, index) => {
+                                return (
+                                    `${targetWords[index]} (${targetTranscriptions[index]}) - перевод`
+                                )
+                            })}
+                        </Text>
+                    </>
+                )
+            }
+        } else if (pathname === '/phrases'){
+            if (phraseExercise === 'completeChain') {
+                return (
+                    <Text style={styles.wordDescription}>
+                        Прослушайте предложение и составьте его из предложенных слов
+                    </Text>
+                )
+            } else if (phraseExercise === 'pronounce') {
+                return (
+                    <Text style={styles.wordDescription}>
+                        Прослушайте предложение и произнесите его
+                    </Text>                    
+                )
+            }
+        }
+    }
+
     return (
         <View style={styles.container}>
             <Text style={styles.header}>
                 Справка
             </Text>
-            <Text style={styles.wordDescription}>
-                {`${targetWord} (${targetTranscription}) - перевод`}
-            </Text>
-            <FlatList 
-            data={phonemeDetails}
-            renderItem={RenderReference}
-            keyExtractor={(item) => item.phonema}
-            showsVerticalScrollIndicator={false}
-            onScrollToIndexFailed={({ index }) => {
-                setTimeout(() => {
-                  flatListRef.current?.scrollToIndex({ index, animated: true });
-                }, 500);
-              }}
-            />
+            {addictiveReference()}
         </View>
     )
 }
