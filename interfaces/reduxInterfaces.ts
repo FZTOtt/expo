@@ -13,6 +13,6 @@ export interface TargetPhrase {
 }
 
 export interface PhraseChain {
-    chain: string[] | null;
+    chain: string[];
     audio: string | null;
 }

@@ -42,7 +42,7 @@ const phraseSlice = createSlice({
             state.chain = action.payload.chain;
             state.audio = action.payload.audio;
         },
-        setCurrentChain: (state, action: PayloadAction<string[] | null>) => {
+        setCurrentChain: (state, action: PayloadAction<string[]>) => {
             state.currentChain = action.payload;
         }
     }
