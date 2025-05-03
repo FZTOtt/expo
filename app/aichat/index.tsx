@@ -10,7 +10,6 @@ const AIChat = () => {
             <View style={styles.chatContainer}>
                 <Chat />
             </View>
-            <RightBar />
         </View>
     );
 }
