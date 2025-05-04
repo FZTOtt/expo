@@ -13,6 +13,7 @@ export interface WordExerciseApiResponse {
     transcriptions: string[];
     audio: string[];
     translations: string[];
+    id: number,
 }
 
 export interface PhrasesExerciseApiResponse {
@@ -22,4 +23,5 @@ export interface PhrasesExerciseApiResponse {
     trascription?: string;
     audio: string;
     chain?: string[];
+    id: number,
 }
