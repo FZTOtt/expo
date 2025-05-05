@@ -1,13 +1,20 @@
-import { useAppSelector } from "@/hooks";
+import { useAppDispatch, useAppSelector } from "@/hooks";
 import { RootState } from "@/redux/store";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import AudioPlayer from "./audioPlayer";
 import PlaySound from '@/assets/icons/soundCurrentColor.svg'
 import { useState } from "react";
+import { nextWordExercise } from "@/redux/module";
+import { useExerciseParser } from "@/hooks/exerciseParser";
 
-const WordGuess = () => {
+const WordGuess = ({handleNext}) => {
+
+    const dispatch = useAppDispatch();
+    const { parseWordExercise } = useExerciseParser();
     
     const { targetWords, targetAudioUrls } = useAppSelector((state: RootState) => state.word);
+    const { currentWordExerciseIndex, wordExercises } = useAppSelector((state: RootState) => state.module)
+
     const [selectedWord, setSelectedWord] = useState<string | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
@@ -27,8 +34,8 @@ const WordGuess = () => {
         
         // типа задержка сети, внутрь добавить запрос на некст задачу
         setTimeout(() => {
-            console.log('go next') 
             setIsCorrect(correct);
+            handleNext()
         }, 1500);
     };
 
@@ -58,6 +65,7 @@ const WordGuess = () => {
                     </TouchableOpacity>
                 ))}
             </View>
+
         </View>
     )
 }

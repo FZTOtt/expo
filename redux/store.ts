@@ -5,6 +5,7 @@ import onboardReducer from './onboard';
 import wordReducer from './word'
 import phrasesReducer from './phrases';
 import exerciseReducer from './exercise';
+import moduleReducer from './module';
 
 const store = configureStore({
     reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
         word: wordReducer,
         phrases: phrasesReducer,
         exercise: exerciseReducer,
+        module: moduleReducer,
     },
 });
 

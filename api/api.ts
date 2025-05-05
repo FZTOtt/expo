@@ -3,6 +3,7 @@ import { postRequest, getRequest } from "./ajax";
 import { PhrasesExerciseApiResponse, WordExerciseApiResponse } from "@/interfaces/apiResponses";
 
 const API_BASE_URL = "https://ouzistudy.ru/api";
+const NODE_API_URL = "http://localhost:3000"
 // localhost:8080
 
 export const translateAudio = async (audioData: string | Blob, word: string): Promise<[number, any]> => {
@@ -116,4 +117,24 @@ export const getPhraseExercise = async (module: string): Promise<[number, Phrase
     const data = JSON.stringify({ module: module })
 
     return postRequest(`${API_BASE_URL}/getExrcise/phrase`, data)
+}
+
+export const getCurrentWordModule = async (): Promise<[number, any]> => {
+
+    return getRequest(`${NODE_API_URL}/api/current-word-module/`)
+}
+
+export const getWordModuleExercises = async (id: number): Promise<[number, any]> => {
+
+    return getRequest(`${NODE_API_URL}/api/word-modules/${id}/exercises`)
+}
+
+export const getCurrentPhraseModule = async (): Promise<[number, any]> => {
+
+    return getRequest(`${NODE_API_URL}/api/current-phrase-module/`)
+}
+
+export const getPhraseModuleExercises = async (id: number): Promise<[number, any]> => {
+
+    return getRequest(`${NODE_API_URL}/api/phrase-modules/${id}/exercises`)
 }

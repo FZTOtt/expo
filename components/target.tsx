@@ -19,7 +19,7 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
                 <>
                     <View style={styles.wordContainer}>
                         <Text style={[styles.transcription]}>
-                            {transcription} trans              
+                            {transcription}        
                         </Text>
                         <AudioPlayer buttonStyle={styles.audioButton} audioUrl={audioUrl}>
                             <PlaySound 
@@ -36,7 +36,7 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
             <>
                 <View style={styles.wordContainer}>
                     <Text style={[styles.transcription]}>
-                        {word ? word.charAt(0).toUpperCase() + word.slice(1) : ''} 12            
+                        {word ? word.charAt(0).toUpperCase() + word.slice(1) : ''}          
                     </Text>
                     <AudioPlayer buttonStyle={styles.audioButton} audioUrl={audioUrl}>
                         <PlaySound 
@@ -45,7 +45,7 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
                     </AudioPlayer>
                 </View>
                 <Text style={styles.word}>
-                    {transcription} trans 
+                    {transcription} 
                 </Text>
             </>            
         )

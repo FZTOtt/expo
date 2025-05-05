@@ -9,7 +9,7 @@ const RightBar = () => {
     return (
         <View style={styles.container}>
             <Modules/>
-            <Reference/>
+            {/* <Reference/> */}
         </View>
     )
 }

@@ -5,7 +5,7 @@ import AudioPlayer from "./audioPlayer"
 import PlaySound from '@/assets/icons/soundCurrentColor.svg'
 import { useEffect, useState } from "react"
 
-const completeChain = () => {
+const completeChain = ({handleNext}) => {
     const { audio } = useAppSelector((state: RootState) => state.phrases)
     const chain = [
         'one',
@@ -65,7 +65,7 @@ const completeChain = () => {
                     </TouchableOpacity>
                 ))}
             </View>
-            <TouchableOpacity style={styles.checkButton}>
+            <TouchableOpacity style={styles.checkButton} onPress={handleNext}>
                 <Text style={styles.checkText}>
                     Проверить
                 </Text>

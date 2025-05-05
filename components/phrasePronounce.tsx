@@ -8,21 +8,10 @@ import { getPhraseExercise, translateAudio } from "@/api/api"
 import { useExerciseParser } from "@/hooks/exerciseParser"
 import { setDetectedTranscription } from "@/redux/word"
 
-const PhrasePronounce = () => {
+const PhrasePronounce = ({handleNext}) => {
     const dispatch = useAppDispatch();
     const { parsePhrasesExercise } = useExerciseParser();
     const { targetPhrase, targetAudioUrl, targetTranscription } = useAppSelector((state: RootState) => state.phrases);
-
-    const fetchWordPronounceExercise = async (module: string = '') => {
-        
-        const [status, response] = await getPhraseExercise('')
-        
-        if (status === 200) {
-            parsePhrasesExercise(response)
-        } else {
-            console.error('Ошибка в запросе fetchRandomWord', response);
-        }
-    }
 
     const handleRecordingComplete = async (audio: Blob | string) => {
         const [status, response] = await translateAudio(audio, targetPhrase);
@@ -33,10 +22,6 @@ const PhrasePronounce = () => {
         }
     }
 
-    function handleNextWord() {
-        fetchWordPronounceExercise()
-    }
-
     return (
         <View style={styles.container}>
             <Target mode='phrase' 
@@ -45,7 +30,7 @@ const PhrasePronounce = () => {
             word={targetPhrase}
             />
             <Chat/>
-            <Manage onRecordComplete={handleRecordingComplete} onNext={handleNextWord}/>
+            <Manage onRecordComplete={handleRecordingComplete} onNext={handleNext}/>
         </View>
     )
 }

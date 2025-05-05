@@ -7,22 +7,12 @@ import { RootState } from "@/redux/store"
 import { getWordExercise, translateAudio } from "@/api/api"
 import { useExerciseParser } from "@/hooks/exerciseParser"
 import { setDetectedTranscription } from "@/redux/word"
+import { nextWordExercise } from "@/redux/module"
 
-const WordPronounce = () => {
+const WordPronounce = ({handleNext}) => {
     const dispatch = useAppDispatch();
     const { parseWordExercise } = useExerciseParser();
     const { targetWords, targetTranscriptions, targetAudioUrls } = useAppSelector((state: RootState) => state.word);
-
-    const fetchWordPronounceExercise = async (module: string = '') => {
-        
-        const [status, response] = await getWordExercise('')
-        
-        if (status === 200) {
-            parseWordExercise(response)
-        } else {
-            console.error('Ошибка в запросе fetchRandomWord', response);
-        }
-    }
 
     const handleRecordingComplete = async (audio: Blob | string) => {
         const [status, response] = await translateAudio(audio, targetWords[0]);
@@ -33,10 +23,6 @@ const WordPronounce = () => {
         }
     }
 
-    function handleNextWord() {
-        fetchWordPronounceExercise()
-    }
-
     return (
         <View style={styles.container}>
             <Target mode="word" 
@@ -45,7 +31,7 @@ const WordPronounce = () => {
             word={targetWords[0]}
             />
             <Chat/>
-            <Manage onRecordComplete={handleRecordingComplete} onNext={handleNextWord}/>
+            <Manage onRecordComplete={handleRecordingComplete} onNext={handleNext}/>
         </View>
     )
 }

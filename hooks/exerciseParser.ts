@@ -3,15 +3,14 @@ import { useAppDispatch } from "./useAppDispatch";
 import { setPhraseExercise, setWordExercise } from "@/redux/exercise";
 import { PhraseChain, TargetPhrase, TargetWord } from "@/interfaces/reduxInterfaces";
 import { setWordDetails } from "@/redux/word";
-import { PhraseExerciseType } from "@/types/exerciseTypes";
 import { setChain, setTargetPhrase } from "@/redux/phrases";
 
 export const useExerciseParser = () => {
     const dispatch = useAppDispatch();
 
     const parseWordExercise = (response: WordExerciseApiResponse) => {
-        dispatch(setWordExercise(response.exercise))
-        if (response.exercise === 'pronounce') {
+        dispatch(setWordExercise(response.exercise_type))
+        if (response.exercise_type === 'pronounce') {
             response.audio.map((url) => {
                 url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
                 url = url.replace(/&/g, '\\u0026');
@@ -28,14 +27,15 @@ export const useExerciseParser = () => {
     }
 
     const parsePhrasesExercise = (response: PhrasesExerciseApiResponse) => {
-        dispatch(setPhraseExercise(response.exercise))
-        if (response.exercise === 'pronounce') {
+        dispatch(setPhraseExercise(response.exercise_type))
+        if (response.exercise_type === 'pronounce') {
             let url = response.audio;
             url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
             url = url.replace(/&/g, '\\u0026');
+            console.log(response.transcription)
             const parsedPhrase: TargetPhrase = {
                 targetPhrase: response.sentence ? response.sentence : null,
-                targetTranscription: response.trascription ? response.trascription : null,
+                targetTranscription: response.transcription ? response.transcription : null,
                 targetAudioUrl: url,
                 translatedPhrase: response.translate ? response.translate : null,
             }
@@ -44,13 +44,13 @@ export const useExerciseParser = () => {
                 chain: [],
                 audio: ''
             }))
-        } else if (response.exercise === 'completeChain') {
+        } else if (response.exercise_type === 'completeChain') {
             let url = response.audio;
             url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
             url = url.replace(/&/g, '\\u0026');
 
             const parsedChain: PhraseChain = {
-                chain: response.chain ? response.chain : null,
+                chain: response.chain ? response.chain : [],
                 audio: url
             }
             dispatch(setChain(parsedChain))

@@ -8,20 +8,22 @@ export interface PhonemeApiResponse {
 }
 
 export interface WordExerciseApiResponse {
-    exercise: WordExerciseType;
+    exercise_type: WordExerciseType;
     words: string[];
     transcriptions: string[];
     audio: string[];
     translations: string[];
     id: number,
+    status: "completed" | "failed" | "none"
 }
 
 export interface PhrasesExerciseApiResponse {
-    exercise: PhraseExerciseType;
+    exercise_type: PhraseExerciseType;
     sentence?: string;
     translate?: string;
-    trascription?: string;
+    transcription?: string;
     audio: string;
     chain?: string[];
     id: number,
+    status: "completed" | "failed" | "none"
 }

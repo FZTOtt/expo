@@ -5,6 +5,7 @@ const pool = require('./db');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const cors = require('cors');
 
 const { WordExerciseSchema, PhraseExerciseSchema, ModuleSchema } = require('./schemas');
 
@@ -27,7 +28,10 @@ const storage = multer.diskStorage({
 
 app.use(express.json());
 app.use('/uploads/audio', express.static(path.join(__dirname, 'uploads/audio')));
-
+app.use(cors({
+    origin: 'http://localhost:8081', 
+    credentials: true,              
+  }));
 
 app.get('/', (req, res) => {
   res.send('Главная страница 🚀');
@@ -48,7 +52,8 @@ app.post('/api/create-word-module', async (req, res) => {
                 result.data.title
             ]
         );
-        res.status(201).json({
+        res.status(200).json({
+            status: 200,
             payload: {
                 id: rows[0].id
             }
@@ -73,7 +78,8 @@ app.post('/api/create-phrase-module', async (req, res) => {
                 result.data.title
             ]
         );
-        res.status(201).json({
+        res.status(200).json({
+            status: 200,
             payload: {
                 id: rows[0].id
             }
@@ -121,7 +127,8 @@ app.post('/api/word-exercises', upload.array('audio', 2), async (req, res) => {
             ]
         );
   
-        res.status(201).json({
+        res.status(200).json({
+            status: 200,
             payload: {
                 status: "success",
                 id: rows[0].id
@@ -176,9 +183,9 @@ app.post('/api/phrases-exercises', upload.single('audio'), async (req, res) => {
             ]
         );
   
-        res.status(201).json({
+        res.status(200).json({
+            status: 200,
             payload: {
-                status: "success",
                 id: rows[0].id
             }
         });
@@ -190,15 +197,153 @@ app.post('/api/phrases-exercises', upload.single('audio'), async (req, res) => {
 
 app.get('/api/debug/word-exercises', async (req, res) => {
     const { rows } = await pool.query('SELECT * FROM word_exercises');
-    res.json(rows);
+    // res.json(rows);
+    res.status(200).json({
+        status: 200,
+        payload: rows
+    })
 });
 
 app.get('/api/debug/phrases-exercises', async (req, res) => {
     const { rows } = await pool.query('SELECT * FROM phrase_exercises');
-    res.json(rows);
+    // res.json(rows);
+    res.status(200).json({
+        status: 200,
+        payload: rows
+    })
 });
 
-// Запуск сервера
+app.get('/api/current-word-module/', async (req, res) => {
+    const userId = 1
+
+    try {
+        const { rows } = await pool.query(
+        `SELECT m.id
+        FROM word_modules m
+        JOIN word_exercises e ON e.module_id = m.id
+        LEFT JOIN exercise_progress p 
+            ON p.exercise_id = e.id AND p.exercise_type = 'word' AND p.user_id = $1
+        GROUP BY m.id
+        HAVING COUNT(*) FILTER (WHERE p.status = 'completed') < COUNT(*)
+        ORDER BY m.id
+        LIMIT 1`,
+        [userId]
+        );
+        res.json({ 
+            status: 200,
+            payload: {
+                module_id: rows[0]?.id || null
+            } 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/word-modules/:id/exercises', async (req, res) => {
+    const moduleId = parseInt(req.params.id);
+    const userId = 1;
+    try {
+        const { rows } = await pool.query(
+        `SELECT e.*, COALESCE(p.status, 'none') AS status
+        FROM word_exercises e
+        LEFT JOIN exercise_progress p 
+            ON p.exercise_id = e.id AND p.exercise_type = 'word' AND p.user_id = $1
+        WHERE e.module_id = $2`,
+        [userId, moduleId]
+        );
+        res.json({ 
+            status: 200,
+            payload: 
+            {
+                exercises: rows
+            } 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+})
+
+app.get('/api/current-phrase-module/', async (req, res) => {
+    const userId = 1
+
+    try {
+        const { rows } = await pool.query(
+        `SELECT m.id
+        FROM phrase_modules m
+        JOIN phrase_exercises e ON e.module_id = m.id
+        LEFT JOIN exercise_progress p 
+            ON p.exercise_id = e.id AND p.exercise_type = 'phrase' AND p.user_id = $1
+        GROUP BY m.id
+        HAVING COUNT(*) FILTER (WHERE p.status = 'completed') < COUNT(*)
+        ORDER BY m.id
+        LIMIT 1`,
+        [userId]
+        );
+        res.json({ 
+            status: 200,
+            payload: {
+                module_id: rows[0]?.id || null
+            } 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/phrase-modules/:id/exercises', async (req, res) => {
+    const moduleId = parseInt(req.params.id);
+    const userId = 1;
+    try {
+        const { rows } = await pool.query(
+        `SELECT e.*, COALESCE(p.status, 'none') AS status
+        FROM phrase_exercises e
+        LEFT JOIN exercise_progress p 
+            ON p.exercise_id = e.id AND p.exercise_type = 'phrase' AND p.user_id = $1
+        WHERE e.module_id = $2`,
+        [userId, moduleId]
+        );
+        res.json({ 
+            status: 200,
+            payload: 
+            {
+                exercises: rows
+            } 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+})
+
+app.post('/api/exercise-progress', async (req, res) => {
+    const userId = 1;
+    const { exercise_id, exercise_type, status } = req.body;
+  
+    try {
+        await pool.query(`
+            INSERT INTO exercise_progress (user_id, exercise_id, exercise_type, status)
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (user_id, exercise_id, exercise_type)
+            DO UPDATE SET status = EXCLUDED.status, updated_at = CURRENT_TIMESTAMP
+        `, [userId, exercise_id, exercise_type, status]);
+    
+        res.status(200).json({ 
+            status: 200,
+            payload: {
+                message: 'Прогресс сохранён'
+            } 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
 app.listen(PORT, () => {
   console.log(`Сервер запущен на http://localhost:${PORT}`);
 });

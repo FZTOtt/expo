@@ -6,8 +6,10 @@ import Manage from "./manage";
 import { translateAudio } from "@/api/api";
 import { setDetectedTranscription } from "@/redux/word";
 import AudioPlayer from "./audioPlayer";
+import { useExerciseParser } from "@/hooks/exerciseParser";
+import { nextWordExercise } from "@/redux/module";
 
-const PronounceFiew = () => {
+const PronounceFiew = ({handleNext}) => {
 
     const words = [
         'dock',
@@ -15,7 +17,9 @@ const PronounceFiew = () => {
     ]
 
     const dispatch = useAppDispatch();
+
     const { targetWords, targetAudioUrls } = useAppSelector((state: RootState) => state.word);
+    
     const [selectedWord, setSelectedWord] = useState<number | null>(null);
     const [isCorrect, setIsCorrect] = useState<(boolean | null)[]>(words.map(() => null));
 
@@ -39,7 +43,7 @@ const PronounceFiew = () => {
             return newStatus
         })
     }
-    
+
     return (
         <View style={styles.container}>
             <Text style={styles.exerciseText}>
@@ -63,7 +67,7 @@ const PronounceFiew = () => {
                     </AudioPlayer>
                 ))}
             </View>
-            <Manage onNext={()=>{}} onRecordComplete={handleRecordingComplete}/>
+            <Manage onNext={handleNext} onRecordComplete={handleRecordingComplete}/>
         </View>
     )
 }
