@@ -9,6 +9,7 @@ interface PhraseState {
     detectedPhrase: string | null;
 
     chain: string[];
+    sentence: string | null;
     audio: string | null;
     currentChain: string[];
 }
@@ -21,6 +22,7 @@ const initialState: PhraseState = {
     detectedPhrase: null,
 
     chain: [],
+    sentence: null,
     audio: null,
     currentChain: [],
 }
@@ -40,6 +42,7 @@ const phraseSlice = createSlice({
         },
         setChain: (state, action: PayloadAction<PhraseChain>) => {
             state.chain = action.payload.chain;
+            state.sentence = action.payload.sentence;
             state.audio = action.payload.audio;
         },
         setCurrentChain: (state, action: PayloadAction<string[]>) => {

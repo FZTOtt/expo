@@ -4,19 +4,18 @@ import Manage from "./manage"
 import Chat from "./chat"
 import { useAppDispatch, useAppSelector } from "@/hooks"
 import { RootState } from "@/redux/store"
-import { getPhraseExercise, translateAudio } from "@/api/api"
-import { useExerciseParser } from "@/hooks/exerciseParser"
-import { setDetectedTranscription } from "@/redux/word"
+import { getPhraseTranscrible } from "@/api/api"
+import { setDetectedPhrase } from "@/redux/phrases"
 
 const PhrasePronounce = ({handleNext}) => {
     const dispatch = useAppDispatch();
-    const { parsePhrasesExercise } = useExerciseParser();
     const { targetPhrase, targetAudioUrl, targetTranscription } = useAppSelector((state: RootState) => state.phrases);
 
     const handleRecordingComplete = async (audio: Blob | string) => {
-        const [status, response] = await translateAudio(audio, targetPhrase);
+        const [status, response] = await getPhraseTranscrible(audio);
+        console.log(response)
         if (status === 200) {
-            dispatch(setDetectedTranscription(response.transcription));
+            dispatch(setDetectedPhrase(response.text));
         } else {
             console.error('Ошибка при запросе расшифровке аудио')
         }

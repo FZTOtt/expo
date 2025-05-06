@@ -4,37 +4,28 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import AudioPlayer from "./audioPlayer";
 import PlaySound from '@/assets/icons/soundCurrentColor.svg'
 import { useState } from "react";
-import { nextWordExercise } from "@/redux/module";
-import { useExerciseParser } from "@/hooks/exerciseParser";
 
 const WordGuess = ({handleNext}) => {
 
-    const dispatch = useAppDispatch();
-    const { parseWordExercise } = useExerciseParser();
-    
     const { targetWords, targetAudioUrls } = useAppSelector((state: RootState) => state.word);
-    const { currentWordExerciseIndex, wordExercises } = useAppSelector((state: RootState) => state.module)
 
     const [selectedWord, setSelectedWord] = useState<string | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
-    const words = [
-        'dock',
-        'deck'
-    ]
-    // тут логика отправить на проверку, получить ответ и через время скипнуть
-    const correctWord = words[0];
+    const random = Math.round(Math.random());
+    console.log(random)
+    const correctWord = targetWords[random];
 
     const handleWordPress = (word: string) => {
         if (selectedWord !== null) return;
         
-        setSelectedWord(word);
         const correct = word == correctWord;
+        setSelectedWord(word)
+        setIsCorrect(correct);
         console.log(correct)
         
-        // типа задержка сети, внутрь добавить запрос на некст задачу
+        // задержка до следующего задания
         setTimeout(() => {
-            setIsCorrect(correct);
             handleNext()
         }, 1500);
     };
@@ -44,13 +35,13 @@ const WordGuess = ({handleNext}) => {
             <Text style={styles.exerciseText}>
                 Какое слово звучит?
             </Text>
-            <AudioPlayer audioUrl={targetAudioUrls[0]} buttonStyle={styles.wordAudio}>
+            <AudioPlayer audioUrl={targetAudioUrls[random]} buttonStyle={styles.wordAudio}>
                 <PlaySound color={'rgb(0, 0, 0)'}
                     width={50} height={50}
                 />
             </AudioPlayer>
             <View style={styles.variants}>
-                {words.map((word, index) => (
+                {targetWords.map((word, index) => (
                     <TouchableOpacity key={index} 
                     style={[
                         styles.wordButton,

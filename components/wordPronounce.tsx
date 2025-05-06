@@ -4,20 +4,20 @@ import Manage from "./manage"
 import Chat from "./chat"
 import { useAppDispatch, useAppSelector } from "@/hooks"
 import { RootState } from "@/redux/store"
-import { getWordExercise, translateAudio } from "@/api/api"
-import { useExerciseParser } from "@/hooks/exerciseParser"
+import { getWordTranscrible } from "@/api/api"
 import { setDetectedTranscription } from "@/redux/word"
-import { nextWordExercise } from "@/redux/module"
 
 const WordPronounce = ({handleNext}) => {
     const dispatch = useAppDispatch();
-    const { parseWordExercise } = useExerciseParser();
     const { targetWords, targetTranscriptions, targetAudioUrls } = useAppSelector((state: RootState) => state.word);
 
     const handleRecordingComplete = async (audio: Blob | string) => {
-        const [status, response] = await translateAudio(audio, targetWords[0]);
+        const [status, response] = await getWordTranscrible(audio);
+
+        const trans = []
+        trans[0] = response.transcription
         if (status === 200) {
-            dispatch(setDetectedTranscription(response.transcription));
+            dispatch(setDetectedTranscription(trans));
         } else {
             console.error('Ошибка при запросе расшифровке аудио')
         }

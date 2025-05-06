@@ -45,7 +45,27 @@ const ExerciseWordBlock = () => {
         } else {
             // Конец модуля
             console.log("Модуль завершён");
-            // Можно вызвать переход к следующему модулю или показать экран с результатами
+            const getNextModule = async () => {
+                let [status, response] = await getWordModuleExercises(currentWordModuleId+1);
+                console.log(response.exercises)
+                if (status === 200) {
+                    if (response.exercises.length != 0) {
+                        dispatch(setCurrentWordModule({
+                            id: currentWordModuleId+1,
+                            exercises: response.exercises}));
+                        parseWordExercise(response.exercises[0]);
+                    } else {
+                        [status, response] = await getWordModuleExercises(1);
+                        if (status === 200) {
+                            dispatch(setCurrentWordModule({
+                                id: 1,
+                                exercises: response.exercises}));
+                            parseWordExercise(response.exercises[0]);
+                        } 
+                    } 
+                }
+            }
+            getNextModule()
         }
     }
     

@@ -13,14 +13,112 @@ interface TargetProps {
 
 const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
 
+    console.log(audioUrl)
+
+    const { translatedTranscriptions } = useAppSelector((state: RootState) => state.word)
+    const { detectedPhrase } = useAppSelector((state: RootState) => state.phrases)
+
+    const HighlightedComparison = ({ original, detected }) => {
+        
+        const originalWords = original.trim().split(/\s+/);
+        if (!detected) {
+            return (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    {originalWords.map((word, index) => {
+                        return (
+                            <Text
+                                key={index}
+                                style={{
+                                    color: 'white',
+                                    fontSize: 60,
+                                    paddingLeft: 15
+                                }}
+                            >
+                                {word}
+                            </Text>
+                        );
+                    })}
+                </View>
+            )
+        }
+        const detectedWords = detected
+        .replace(/[.,!?;:"“”()]/g, '')
+        .trim()
+        .split(/\s+/);
+    
+        return (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap'}}>
+                {originalWords.map((word, index) => {
+                    const match = detectedWords[index]?.toLowerCase() === word.toLowerCase();
+                    return (
+                        <Text
+                            key={index}
+                            style={{
+                                color: match ? 'green' : 'red',
+                                fontSize: 60,
+                                paddingLeft: 15
+                            }}
+                        >
+                            {word}
+                        </Text>
+                    );
+                })}
+            </View>
+        );
+    };
+
+    const cleanTranscription = (text: string) => 
+        text.replace(/[ˈˌ]/g, '').toLowerCase();
+
+    const HighlightedTranscription = ({ transcription, detectedTranscription }) => {
+        
+        const originalPhonemes = transcription.trim().split('');
+        if (!detectedTranscription) {
+            return (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5 }}>
+                {originalPhonemes.map((ph, index) => {
+                    return (
+                        <Text
+                            key={index}
+                            style={{
+                                color: 'white',
+                                fontSize: 60
+                            }}
+                        >
+                            {ph}
+                        </Text>
+                    );
+                })}
+            </View>
+            )
+        }
+        const detectedPhonemes = detectedTranscription.split('');
+    
+        return (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5 }}>
+                {originalPhonemes.map((ph, index) => {
+                    const match = cleanTranscription(detectedPhonemes[index] || '') === cleanTranscription(ph);
+                    return (
+                        <Text
+                            key={index}
+                            style={{
+                                color: match ? 'green' : 'red',
+                                fontSize: 60
+                            }}
+                        >
+                            {ph}
+                        </Text>
+                    );
+                })}
+            </View>
+        );
+    };
     const handleMode = () => {
         if (mode === 'word') {
             return (
                 <>
                     <View style={styles.wordContainer}>
-                        <Text style={[styles.transcription]}>
-                            {transcription}        
-                        </Text>
+                        <HighlightedTranscription transcription={transcription} detectedTranscription={translatedTranscriptions[0]} />
                         <AudioPlayer buttonStyle={styles.audioButton} audioUrl={audioUrl}>
                             <PlaySound 
                                 width={30} height={30}
@@ -35,9 +133,7 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
         } else return (
             <>
                 <View style={styles.wordContainer}>
-                    <Text style={[styles.transcription]}>
-                        {word ? word.charAt(0).toUpperCase() + word.slice(1) : ''}          
-                    </Text>
+                    <HighlightedComparison original={word} detected={detectedPhrase} />
                     <AudioPlayer buttonStyle={styles.audioButton} audioUrl={audioUrl}>
                         <PlaySound 
                             width={30} height={30}

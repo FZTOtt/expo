@@ -2,8 +2,8 @@ import { PhrasesExerciseApiResponse, WordExerciseApiResponse } from "@/interface
 import { useAppDispatch } from "./useAppDispatch";
 import { setPhraseExercise, setWordExercise } from "@/redux/exercise";
 import { PhraseChain, TargetPhrase, TargetWord } from "@/interfaces/reduxInterfaces";
-import { setWordDetails } from "@/redux/word";
-import { setChain, setTargetPhrase } from "@/redux/phrases";
+import { setDetectedTranscription, setWordDetails } from "@/redux/word";
+import { setChain, setDetectedPhrase, setTargetPhrase } from "@/redux/phrases";
 
 export const useExerciseParser = () => {
     const dispatch = useAppDispatch();
@@ -11,15 +11,28 @@ export const useExerciseParser = () => {
     const parseWordExercise = (response: WordExerciseApiResponse) => {
         dispatch(setWordExercise(response.exercise_type))
         if (response.exercise_type === 'pronounce') {
-            response.audio.map((url) => {
-                url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
-                url = url.replace(/&/g, '\\u0026');
-                return url
-            })
+            // const urls = response.audio.map((url) => {
+            //     // url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
+            //     // url = url.replace(/&/g, '\\u0026');
+            //     url = 'http://localhost:3000' + url
+            //     return url
+            // })
+            const urls = response.audio.map((url) => `http://localhost:3000${url}`);
             const parsedWords: TargetWord = {
                 targetWords: response.words,
                 targetTranscriptions: response.transcriptions,
-                targetAudioUrls: response.audio,
+                targetAudioUrls: urls,
+                wordTranslations: response.translations
+            }
+            dispatch(setWordDetails(parsedWords))
+            dispatch(setDetectedTranscription([]))
+        } else if (response.exercise_type === 'guessWord') {
+            const urls = response.audio.map((url) => `http://localhost:3000${url}`);
+            console.log(response.words)
+            const parsedWords: TargetWord = {
+                targetWords: response.words,
+                targetTranscriptions: response.transcriptions,
+                targetAudioUrls: urls,
                 wordTranslations: response.translations
             }
             dispatch(setWordDetails(parsedWords))
@@ -30,9 +43,10 @@ export const useExerciseParser = () => {
         dispatch(setPhraseExercise(response.exercise_type))
         if (response.exercise_type === 'pronounce') {
             let url = response.audio;
-            url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
-            url = url.replace(/&/g, '\\u0026');
-            console.log(response.transcription)
+            // url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
+            // url = url.replace(/&/g, '\\u0026');
+            url = 'http://localhost:3000' + url
+            console.log(url)
             const parsedPhrase: TargetPhrase = {
                 targetPhrase: response.sentence ? response.sentence : null,
                 targetTranscription: response.transcription ? response.transcription : null,
@@ -40,17 +54,22 @@ export const useExerciseParser = () => {
                 translatedPhrase: response.translate ? response.translate : null,
             }
             dispatch(setTargetPhrase(parsedPhrase))
+            dispatch(setDetectedPhrase(''))
             dispatch(setChain({
                 chain: [],
-                audio: ''
+                audio: '',
+                sentence: ''
             }))
         } else if (response.exercise_type === 'completeChain') {
             let url = response.audio;
-            url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
-            url = url.replace(/&/g, '\\u0026');
+            // url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
+            // url = url.replace(/&/g, '\\u0026');
+            
+            url = 'http://localhost:3000' + url
 
             const parsedChain: PhraseChain = {
                 chain: response.chain ? response.chain : [],
+                sentence: response.sentence ? response.sentence : '',
                 audio: url
             }
             dispatch(setChain(parsedChain))
@@ -61,6 +80,10 @@ export const useExerciseParser = () => {
                 translatedPhrase: null,
             }))
         }
+    }
+
+    const deletePhraseExercise = () => {
+
     }
 
     return {

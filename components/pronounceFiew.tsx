@@ -3,25 +3,18 @@ import { RootState } from "@/redux/store";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Manage from "./manage";
-import { translateAudio } from "@/api/api";
+import { getWordTranscrible, translateAudio } from "@/api/api";
 import { setDetectedTranscription } from "@/redux/word";
 import AudioPlayer from "./audioPlayer";
-import { useExerciseParser } from "@/hooks/exerciseParser";
-import { nextWordExercise } from "@/redux/module";
 
 const PronounceFiew = ({handleNext}) => {
-
-    const words = [
-        'dock',
-        'deck'
-    ]
 
     const dispatch = useAppDispatch();
 
     const { targetWords, targetAudioUrls } = useAppSelector((state: RootState) => state.word);
     
     const [selectedWord, setSelectedWord] = useState<number | null>(null);
-    const [isCorrect, setIsCorrect] = useState<(boolean | null)[]>(words.map(() => null));
+    const [isCorrect, setIsCorrect] = useState<(boolean | null)[]>(targetWords.map(() => null));
 
 
 
@@ -29,17 +22,27 @@ const PronounceFiew = ({handleNext}) => {
         setSelectedWord(index);
     };
 
+    const cleanPhonemes = (str: string) => str.replace(/[ˈˌ]/g, '').split('');
+
     const handleRecordingComplete = async (audio: Blob | string) => {
-        const [status, response] = await translateAudio(audio, targetWords[0]);
+        const [status, response] = await getWordTranscrible(audio);
         if (status === 200) {
             dispatch(setDetectedTranscription(response.transcription));
         } else {
             console.error('Ошибка при запросе расшифровке аудио')
         }
+        const originalPhonemes = cleanPhonemes(targetWords[selectedWord]);
+        const detectedPhonemes = cleanPhonemes(response.transcription);
+
+        const areEqual = (
+            originalPhonemes.length === detectedPhonemes.length &&
+            originalPhonemes.every((val, i) => val === detectedPhonemes[i])
+        );
+
         setIsCorrect(prev => {
             if (selectedWord === null) return prev
             const newStatus = [...prev]
-            newStatus[selectedWord] = true
+            newStatus[selectedWord] = areEqual
             return newStatus
         })
     }
@@ -50,7 +53,7 @@ const PronounceFiew = ({handleNext}) => {
                 Произнесите два похожих слова
             </Text>
             <View style={styles.variants}>
-                {words.map((word, index) => (
+                {targetWords.map((word, index) => (
                     <AudioPlayer audioUrl={targetAudioUrls[index]} 
                     buttonStyle={[
                         styles.wordButton,

@@ -138,3 +138,68 @@ export const getPhraseModuleExercises = async (id: number): Promise<[number, any
 
     return getRequest(`${NODE_API_URL}/api/phrase-modules/${id}/exercises`)
 }
+
+export const getWordModules = async (): Promise<[number, any]> => {
+
+    return getRequest(`${NODE_API_URL}/api/word-modules`)
+}
+
+export const getPhraseModules = async (): Promise<[number, any]> => {
+
+    return getRequest(`${NODE_API_URL}/api/phrase-modules`)
+}
+
+export const getWordTranscrible = async (audioData: string | Blob): Promise<[number, any]> => {
+    const formData = new FormData();
+    
+    if (typeof audioData === 'string') {
+        const filename = audioData.split('/').pop() || 'audio.wav';
+        formData.append('audio', {
+            uri: audioData,
+            name: filename,
+            type: 'audio/wav'
+        } as any);
+    } else {
+        formData.append('audio', audioData, 'audio.wav');
+    }
+    const headers: Record<string, string> = Platform.OS === 'web' ? {} : {
+        'Content-Type': 'multipart/form-data'
+    };
+    
+    return postRequest(`${NODE_API_URL}/api/transcribe-word`, formData, headers);
+};
+
+export const getPhraseTranscrible = async (audioData: string | Blob): Promise<[number, any]> => {
+    const formData = new FormData();
+    
+    if (typeof audioData === 'string') {
+        const filename = audioData.split('/').pop() || 'audio.wav';
+        formData.append('audio', {
+            uri: audioData,
+            name: filename,
+            type: 'audio/wav'
+        } as any);
+    } else {
+        formData.append('audio', audioData, 'audio.wav');
+    }
+    const headers: Record<string, string> = Platform.OS === 'web' ? {} : {
+        'Content-Type': 'multipart/form-data'
+    };
+    
+    return postRequest(`${NODE_API_URL}/api/transcribe-phrase`, formData, headers);
+};
+
+export const getAIHelp = async (target: string, errors: number): Promise<[number, any]> => {
+
+    const data = JSON.stringify({ 
+        target: target,
+        errors: errors
+    })
+    const headers = {
+        'Content-Type': 'application/json', // <== это важно
+    };
+
+    console.log(data)
+
+    return postRequest(`${NODE_API_URL}/api/get-ai-help`, data, headers)
+}

@@ -1,3 +1,7 @@
+import { getAIHelp } from "@/api/api";
+import { useAppSelector } from "@/hooks";
+import { RootState } from "@/redux/store";
+import { usePathname } from "expo-router";
 import React, { useState, useRef, useEffect } from "react";
 import { 
     StyleSheet, 
@@ -18,20 +22,12 @@ type Message = {
 };
 
 const Chat = () => {
+    const pathname = usePathname();
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputText, setInputText] = useState("");
     const flatListRef = useRef<FlatList>(null);
-
-    const getAIResponse = async (userMessage: string) => {
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        let response = "Я не понял ваш вопрос.";
-        if (userMessage.toLowerCase().includes("привет")) response = "Привет! Как дела?";
-        if (userMessage.toLowerCase().includes("как дела")) response = "У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?У меня всё отлично! А у тебя?";
-        
-        return response;
-    };
+    const { translatedTranscriptions, targetWords } = useAppSelector((state: RootState) => state.word);
+    const { detectedPhrase, targetPhrase } = useAppSelector((state: RootState) => state.phrases);
 
   // Отправка сообщения
     const handleSend = async () => {
@@ -45,12 +41,20 @@ const Chat = () => {
         setMessages(prev => [...prev, userMessage]);
         setInputText("");
 
-        const aiResponse = await getAIResponse(inputText);
+        // const [status, response] = await getAIHelp(inputText);
+        // if (status == 200) {
+        //     const aiMessage: Message = {
+        //         id: Date.now().toString(),
+        //         text: response.text,
+        //         isUser: false,
+        //     }
+        //     setMessages(prev => [...prev, aiMessage]);
+        // }
         const aiMessage: Message = {
             id: Date.now().toString(),
-            text: aiResponse,
+            text: 'прости, я пока не могу отвечать на сообщения',
             isUser: false,
-        };
+        }
         setMessages(prev => [...prev, aiMessage]);
     };
 
@@ -59,6 +63,67 @@ const Chat = () => {
             flatListRef.current?.scrollToEnd({ animated: true });
         }
     }, [messages]);
+
+    const cleanPhonemes = (str: string) => str.replace(/[ˈˌ]/g, '').split('');
+
+    function countWordErrors(detectedPhrase: string, sentence: string): number {
+        const normalize = (str: string) =>
+            str
+                .toLowerCase()
+                .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '')
+                .split(/\s+/)
+    
+        const detectedWords = normalize(detectedPhrase);
+        const sentenceWords = normalize(sentence);
+    
+        const maxLength = Math.max(detectedWords.length, sentenceWords.length);
+        let errors = 0;
+    
+        for (let i = 0; i < maxLength; i++) {
+            if (detectedWords[i] !== sentenceWords[i]) {
+                errors++;
+            }
+        }
+    
+        return errors;
+    }
+
+    useEffect(() => {
+        const getAISuggest = async (target:string, errors:number) => {
+            const [status, response] = await getAIHelp(target, errors)
+            if (status == 200) {
+                const aiMessage: Message = {
+                    id: Date.now().toString(),
+                    text: response.text,
+                    isUser: false,
+                }
+                setMessages(prev => [...prev, aiMessage]);
+            }
+        }
+        if(pathname == '/') {
+            console.log(translatedTranscriptions)
+            if (translatedTranscriptions.length > 0) {
+                const originalPhonemes = cleanPhonemes(targetWords[0]);
+                const detectedPhonemes = cleanPhonemes(translatedTranscriptions[0]);
+        
+                const maxLength = Math.max(originalPhonemes.length, detectedPhonemes.length);
+                let errors = 0;
+            
+                for (let i = 0; i < maxLength; i++) {
+                    if (originalPhonemes[i] !== detectedPhonemes[i]) {
+                        errors++;
+                    }
+                }
+                getAISuggest(targetWords[0], errors)
+            }
+        } else {
+            if (detectedPhrase) {
+                const errors = countWordErrors(detectedPhrase, targetPhrase)
+                getAISuggest(targetPhrase, errors)
+            }
+        }
+
+    }, [translatedTranscriptions, detectedPhrase]);
 
     const renderMessage = ({ item }: { item: Message }) => (
         <View style={[

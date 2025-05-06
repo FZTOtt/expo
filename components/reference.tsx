@@ -20,7 +20,7 @@ const Reference = () => {
     const pathname = usePathname();
     const { wordExercise, phraseExercise } = useAppSelector((state: RootState) => state.exercise);
     
-    const { targetWords, targetTranscriptions } = useAppSelector((state: RootState) => state.word);
+    const { targetWords, targetTranscriptions, wordTranslations } = useAppSelector((state: RootState) => state.word);
     
     const [phonemes, setPhonemes] = useState<string[]>([])
     const [phonemeDetails, setPhonemeDetails] = useState<PhonemeReference[]>([])
@@ -70,6 +70,12 @@ const Reference = () => {
         try {
             const details = await Promise.all(
                 phonemes.map(async _symbol => {
+                    if (_symbol == 'p') return {
+                        phonema: 'p',
+                        text: 'а вот нет, давайте сами',
+                        // audio_link: url,
+                        // media_link: videoUrl
+                    } as PhonemeReference;
                     const [status, response] = await getPhonemeReference(_symbol)
                     if (status === 200) {
                         let url = response.audio_link;
@@ -179,10 +185,10 @@ const Reference = () => {
                 return (
                     <>
                         <Text style={styles.wordDescription}>
-                            Прослушайте слово и выберите правильный вариант.
+                            Прослушайте слово и выберите правильный вариант.{'\n'}
                             {targetWords.map((word, index) => {
                                 return (
-                                    `${targetWords[index]} (${targetTranscriptions[index]}) - перевод`
+                                    `${targetWords[index]} (${targetTranscriptions[index]}) - ${wordTranslations[index]}\n`
                                 )
                             })}
                         </Text>
@@ -193,10 +199,10 @@ const Reference = () => {
                 return (
                     <>
                         <Text style={styles.wordDescription}>
-                            Нажмите на слово для выбора и произнесите верно.
+                            Нажмите на слово для выбора и произнесите верно.{'\n'}
                             {targetWords.map((word, index) => {
                                 return (
-                                    `${targetWords[index]} (${targetTranscriptions[index]}) - перевод`
+                                    `${targetWords[index]} (${targetTranscriptions[index]}) - ${wordTranslations[index]}\n`
                                 )
                             })}
                         </Text>

@@ -14,5 +14,6 @@ export interface TargetPhrase {
 
 export interface PhraseChain {
     chain: string[];
+    sentence: string;
     audio: string | null;
 }

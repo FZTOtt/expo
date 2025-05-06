@@ -6,22 +6,23 @@ import PlaySound from '@/assets/icons/soundCurrentColor.svg'
 import { useEffect, useState } from "react"
 
 const completeChain = ({handleNext}) => {
-    const { audio } = useAppSelector((state: RootState) => state.phrases)
-    const chain = [
-        'one',
-        'two',
-        'three',
-        'four',
-        'five',
-        'six'
-    ]
+    const { chain, audio, sentence } = useAppSelector((state: RootState) => state.phrases)
+    // const chain = [
+    //     'one',
+    //     'two',
+    //     'three',
+    //     'four',
+    //     'five',
+    //     'six'
+    // ]
     const [availableWords, setAvailableWords] = useState<string[]>([])
     const [selectedWords, setSelectedWords] = useState<string[]>([])
+    const [correct, setCorrect] = useState<boolean|null>(null)
 
     useEffect(() => {
         setAvailableWords(chain)
         setSelectedWords([])
-    }, [])
+    }, [chain])
 
     const handleWordPress = (word: string) => {
         setAvailableWords(prev => prev.filter(w => w !== word))
@@ -31,6 +32,16 @@ const completeChain = ({handleNext}) => {
     const handleSelectedPress = (word: string) => {
         setSelectedWords(prev => prev.filter(w => w !== word))
         setAvailableWords(prev => [...prev, word])
+    }
+
+    function checkChain() {
+        console.log(selectedWords)
+        const isMatch = selectedWords.join(' ').toLowerCase() === sentence.toLowerCase();
+        setCorrect(isMatch)
+        setTimeout(()=>{
+            handleNext(selectedWords)
+            setCorrect(null)
+        }, 1500)
     }
 
     return (
@@ -65,7 +76,11 @@ const completeChain = ({handleNext}) => {
                     </TouchableOpacity>
                 ))}
             </View>
-            <TouchableOpacity style={styles.checkButton} onPress={handleNext}>
+            <TouchableOpacity style={[
+                styles.checkButton,
+                correct && { backgroundColor: 'green' },
+                correct == false && { backgroundColor: 'red', borderColor: 'red' }
+            ]} onPress={checkChain}>
                 <Text style={styles.checkText}>
                     Проверить
                 </Text>

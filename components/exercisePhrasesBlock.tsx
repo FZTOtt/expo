@@ -1,9 +1,7 @@
 import { useEffect } from "react"
-import WordPronounce from "./wordPronounce"
 import { useAppDispatch, useAppSelector } from "@/hooks"
 import { useExerciseParser } from "@/hooks/exerciseParser"
 import { RootState } from "@/redux/store"
-import { setPhraseExercise } from "@/redux/exercise"
 import PhrasePronounce from "./phrasePronounce"
 import CompleteChain from "./completeChain"
 import { getCurrentPhraseModule, getPhraseModuleExercises } from "@/api/api"
@@ -45,7 +43,27 @@ const ExercisePhrasesBlock = () => {
         } else {
             // Конец модуля
             console.log("Модуль завершён");
-            // Можно вызвать переход к следующему модулю или показать экран с результатами
+            const getNextModule = async () => {
+                let [status, response] = await getPhraseModuleExercises(currentPhraseModuleId+1);
+                console.log(response.exercises)
+                if (status === 200) {
+                    if (response.exercises.length != 0) {
+                        dispatch(setCurrentPhraseModule({
+                            id: currentPhraseModuleId+1,
+                            exercises: response.exercises}));
+                        parsePhrasesExercise(response.exercises[0]);
+                    } else {
+                        [status, response] = await getPhraseModuleExercises(1);
+                        if (status === 200) {
+                            dispatch(setCurrentPhraseModule({
+                                id: 1,
+                                exercises: response.exercises}));
+                                parsePhrasesExercise(response.exercises[0]);
+                        } 
+                    } 
+                }
+            }
+            getNextModule()
         }
     }
     

@@ -6,6 +6,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
+const axios = require('axios');
+const FormData = require('form-data');
 
 const { WordExerciseSchema, PhraseExerciseSchema, ModuleSchema } = require('./schemas');
 
@@ -342,6 +344,116 @@ app.post('/api/exercise-progress', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+app.get('/api/word-modules', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT id, title FROM word_modules ORDER BY id');
+        res.status(200).json({ 
+            status: 200,
+            payload: {
+                modules: result.rows
+            } 
+        });
+    } catch (error) {
+        console.error('Ошибка при получении модулей слов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+app.get('/api/phrase-modules', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT id, title FROM phrase_modules ORDER BY id');
+        res.status(200).json({ 
+            status: 200,
+            payload: {
+                modules: result.rows
+            } 
+        });
+    } catch (error) {
+        console.error('Ошибка при получении модулей слов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+app.post('/api/transcribe-word', upload.single('audio'), async (req, res) => {
+
+    const audioPath = req.file?.path;
+
+    if (!audioPath) {
+        return res.status(400).json({ error: "Аудиофайл обязателен." });
+    }
+
+    try {
+        const form = new FormData();
+        form.append('file', fs.createReadStream(audioPath));
+
+        const response = await axios.post('http://94.253.9.254:5001/transcribe', form, {
+            headers: form.getHeaders(),
+        });
+
+        res.status(200).json({ 
+            status: 200,
+            payload: response.data
+
+        });
+    } catch (error) {
+        console.error('Ошибка при получении модулей слов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+})
+
+app.post('/api/transcribe-phrase', upload.single('audio'), async (req, res) => {
+
+    const audioPath = req.file?.path;
+
+    if (!audioPath) {
+        return res.status(400).json({ error: "Аудиофайл обязателен." });
+    }
+
+    try {
+        const form = new FormData();
+        form.append('file', fs.createReadStream(audioPath));
+
+        const response = await axios.post('http://94.253.9.254:5000/recognize_speech', form, {
+            headers: form.getHeaders(),
+        });
+
+        res.status(200).json({ 
+            status: 200,
+            payload: response.data
+
+        });
+    } catch (error) {
+        console.error('Ошибка при получении модулей слов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+})
+
+app.post('/api/get-ai-help', async (req, res) => {
+    try {
+        const {target, errors} = req.body
+        const inputText = `Ситуация: Человек произносил на английском языке: \"${target}\", и ошибся в произношении ${errors} раза.\nТебе задание A:\n1) Нужно сообщить ТОЛЬКО о ФАКТЕ ошибки (что она просто есть, БЕЗ ПОДРОБНОСТЕЙ),\n2) Нужно как-то мягко пошутить на этот счёт, и обязательно с эмодзи.\nНужен ТОЛЬКО ответ на два пункта задания A. НЕЛЬЗЯ писать то, что напрямую не относится к ответам на два пункта задания A! СТРОГО соблюдать этот формат ответа!!!`
+
+        const response = await axios.post(
+            'http://94.253.9.254:5002/get_helper_text',
+            { input_text: inputText },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        res.status(200).json({ 
+            status: 200,
+            payload: response.data
+
+        });
+    } catch (error) {
+        console.error('Ошибка при получении модулей слов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+})
 
 
 app.listen(PORT, () => {
