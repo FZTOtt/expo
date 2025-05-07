@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
   res.send('Главная страница 🚀');
 });
 
-app.post('/api/create-word-module', async (req, res) => {
+app.post('/apinode/create-word-module', async (req, res) => {
     const result = ModuleSchema.safeParse(req.body);
     if (!result.success) {
         return res.status(400).json({ error: result.error.issues });
@@ -65,7 +65,7 @@ app.post('/api/create-word-module', async (req, res) => {
     }
 })
 
-app.post('/api/create-phrase-module', async (req, res) => {
+app.post('/apinode/create-phrase-module', async (req, res) => {
     const result = ModuleSchema.safeParse(req.body);
     if (!result.success) {
         return res.status(400).json({ error: result.error.issues });
@@ -91,7 +91,7 @@ app.post('/api/create-phrase-module', async (req, res) => {
     }
 })
 
-app.post('/api/word-exercises', upload.array('audio', 2), async (req, res) => {
+app.post('/apinode/word-exercises', upload.array('audio', 2), async (req, res) => {
     try {
         const { exercise, module_id, words, transcriptions, translations } = req.body;
     
@@ -142,7 +142,7 @@ app.post('/api/word-exercises', upload.array('audio', 2), async (req, res) => {
     }
 });
 
-app.post('/api/phrases-exercises', upload.single('audio'), async (req, res) => {
+app.post('/apinode/phrases-exercises', upload.single('audio'), async (req, res) => {
     try {
         const { exercise, module_id, sentence, transcription, translate, chain } = req.body;
 
@@ -197,7 +197,7 @@ app.post('/api/phrases-exercises', upload.single('audio'), async (req, res) => {
     }
 });
 
-app.get('/api/debug/word-exercises', async (req, res) => {
+app.get('/apinode/debug/word-exercises', async (req, res) => {
     const { rows } = await pool.query('SELECT * FROM word_exercises');
     // res.json(rows);
     res.status(200).json({
@@ -206,7 +206,7 @@ app.get('/api/debug/word-exercises', async (req, res) => {
     })
 });
 
-app.get('/api/debug/phrases-exercises', async (req, res) => {
+app.get('/apinode/debug/phrases-exercises', async (req, res) => {
     const { rows } = await pool.query('SELECT * FROM phrase_exercises');
     // res.json(rows);
     res.status(200).json({
@@ -215,7 +215,7 @@ app.get('/api/debug/phrases-exercises', async (req, res) => {
     })
 });
 
-app.get('/api/current-word-module/', async (req, res) => {
+app.get('/apinode/current-word-module/', async (req, res) => {
     const userId = 1
 
     try {
@@ -243,7 +243,7 @@ app.get('/api/current-word-module/', async (req, res) => {
     }
 });
 
-app.get('/api/word-modules/:id/exercises', async (req, res) => {
+app.get('/apinode/word-modules/:id/exercises', async (req, res) => {
     const moduleId = parseInt(req.params.id);
     const userId = 1;
     try {
@@ -268,7 +268,7 @@ app.get('/api/word-modules/:id/exercises', async (req, res) => {
     }
 })
 
-app.get('/api/current-phrase-module/', async (req, res) => {
+app.get('/apinode/current-phrase-module/', async (req, res) => {
     const userId = 1
 
     try {
@@ -296,7 +296,7 @@ app.get('/api/current-phrase-module/', async (req, res) => {
     }
 });
 
-app.get('/api/phrase-modules/:id/exercises', async (req, res) => {
+app.get('/apinode/phrase-modules/:id/exercises', async (req, res) => {
     const moduleId = parseInt(req.params.id);
     const userId = 1;
     try {
@@ -321,7 +321,7 @@ app.get('/api/phrase-modules/:id/exercises', async (req, res) => {
     }
 })
 
-app.post('/api/exercise-progress', async (req, res) => {
+app.post('/apinode/exercise-progress', async (req, res) => {
     const userId = 1;
     const { exercise_id, exercise_type, status } = req.body;
   
@@ -345,7 +345,7 @@ app.post('/api/exercise-progress', async (req, res) => {
     }
 });
 
-app.get('/api/word-modules', async (req, res) => {
+app.get('/apinode/word-modules', async (req, res) => {
     try {
         const result = await pool.query('SELECT id, title FROM word_modules ORDER BY id');
         res.status(200).json({ 
@@ -360,7 +360,7 @@ app.get('/api/word-modules', async (req, res) => {
     }
 });
 
-app.get('/api/phrase-modules', async (req, res) => {
+app.get('/apinode/phrase-modules', async (req, res) => {
     try {
         const result = await pool.query('SELECT id, title FROM phrase_modules ORDER BY id');
         res.status(200).json({ 
@@ -375,7 +375,7 @@ app.get('/api/phrase-modules', async (req, res) => {
     }
 });
 
-app.post('/api/transcribe-word', upload.single('audio'), async (req, res) => {
+app.post('/apinode/transcribe-word', upload.single('audio'), async (req, res) => {
 
     const audioPath = req.file?.path;
 
@@ -402,7 +402,7 @@ app.post('/api/transcribe-word', upload.single('audio'), async (req, res) => {
     }
 })
 
-app.post('/api/transcribe-phrase', upload.single('audio'), async (req, res) => {
+app.post('/apinode/transcribe-phrase', upload.single('audio'), async (req, res) => {
 
     const audioPath = req.file?.path;
 
@@ -429,7 +429,7 @@ app.post('/api/transcribe-phrase', upload.single('audio'), async (req, res) => {
     }
 })
 
-app.post('/api/get-ai-help', async (req, res) => {
+app.post('/apinode/get-ai-help', async (req, res) => {
     try {
         const {target, errors} = req.body
         const inputText = `Ситуация: Человек произносил на английском языке: \"${target}\", и ошибся в произношении ${errors} раза.\nТебе задание A:\n1) Нужно сообщить ТОЛЬКО о ФАКТЕ ошибки (что она просто есть, БЕЗ ПОДРОБНОСТЕЙ),\n2) Нужно как-то мягко пошутить на этот счёт, и обязательно с эмодзи.\nНужен ТОЛЬКО ответ на два пункта задания A. НЕЛЬЗЯ писать то, что напрямую не относится к ответам на два пункта задания A! СТРОГО соблюдать этот формат ответа!!!`
@@ -455,7 +455,7 @@ app.post('/api/get-ai-help', async (req, res) => {
     }
 })
 
-app.post('/api/get-ai-talk', async (req, res) => {
+app.post('/apinode/get-ai-talk', async (req, res) => {
     try {
         const { message } = req.body
 
