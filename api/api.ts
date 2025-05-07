@@ -5,7 +5,7 @@ import { PhrasesExerciseApiResponse, WordExerciseApiResponse } from "@/interface
 const API_BASE_URL = "https://ouzistudy.ru/api";
 const NODE_API_URL = "http://localhost:3000";
 const NODE_API_DEPLOY = "https://ouzistudy.ru";
-// localhost:8080
+// https://ouzistudy.ru
 
 export const translateAudio = async (audioData: string | Blob, word: string): Promise<[number, any]> => {
     const formData = new FormData();

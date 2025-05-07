@@ -234,7 +234,7 @@ app.get('/apinode/current-word-module/', async (req, res) => {
         res.json({ 
             status: 200,
             payload: {
-                module_id: rows[0]?.id || null
+                module_id: rows[0]?.id || 1
             } 
         });
     } catch (err) {
@@ -287,7 +287,7 @@ app.get('/apinode/current-phrase-module/', async (req, res) => {
         res.json({ 
             status: 200,
             payload: {
-                module_id: rows[0]?.id || null
+                module_id: rows[0]?.id || 1
             } 
         });
     } catch (err) {

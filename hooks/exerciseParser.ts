@@ -17,7 +17,7 @@ export const useExerciseParser = () => {
             //     url = 'http://localhost:3000' + url
             //     return url
             // })
-            const urls = response.audio.map((url) => `http://localhost:3000${url}`);
+            const urls = response.audio.map((url) => `https://ouzistudy.ru/media${url}`);
             const parsedWords: TargetWord = {
                 targetWords: response.words,
                 targetTranscriptions: response.transcriptions,
@@ -27,7 +27,7 @@ export const useExerciseParser = () => {
             dispatch(setWordDetails(parsedWords))
             dispatch(setDetectedTranscription([]))
         } else if (response.exercise_type === 'guessWord') {
-            const urls = response.audio.map((url) => `http://localhost:3000${url}`);
+            const urls = response.audio.map((url) => `https://ouzistudy.ru/media${url}`);
             console.log(response.words)
             const parsedWords: TargetWord = {
                 targetWords: response.words,
@@ -45,7 +45,7 @@ export const useExerciseParser = () => {
             let url = response.audio;
             // url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
             // url = url.replace(/&/g, '\\u0026');
-            url = 'http://localhost:3000' + url
+            url = 'https://ouzistudy.ru/media' + url
             console.log(url)
             const parsedPhrase: TargetPhrase = {
                 targetPhrase: response.sentence ? response.sentence : null,
@@ -65,7 +65,7 @@ export const useExerciseParser = () => {
             // url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
             // url = url.replace(/&/g, '\\u0026');
             
-            url = 'http://localhost:3000' + url
+            url = 'https://ouzistudy.ru/media' + url
 
             const parsedChain: PhraseChain = {
                 chain: response.chain ? response.chain : [],
