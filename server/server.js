@@ -31,8 +31,8 @@ const storage = multer.diskStorage({
 app.use(express.json());
 app.use('/uploads/audio', express.static(path.join(__dirname, 'uploads/audio')));
 app.use(cors({
-    origin: 'http://localhost:8081', 
-    credentials: true,              
+    origin: ['http://localhost:8081', 'https://ouzistudy.ru'], 
+    credentials: true,
   }));
 
 app.get('/', (req, res) => {
