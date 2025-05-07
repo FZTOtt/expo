@@ -455,6 +455,30 @@ app.post('/api/get-ai-help', async (req, res) => {
     }
 })
 
+app.post('/api/get-ai-talk', async (req, res) => {
+    try {
+        const { message } = req.body
+
+        const response = await axios.post(
+            'http://94.253.9.254:5002/get_helper_text',
+            { input_text: message },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        res.status(200).json({ 
+            status: 200,
+            payload: response.data
+
+        });
+    } catch (error) {
+        console.error('Ошибка при получении модулей слов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+})
 
 app.listen(PORT, () => {
   console.log(`Сервер запущен на http://localhost:${PORT}`);

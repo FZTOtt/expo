@@ -1,5 +1,6 @@
-import { getAIHelp } from "@/api/api";
-import { useAppSelector } from "@/hooks";
+import { getAIHelp, getAITalk, getPhraseTranscrible } from "@/api/api";
+import { useAppDispatch, useAppSelector } from "@/hooks";
+import { writeMessage } from "@/redux/aichat";
 import { RootState } from "@/redux/store";
 import { usePathname } from "expo-router";
 import React, { useState, useRef, useEffect } from "react";
@@ -13,6 +14,9 @@ import {
     KeyboardAvoidingView,
     Platform
 } from "react-native";
+import MicOn from '@/assets/icons/micon.svg';
+import MicOff from '@/assets/icons/micoff.svg';
+import AudioRecorder from './aidoRecorder';
 
 // Тип сообщения
 type Message = {
@@ -23,11 +27,16 @@ type Message = {
 
 const Chat = () => {
     const pathname = usePathname();
-    const [messages, setMessages] = useState<Message[]>([]);
+    const dispatch = useAppDispatch();
+
+    const [localMessages, setLocalMessages] = useState<Message[]>([]);
     const [inputText, setInputText] = useState("");
     const flatListRef = useRef<FlatList>(null);
     const { translatedTranscriptions, targetWords } = useAppSelector((state: RootState) => state.word);
     const { detectedPhrase, targetPhrase } = useAppSelector((state: RootState) => state.phrases);
+    const { messages } = useAppSelector((state: RootState) => state.aiChat);
+
+    const fullchat = pathname == '/aichat'
 
   // Отправка сообщения
     const handleSend = async () => {
@@ -38,31 +47,51 @@ const Chat = () => {
             text: inputText,
             isUser: true,
         };
-        setMessages(prev => [...prev, userMessage]);
+
+        if (pathname == '/aichat') {
+            console.log('aichat')
+            dispatch(writeMessage(userMessage))
+            setInputText("");
+            const [status, response] = await getAITalk(inputText);
+            if (status == 200) {
+                const aiMessage: Message = {
+                    id: Date.now().toString(),
+                    text: response.text,
+                    isUser: false,
+                }
+                dispatch(writeMessage(aiMessage));
+            }
+            return;
+        }
+
+
+        setLocalMessages(prev => [...prev, userMessage]);
         setInputText("");
 
-        // const [status, response] = await getAIHelp(inputText);
-        // if (status == 200) {
-        //     const aiMessage: Message = {
-        //         id: Date.now().toString(),
-        //         text: response.text,
-        //         isUser: false,
-        //     }
-        //     setMessages(prev => [...prev, aiMessage]);
-        // }
-        const aiMessage: Message = {
-            id: Date.now().toString(),
-            text: 'прости, я пока не могу отвечать на сообщения',
-            isUser: false,
+        const [status, response] = await getAITalk(inputText);
+        if (status == 200) {
+            const aiMessage: Message = {
+                id: Date.now().toString(),
+                text: response.text,
+                isUser: false,
+            }
+            setLocalMessages(prev => [...prev, aiMessage]);
         }
-        setMessages(prev => [...prev, aiMessage]);
     };
 
     useEffect(() => {
-        if (messages.length > 0) {
-            flatListRef.current?.scrollToEnd({ animated: true });
+        if (pathname == '/aichat') {
+            if (messages.length > 0) {
+                flatListRef.current?.scrollToEnd({ animated: true });
+            }
+        } else {
+            if (localMessages.length > 0) {
+                flatListRef.current?.scrollToEnd({ animated: true });
+            }   
         }
-    }, [messages]);
+        if (messages.length > 0) {
+        }
+    }, [localMessages, messages]);
 
     const cleanPhonemes = (str: string) => str.replace(/[ˈˌ]/g, '').split('');
 
@@ -97,7 +126,7 @@ const Chat = () => {
                     text: response.text,
                     isUser: false,
                 }
-                setMessages(prev => [...prev, aiMessage]);
+                setLocalMessages(prev => [...prev, aiMessage]);
             }
         }
         if(pathname == '/') {
@@ -116,7 +145,7 @@ const Chat = () => {
                 }
                 getAISuggest(targetWords[0], errors)
             }
-        } else {
+        } else if (pathname == '/phrases') {
             if (detectedPhrase) {
                 const errors = countWordErrors(detectedPhrase, targetPhrase)
                 getAISuggest(targetPhrase, errors)
@@ -134,36 +163,62 @@ const Chat = () => {
         </View>
     );
 
+    const handleRecordingComplete = async (audio: Blob | string) => {
+        const [status, response] = await getPhraseTranscrible(audio);
+        if (status === 200) {
+            const message = response.text
+            const userMessage: Message = {
+                id: Date.now().toString(),
+                text: message,
+                isUser: true,
+            };
+            dispatch(writeMessage(userMessage))
+            const [status1, response1] = await getAITalk(inputText);
+            if (status1 == 200) {
+                const aiMessage: Message = {
+                    id: Date.now().toString(),
+                    text: response1.text,
+                    isUser: false,
+                }
+                dispatch(writeMessage(aiMessage));
+            }
+        } else {
+            console.error('Ошибка при запросе расшифровке аудио')
+        }
+    }
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={styles.container}
         >
-        {/* Список сообщений */}
         <FlatList
             ref={flatListRef}
-            data={messages}
+            data={fullchat ? messages : localMessages}
             renderItem={renderMessage}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.messagesContainer}
             showsVerticalScrollIndicator={false}
-            // indicatorStyle="black"
         />
+        {fullchat ? (
+            <View style={styles.audioInput}>
+                <AudioRecorder onState={MicOn} offState={MicOff} size={90} onRecordComplete={handleRecordingComplete}></AudioRecorder>
+            </View>
+        ) : (        
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.input}
+                    value={inputText}
+                    onChangeText={setInputText}
+                    placeholder="Напишите сообщение..."
+                    placeholderTextColor="#999"
+                    onSubmitEditing={handleSend}
+                />
+                <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
+                <Text style={styles.sendButtonText}>➤</Text>
+                </TouchableOpacity>
+            </View>) }
 
-        {/* Поле ввода и кнопка отправки */}
-        <View style={styles.inputContainer}>
-            <TextInput
-                style={styles.input}
-                value={inputText}
-                onChangeText={setInputText}
-                placeholder="Напишите сообщение..."
-                placeholderTextColor="#999"
-                onSubmitEditing={handleSend}
-            />
-            <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-            <Text style={styles.sendButtonText}>➤</Text>
-            </TouchableOpacity>
-        </View>
         </KeyboardAvoidingView>
     );
 };
@@ -227,6 +282,16 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 18,
     },
+    audioInput: {
+        // flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        // height: 300
+        borderTopWidth: 2,
+        borderTopColor: 'rgba(82, 101, 109, 1)',
+        paddingTop: 30,
+        marginTop: 20
+    }
 });
 
 export default Chat;

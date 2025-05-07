@@ -196,10 +196,20 @@ export const getAIHelp = async (target: string, errors: number): Promise<[number
         errors: errors
     })
     const headers = {
-        'Content-Type': 'application/json', // <== это важно
+        'Content-Type': 'application/json',
+    };
+    
+    return postRequest(`${NODE_API_URL}/api/get-ai-help`, data, headers)
+}
+
+export const getAITalk = async (message: string): Promise<[number, any]> => {
+
+    const data = JSON.stringify({ 
+        message: message
+    })
+    const headers = {
+        'Content-Type': 'application/json',
     };
 
-    console.log(data)
-
-    return postRequest(`${NODE_API_URL}/api/get-ai-help`, data, headers)
+    return postRequest(`${NODE_API_URL}/api/get-ai-talk`, data, headers)
 }

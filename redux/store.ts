@@ -6,6 +6,7 @@ import wordReducer from './word'
 import phrasesReducer from './phrases';
 import exerciseReducer from './exercise';
 import moduleReducer from './module';
+import aiChatReducer from './aichat';
 
 const store = configureStore({
     reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
         phrases: phrasesReducer,
         exercise: exerciseReducer,
         module: moduleReducer,
+        aiChat: aiChatReducer,
     },
 });
 
