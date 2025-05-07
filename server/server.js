@@ -35,7 +35,7 @@ app.use(cors({
     credentials: true,
   }));
 
-app.get('/', (req, res) => {
+app.get('/apinode/', (req, res) => {
   res.send('Главная страница 🚀');
 });
 
