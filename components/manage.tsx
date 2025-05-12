@@ -1,9 +1,8 @@
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import React from 'react';
 import MicOn from '@/assets/icons/micon.svg';
 import MicOff from '@/assets/icons/micoff.svg';
 import AudioRecorder from './aidoRecorder';
-import Skip from '@/assets/icons/skip.svg';
 
 type ManageProps = {
     onRecordComplete: (audio: Blob | string) => Promise<void>;
@@ -15,10 +14,13 @@ const Manage = ({onRecordComplete, onNext}: ManageProps) => {
         <View style={styles.container}>
             <View style={styles.buttonsContainer}>                
                 <AudioRecorder onState={MicOn} offState={MicOff} size={90} onRecordComplete={onRecordComplete}></AudioRecorder>
-                <TouchableOpacity style={[styles.button, styles.disabledButton]} onPress={onNext}>
-                    <Skip width={40} height={40}/>
+                <TouchableOpacity style={[styles.button]} onPress={onNext}>
+                    <Text style={styles.buttonSkipText}>Пропустить</Text>
                 </TouchableOpacity>
-            </View >
+            </View>
+            <Text style={styles.textDescription}>
+                Варианты записи: 1) Зажать, записать, отпустить; 2) Нажать, записать, нажать
+            </Text>
         </View>
     );
 }
@@ -35,7 +37,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 30,
-        marginLeft: 70
+        marginLeft: 170
     },
     recognizedText: {
         marginTop: 20,
@@ -48,30 +50,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     button: {
-      width: 60,
-      height: 60,
-      justifyContent: 'center',
-      alignItems: 'center',
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderRadius: 10,
+        borderColor: 'rgba(63, 133, 167, 1.00)',
     },
-    buttonLarge: {
-      width: 90,
-      height: 90,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginHorizontal: 20,
+    buttonSkipText: {
+        fontSize: 20,
+        color: 'white'
     },
-    disabledButton: {
-      opacity: 0.5,
-    },
-    icon: {
-        width: '100%',
-        height: '100%',
-        resizeMode: 'cover',
-    },
-    iconLarge: {
-        width: '100%',
-        height: '100%',
-        resizeMode: 'cover',
+    textDescription: {
+        fontSize: 16,
+        paddingTop: 20,
+        color: 'white'
     }
 });
 

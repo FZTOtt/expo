@@ -1,10 +1,9 @@
 import { useAppDispatch } from "@/hooks";
-import { setTranslatedAudio, setUsersRecording } from "@/redux/translated";
+import { setUsersRecording } from "@/redux/translated";
 import { Audio } from "expo-av";
 import { AndroidAudioEncoder, AndroidOutputFormat, IOSOutputFormat } from "expo-av/build/Audio";
-import { useRef, useState } from "react";
-import { Platform, TouchableOpacity, View } from "react-native";
-import { IconButton } from "react-native-paper";
+import { useEffect, useRef, useState } from "react";
+import { Animated, Easing, Platform, TouchableOpacity, View } from "react-native";
 import { SvgProps } from "react-native-svg";
 
 interface AudioRecorderProps {
@@ -21,6 +20,9 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
     onRecordComplete 
 }) => {
     const dispatch = useAppDispatch();
+    const pressTimer = useRef<NodeJS.Timeout | null>(null);
+    const hasLongPressed = useRef(false);
+    const blockNextTap = useRef(false);
 
     const [isRecording, setIsRecording] = useState<boolean>(false);
     const [recording, setRecording] = useState<Audio.Recording | undefined>();
@@ -28,7 +30,63 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
 
+    const scaleAnim = useRef(new Animated.Value(1)).current;
+
+    useEffect(() => {
+        if (isRecording) {
+            Animated.loop(
+                Animated.sequence([
+                    Animated.timing(scaleAnim, {
+                        toValue: 1.4,
+                        duration: 700,
+                        easing: Easing.out(Easing.ease),
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(scaleAnim, {
+                        toValue: 1,
+                        duration: 700,
+                        easing: Easing.in(Easing.ease),
+                        useNativeDriver: true,
+                    }),
+                ])
+            ).start();
+        } else {
+            scaleAnim.stopAnimation();
+            scaleAnim.setValue(1);
+        }
+    }, [isRecording]);
+
+    const handlePressIn = () => {
+        hasLongPressed.current = false;
+        pressTimer.current = setTimeout(() => {
+            hasLongPressed.current = true;
+            startRecording();
+        }, 50);
+    };
+
+    const handlePressOut = () => {
+        if (pressTimer.current) {
+            clearTimeout(pressTimer.current);
+        }
+
+        if (hasLongPressed.current) {
+            if (isRecording) stopRecording();
+            blockNextTap.current = true;
+            setTimeout(() => (blockNextTap.current = false), 300);
+        }
+    };
+
+    const handleTap = () => {
+        if (blockNextTap.current) return;
+
+        if (!hasLongPressed.current) {
+            if (!isRecording) startRecording();
+            else stopRecording();
+        }
+    };
+
     const startRecording = async () => {
+        console.log('start')
         if (Platform.OS === 'web') {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -88,6 +146,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
     }
 
     async function stopRecording() {
+        console.log('stop')
         if (Platform.OS === 'web') {
             if (mediaRecorderRef.current) {
                 mediaRecorderRef.current.stop();
@@ -117,7 +176,9 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
     return (
         <TouchableOpacity 
-            onPress={isRecording ? stopRecording : startRecording}
+            onPress={handleTap}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
             style={{
             width: size,
             height: size,
@@ -126,13 +187,28 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
             borderRadius: size / 2,
             }}
         >
-        <View style={{ width: size, height: size}}>
+        {/* <View style={{ width: size, height: size}}>
           {isRecording ? (
             <OffStateIcon width="100%" height="100%" />
           ) : (
             <OnStateIcon width="100%" height="100%" />
           )}
-        </View>
+        </View> */}
+            <Animated.View
+                style={{
+                    width: size,
+                    height: size,
+                    borderRadius: size / 2,
+                    backgroundColor: isRecording ? 'red' : 'gray',
+                    transform: [{ scale: scaleAnim }],
+                    shadowColor: 'red',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: isRecording ? 0.6 : 0,
+                    shadowRadius: 10,
+                }}
+            >
+                <OnStateIcon width="100%" height="100%" />
+            </Animated.View>
       </TouchableOpacity>
     )
 }
