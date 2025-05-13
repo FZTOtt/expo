@@ -1,34 +1,155 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { RootState } from '@/redux/store';
 import { useAppSelector } from '@/hooks/useAppSelector';
-import Reference from '@/assets/icons/reference.svg';
-import { useAppDispatch } from '@/hooks';
-import { setVisible } from '@/redux/modal';
 import AudioPlayer from './audioPlayer';
+import PlaySound from '@/assets/icons/playSound.svg'
 
-const Target = () => {
-    const { targetWord, isCorrect, targetAudioUrl, targetTranscription } = useAppSelector((state: RootState) => state.translated);
-    const { isVisible } = useAppSelector((state: RootState) => state.modal);
-    const dispatch = useAppDispatch();
+interface TargetProps {
+    word: string;
+    transcription: string;
+    audioUrl: string;
+    mode: 'word' | 'phrase';
+}
 
-    function openReference() {
-        dispatch(setVisible(!isVisible))
+const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
+
+    console.log(audioUrl)
+
+    const { translatedTranscriptions } = useAppSelector((state: RootState) => state.word)
+    const { detectedPhrase } = useAppSelector((state: RootState) => state.phrases)
+
+    const HighlightedComparison = ({ original, detected }) => {
+        
+        const originalWords = original.trim().split(/\s+/);
+        if (!detected) {
+            return (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    {originalWords.map((word, index) => {
+                        return (
+                            <Text
+                                key={index}
+                                style={{
+                                    color: 'white',
+                                    fontSize: 60,
+                                    paddingLeft: 15
+                                }}
+                            >
+                                {word}
+                            </Text>
+                        );
+                    })}
+                </View>
+            )
+        }
+        const detectedWords = detected
+        .replace(/[.,!?;:"“”()]/g, '')
+        .trim()
+        .split(/\s+/);
+    
+        return (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap'}}>
+                {originalWords.map((word, index) => {
+                    const match = detectedWords[index]?.toLowerCase() === word.toLowerCase();
+                    return (
+                        <Text
+                            key={index}
+                            style={{
+                                color: match ? 'green' : 'red',
+                                fontSize: 60,
+                                paddingLeft: 15
+                            }}
+                        >
+                            {word}
+                        </Text>
+                    );
+                })}
+            </View>
+        );
+    };
+
+    const cleanTranscription = (text: string) => 
+        text.replace(/[ˈˌ]/g, '').toLowerCase();
+
+    const HighlightedTranscription = ({ transcription, detectedTranscription }) => {
+        
+        const originalPhonemes = transcription.trim().split('');
+        if (!detectedTranscription) {
+            return (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5 }}>
+                {originalPhonemes.map((ph, index) => {
+                    return (
+                        <Text
+                            key={index}
+                            style={{
+                                color: 'white',
+                                fontSize: 60
+                            }}
+                        >
+                            {ph}
+                        </Text>
+                    );
+                })}
+            </View>
+            )
+        }
+        const detectedPhonemes = detectedTranscription.split('');
+    
+        return (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5 }}>
+                {originalPhonemes.map((ph, index) => {
+                    const match = cleanTranscription(detectedPhonemes[index] || '') === cleanTranscription(ph);
+                    return (
+                        <Text
+                            key={index}
+                            style={{
+                                color: match ? 'green' : 'red',
+                                fontSize: 60
+                            }}
+                        >
+                            {ph}
+                        </Text>
+                    );
+                })}
+            </View>
+        );
+    };
+    const handleMode = () => {
+        if (mode === 'word') {
+            return (
+                <>
+                    <View style={styles.wordContainer}>
+                        <HighlightedTranscription transcription={transcription} detectedTranscription={translatedTranscriptions[0]} />
+                        <AudioPlayer buttonStyle={styles.audioButton} audioUrl={audioUrl}>
+                            <PlaySound 
+                                width={30} height={30}
+                            />
+                        </AudioPlayer>
+                    </View>
+                    <Text style={styles.word}>
+                        {word ? word.charAt(0).toUpperCase() + word.slice(1) : ''}
+                    </Text>
+                </>
+            )
+        } else return (
+            <>
+                <View style={styles.wordContainer}>
+                    <HighlightedComparison original={word} detected={detectedPhrase} />
+                    <AudioPlayer buttonStyle={styles.audioButton} audioUrl={audioUrl}>
+                        <PlaySound 
+                            width={30} height={30}
+                        />
+                    </AudioPlayer>
+                </View>
+                <Text style={styles.word}>
+                    {transcription} 
+                </Text>
+            </>            
+        )
     }
 
     return (
         <View style={styles.container}>
-            <View style={styles.wordContainer}>
-                <TouchableOpacity style={styles.referenceButton} onPress={openReference}>
-                    <Reference width={30} height={30}></Reference>
-                </TouchableOpacity>
-                <Text style={[styles.word, isCorrect === null ? {} : isCorrect ? styles.wordCorrect : styles.wordIncorrect]}>
-                    {targetWord ? targetWord.charAt(0).toUpperCase() + targetWord.slice(1) : ''}
-                </Text>
-                <AudioPlayer buttonStyle={styles.audioButton} imgStyle={styles.playButton} audioUrl={targetAudioUrl}/>
-            </View>
-            <Text style={styles.transcription}>
-                {targetTranscription}
-            </Text>
+            {handleMode()}
         </View>
     )
 }
@@ -42,10 +163,15 @@ const styles = StyleSheet.create({
     },
     wordContainer: {
         height: 60,
+        flex: 1,
+        flexDirection: 'row',
+        gap: 20,
+        marginLeft: 50
     },
     word: {
-        fontSize: 60,
-        lineHeight: 60,
+        fontSize: 20,
+        marginTop: 10,
+        color: 'white',
     },
     wordCorrect: {
         color: 'green',
@@ -54,9 +180,6 @@ const styles = StyleSheet.create({
         color: 'red',
     },
     audioButton: {
-        position: 'absolute',
-        height: 60,
-        right: -40,
         justifyContent: 'center',
     },
     referenceButton: {
@@ -70,8 +193,9 @@ const styles = StyleSheet.create({
         height: 30,
     },
     transcription: {
-        fontSize: 20,
-        marginTop: 10,
+        fontSize: 60,
+        lineHeight: 60,
+        color: 'white'
     }
 });
 

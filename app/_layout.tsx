@@ -9,7 +9,6 @@ import store from "@/redux/store";
 export default function RootLayout() {
   return <ReduxProvider store={store}>
         <PaperProvider>
-            <Navbar />
             <Slot />
         </PaperProvider>
     </ReduxProvider>

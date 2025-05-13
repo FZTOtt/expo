@@ -1,0 +1,4 @@
+{
+    "databaseUrl": "postgres://postgres:1@localhost:5432/ouzidb",
+    "migrationsDir": "./migrations"
+}

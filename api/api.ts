@@ -1,8 +1,11 @@
 import { Platform } from "react-native";
 import { postRequest, getRequest } from "./ajax";
+import { PhrasesExerciseApiResponse, WordExerciseApiResponse } from "@/interfaces/apiResponses";
 
 const API_BASE_URL = "https://ouzistudy.ru/api";
-// localhost:8080
+const NODE_API_URL = "http://localhost:3000";
+const NODE_API_DEPLOY = "https://ouzistudy.ru";
+// https://ouzistudy.ru
 
 export const translateAudio = async (audioData: string | Blob, word: string): Promise<[number, any]> => {
     const formData = new FormData();
@@ -30,7 +33,6 @@ export const translateAudio = async (audioData: string | Blob, word: string): Pr
     Запрос на получение подсказки по фонеме
 */
 export const getPhonemeReference = async (phoneme: string): Promise<[number, any]> => {
-    console.log(`[API] Запрос подсказки для фонемы: "${phoneme}"`);
     const data = JSON.stringify({ phonema: phoneme})
     
     return postRequest(`${API_BASE_URL}/tip/get_tip`, data)
@@ -102,4 +104,113 @@ export const getPhoneme = async (): Promise<[number, any]> => {
 export const getWordNode = async (): Promise<[number, any]> => {
 
     return getRequest(`http://localhost:3001/word/random`)
+}
+
+export const getWordExercise = async (module: string): Promise<[number, WordExerciseApiResponse]> => {
+
+    const data = JSON.stringify({ module: module })
+
+    return postRequest(`${API_BASE_URL}/getExrcise/word`, data)
+}
+
+export const getPhraseExercise = async (module: string): Promise<[number, PhrasesExerciseApiResponse]> => {
+
+    const data = JSON.stringify({ module: module })
+
+    return postRequest(`${API_BASE_URL}/getExrcise/phrase`, data)
+}
+
+export const getCurrentWordModule = async (): Promise<[number, any]> => {
+
+    return getRequest(`${NODE_API_DEPLOY}/apinode/current-word-module/`)
+}
+
+export const getWordModuleExercises = async (id: number): Promise<[number, any]> => {
+
+    return getRequest(`${NODE_API_DEPLOY}/apinode/word-modules/${id}/exercises`)
+}
+
+export const getCurrentPhraseModule = async (): Promise<[number, any]> => {
+
+    return getRequest(`${NODE_API_DEPLOY}/apinode/current-phrase-module/`)
+}
+
+export const getPhraseModuleExercises = async (id: number): Promise<[number, any]> => {
+
+    return getRequest(`${NODE_API_DEPLOY}/apinode/phrase-modules/${id}/exercises`)
+}
+
+export const getWordModules = async (): Promise<[number, any]> => {
+
+    return getRequest(`${NODE_API_DEPLOY}/apinode/word-modules`)
+}
+
+export const getPhraseModules = async (): Promise<[number, any]> => {
+
+    return getRequest(`${NODE_API_DEPLOY}/apinode/phrase-modules`)
+}
+
+export const getWordTranscrible = async (audioData: string | Blob): Promise<[number, any]> => {
+    const formData = new FormData();
+    
+    if (typeof audioData === 'string') {
+        const filename = audioData.split('/').pop() || 'audio.wav';
+        formData.append('audio', {
+            uri: audioData,
+            name: filename,
+            type: 'audio/wav'
+        } as any);
+    } else {
+        formData.append('audio', audioData, 'audio.wav');
+    }
+    const headers: Record<string, string> = Platform.OS === 'web' ? {} : {
+        'Content-Type': 'multipart/form-data'
+    };
+    
+    return postRequest(`${NODE_API_DEPLOY}/apinode/transcribe-word`, formData, headers);
+};
+
+export const getPhraseTranscrible = async (audioData: string | Blob): Promise<[number, any]> => {
+    const formData = new FormData();
+    
+    if (typeof audioData === 'string') {
+        const filename = audioData.split('/').pop() || 'audio.wav';
+        formData.append('audio', {
+            uri: audioData,
+            name: filename,
+            type: 'audio/wav'
+        } as any);
+    } else {
+        formData.append('audio', audioData, 'audio.wav');
+    }
+    const headers: Record<string, string> = Platform.OS === 'web' ? {} : {
+        'Content-Type': 'multipart/form-data'
+    };
+    
+    return postRequest(`${NODE_API_DEPLOY}/apinode/transcribe-phrase`, formData, headers);
+};
+
+export const getAIHelp = async (target: string, errors: number): Promise<[number, any]> => {
+
+    const data = JSON.stringify({ 
+        target: target,
+        errors: errors
+    })
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+    
+    return postRequest(`${NODE_API_DEPLOY}/apinode/get-ai-help`, data, headers)
+}
+
+export const getAITalk = async (message: string): Promise<[number, any]> => {
+
+    const data = JSON.stringify({ 
+        message: message
+    })
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+
+    return postRequest(`${NODE_API_DEPLOY}/apinode/get-ai-talk`, data, headers)
 }

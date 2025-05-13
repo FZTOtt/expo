@@ -1,271 +1,485 @@
 const express = require('express');
-const cors = require('cors');
+const app = express();
+const PORT = 3000;
+const pool = require('./db');
 const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const cors = require('cors');
 const axios = require('axios');
 const FormData = require('form-data');
-const fs = require('fs');
-const path = require('path');
 
-const app = express();
+const { WordExerciseSchema, PhraseExerciseSchema, ModuleSchema } = require('./schemas');
 
-app.use(cors());
-app.use(express.json());
+const uploadDir = path.join(__dirname, 'uploads/audio');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-const AUDIO_DIR = 'uploads/audio/';
-const METADATA_FILE = 'uploads/metadata.json';
-
-if (!fs.existsSync(AUDIO_DIR)) fs.mkdirSync(AUDIO_DIR, { recursive: true });
-if (!fs.existsSync(METADATA_FILE)) fs.writeFileSync(METADATA_FILE, '[]');
-
-const WORDS_DIR = 'uploads/words/';
-const WORDS_METADATA_FILE = 'uploads/words_metadata.json';
-
-if (!fs.existsSync(WORDS_DIR)) fs.mkdirSync(WORDS_DIR, { recursive: true });
-if (!fs.existsSync(WORDS_METADATA_FILE)) fs.writeFileSync(WORDS_METADATA_FILE, '[]');
-
-const uploadTemp = multer({ dest: 'temp/' });
-
-const upload = multer({ 
-    dest: AUDIO_DIR,
-    limits: { fileSize: 10 * 1024 * 1024 },
-});
-
-const wordUpload = multer({ 
-    dest: WORDS_DIR,
-    limits: { fileSize: 10 * 1024 * 1024 },
-});
-
-app.post('/phoneme/upload', upload.single('audio'), (req, res) => {
-    try {
-        const { phoneme } = req.body;
-        if (!req.file || !phoneme) {
-            return res.status(400).json({ error: 'Нужны аудио и фонема' });
-        }
-    
-        const metadata = JSON.parse(fs.readFileSync(METADATA_FILE));
-        
-        metadata.push({
-            id: req.file.filename, // Имя файла = ID
-            filename: req.file.filename,
-            phoneme,
-            createdAt: new Date().toISOString()
-        });
-    
-        // Сохраняем метаданные
-        fs.writeFileSync(METADATA_FILE, JSON.stringify(metadata, null, 2));
-    
-        // Переименовываем файл (убираем временный суффикс Multer)
-        const newPath = path.join(AUDIO_DIR, req.file.filename + '.wav');
-        fs.renameSync(req.file.path, newPath);
-    
-        res.status(201).json({ 
-            id: req.file.filename,
-            phoneme 
-        });
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, `${uniqueSuffix}-${file.originalname}`);
+    }
+  });
   
+  const upload = multer({ storage });
+
+app.use(express.json());
+app.use('/uploads/audio', express.static(path.join(__dirname, 'uploads/audio')));
+app.use(cors({
+    origin: ['http://localhost:8081', 'https://ouzistudy.ru'], 
+    credentials: true,
+  }));
+
+app.get('/apinode/', (req, res) => {
+  res.send('Главная страница 🚀');
+});
+
+app.post('/apinode/create-word-module', async (req, res) => {
+    const result = ModuleSchema.safeParse(req.body);
+    if (!result.success) {
+        return res.status(400).json({ error: result.error.issues });
+    }
+
+    try {
+        const { rows } = await pool.query(
+            `INSERT INTO word_modules
+            (title)
+            VALUES ($1) RETURNING id`,
+            [
+                result.data.title
+            ]
+        );
+        res.status(200).json({
+            status: 200,
+            payload: {
+                id: rows[0].id
+            }
+        })
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+})
 
-app.post('/word/upload', wordUpload.single('audio'), (req, res) => {
+app.post('/apinode/create-phrase-module', async (req, res) => {
+    const result = ModuleSchema.safeParse(req.body);
+    if (!result.success) {
+        return res.status(400).json({ error: result.error.issues });
+    }
+
     try {
-        const { word, transcription } = req.body;
-        
-        if (!req.file || !word || !transcription) {
-            return res.status(400).json({ 
-                error: 'Необходимы: аудиофайл, слово и транскрипция' 
-            });
-        }
+        const { rows } = await pool.query(
+            `INSERT INTO phrase_modules
+            (title)
+            VALUES ($1) RETURNING id`,
+            [
+                result.data.title
+            ]
+        );
+        res.status(200).json({
+            status: 200,
+            payload: {
+                id: rows[0].id
+            }
+        })
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+})
 
-        const wordsMetadata = JSON.parse(fs.readFileSync(WORDS_METADATA_FILE));
-        
-        const newWord = {
-            id: req.file.filename,
-            filename: req.file.filename + '.wav',
-            word,
-            transcription,
-            createdAt: new Date().toISOString()
+app.post('/apinode/word-exercises', upload.array('audio', 2), async (req, res) => {
+    try {
+        const { exercise, module_id, words, transcriptions, translations } = req.body;
+    
+        const parsedWords = JSON.parse(words);
+        const parsedTranscriptions = JSON.parse(transcriptions);
+        const parsedTranslations = JSON.parse(translations);
+    
+        const audioLinks = req.files.map(file => `/uploads/audio/${file.filename}`);
+    
+        const parsedData = {
+            exercise,
+            module_id: parseInt(module_id, 10),
+            words: parsedWords,
+            transcriptions: parsedTranscriptions,
+            audio: audioLinks,
+            translations: parsedTranslations
         };
-        wordsMetadata.push(newWord);
-
-        // Сохраняем метаданные
-        fs.writeFileSync(WORDS_METADATA_FILE, JSON.stringify(wordsMetadata, null, 2));
-
-        // Переименовываем аудиофайл
-        const newPath = path.join(WORDS_DIR, req.file.filename + '.wav');
-        fs.renameSync(req.file.path, newPath);
-
-        res.status(201).json({
-            id: newWord.id,
-            word: newWord.word,
-            transcription: newWord.transcription
-        });
-
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.get('/node/random_phoneme', (req, res) => {
-    try {
-        const metadata = JSON.parse(fs.readFileSync(METADATA_FILE));
-        if (metadata.length === 0) {
-            return res.status(404).json({ error: 'Нет доступных фонем' });
+  
+        const result = WordExerciseSchema.safeParse(parsedData);
+        if (!result.success) {
+            return res.status(400).json({ error: result.error.issues });
         }
-
-        // Выбираем случайную запись
-        const randomIndex = Math.floor(Math.random() * metadata.length);
-        const randomPhoneme = metadata[randomIndex];
-
-        // Формируем URL для скачивания аудио
-        const audioUrl = `http://${req.get('host')}/api/audio/${randomPhoneme.id}`;
-
-        res.json({
+  
+        const { rows } = await pool.query(
+            `INSERT INTO word_exercises 
+            (exercise_type, words, transcriptions, audio, translations, module_id) 
+            VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+            [
+            result.data.exercise,
+            result.data.words,
+            result.data.transcriptions,
+            result.data.audio,
+            result.data.translations,
+            result.data.module_id,
+            ]
+        );
+  
+        res.status(200).json({
             status: 200,
             payload: {
-                phoneme: randomPhoneme.phoneme,
-                audioUrl: audioUrl,
+                status: "success",
+                id: rows[0].id
             }
-
         });
-
-    } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении фонемы' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
     }
 });
 
-app.get('/api/audio/:id', (req, res) => {
+app.post('/apinode/phrases-exercises', upload.single('audio'), async (req, res) => {
     try {
-        const filePath = path.join(AUDIO_DIR, req.params.id + '.wav');
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).json({ error: 'Аудио не найдено' });
+        const { exercise, module_id, sentence, transcription, translate, chain } = req.body;
+
+        const parsedChain = JSON.parse(chain);
+    
+        const audioLink = req.file?.filename
+            ? `/uploads/audio/${req.file.filename}`
+            : null;
+  
+        if (!audioLink) {
+            return res.status(400).json({ error: "Аудиофайл обязателен." });
         }
-        res.download(filePath);
-    } catch (error) {
-        res.status(500).json({ error: 'Ошибка скачивания' });
-    }
-});
-
-
-app.get('/word/random', (req, res) => {
-    try {
-        const words = JSON.parse(fs.readFileSync(WORDS_METADATA_FILE));
-        
-        if (words.length === 0) {
-            return res.status(404).json({ error: 'Слова не найдены' });
+    
+        const parsedData = {
+            exercise,
+            module_id: parseInt(module_id, 10),
+            sentence,
+            transcription,
+            audio: audioLink,
+            translate,
+            chain: parsedChain
+        };
+  
+        const result = PhraseExerciseSchema.safeParse(parsedData);
+        if (!result.success) {
+            return res.status(400).json({ error: result.error.issues });
         }
-
-        // Выбираем случайное слово
-        const randomWord = words[Math.floor(Math.random() * words.length)];
-        
-        // Формируем URL для аудио
-        const audioUrl = `http://${req.get('host')}/word/audio/${randomWord.id}`;
-
-        res.json({
+        const { rows } = await pool.query(
+            `INSERT INTO phrase_exercises  
+            (exercise_type, sentence, translate, transcription, audio, chain, module_id) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+            [
+                result.data.exercise,
+                result.data.sentence,
+                result.data.translate,
+                result.data.transcription,
+                result.data.audio,
+                result.data.chain,
+                result.data.module_id,
+            ]
+        );
+  
+        res.status(200).json({
             status: 200,
             payload: {
-                word: randomWord.word,
-                transcription: randomWord.transcription,
-                audioUrl: audioUrl
+                id: rows[0].id
             }
         });
-
-    } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении слова' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
     }
 });
 
-app.get('/word/audio/:id', (req, res) => {
-    try {
-        const filePath = path.join(WORDS_DIR, req.params.id + '.wav');
-        
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).json({ error: 'Аудио не найдено' });
-        }
+app.get('/apinode/debug/word-exercises', async (req, res) => {
+    const { rows } = await pool.query('SELECT * FROM word_exercises');
+    // res.json(rows);
+    res.status(200).json({
+        status: 200,
+        payload: rows
+    })
+});
 
-        res.download(filePath);
-        
-    } catch (error) {
-        res.status(500).json({ error: 'Ошибка при скачивании аудио' });
+app.get('/apinode/debug/phrases-exercises', async (req, res) => {
+    const { rows } = await pool.query('SELECT * FROM phrase_exercises');
+    // res.json(rows);
+    res.status(200).json({
+        status: 200,
+        payload: rows
+    })
+});
+
+app.get('/apinode/current-word-module/', async (req, res) => {
+    const userId = 1
+
+    try {
+        const { rows } = await pool.query(
+        `SELECT m.id
+        FROM word_modules m
+        JOIN word_exercises e ON e.module_id = m.id
+        LEFT JOIN exercise_progress p 
+            ON p.exercise_id = e.id AND p.exercise_type = 'word' AND p.user_id = $1
+        GROUP BY m.id
+        HAVING COUNT(*) FILTER (WHERE p.status = 'completed') < COUNT(*)
+        ORDER BY m.id
+        LIMIT 1`,
+        [userId]
+        );
+        res.json({ 
+            status: 200,
+            payload: {
+                module_id: rows[0]?.id || 1
+            } 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
     }
 });
 
-app.post('/audio/translate_audio_phoneme', uploadTemp.single('file'), async (req, res) => {
+app.get('/apinode/word-modules/:id/exercises', async (req, res) => {
+    const moduleId = parseInt(req.params.id);
+    const userId = 1;
     try {
-        if (!req.file) {
-        return res.status(400).json({ error: 'Файл не загружен' });
-        }
+        const { rows } = await pool.query(
+        `SELECT e.*, COALESCE(p.status, 'none') AS status
+        FROM word_exercises e
+        LEFT JOIN exercise_progress p 
+            ON p.exercise_id = e.id AND p.exercise_type = 'word' AND p.user_id = $1
+        WHERE e.module_id = $2`,
+        [userId, moduleId]
+        );
+        res.json({ 
+            status: 200,
+            payload: 
+            {
+                exercises: rows
+            } 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+})
 
-    const formData = new FormData();
-    formData.append('file', fs.createReadStream(req.file.path), {
-        filename: 'audio.wav',
-        contentType: 'audio/wav',
-    });
+app.get('/apinode/current-phrase-module/', async (req, res) => {
+    const userId = 1
 
-    const mlResponse = await axios.post('http://94.253.9.254:5001/transcribe', formData, {
-      headers: {
-        ...formData.getHeaders(),
-      },
-    });
-
-    fs.unlinkSync(req.file.path);
-
-    res.status(200).json({
-        status: 200,    
-        payload: {
-            transcription: mlResponse.data.transcription || '',
-        },
-    });
-
-  } catch (error) {
-        console.error('Ошибка:', error.message);
-        if (error.response?.status === 504) {
-            res.status(504).json({ error: 'Сервер ML недоступен, попробуйте позже' });
-        } else {
-            res.status(500).json({ error: 'Ошибка при обработке файла' });
-        }
-  }
+    try {
+        const { rows } = await pool.query(
+        `SELECT m.id
+        FROM phrase_modules m
+        JOIN phrase_exercises e ON e.module_id = m.id
+        LEFT JOIN exercise_progress p 
+            ON p.exercise_id = e.id AND p.exercise_type = 'phrase' AND p.user_id = $1
+        GROUP BY m.id
+        HAVING COUNT(*) FILTER (WHERE p.status = 'completed') < COUNT(*)
+        ORDER BY m.id
+        LIMIT 1`,
+        [userId]
+        );
+        res.json({ 
+            status: 200,
+            payload: {
+                module_id: rows[0]?.id || 1
+            } 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
-app.post('/audio/translate_audio_word', uploadTemp.single('file'), async (req, res) => {
+app.get('/apinode/phrase-modules/:id/exercises', async (req, res) => {
+    const moduleId = parseInt(req.params.id);
+    const userId = 1;
     try {
-        if (!req.file) {
-        return res.status(400).json({ error: 'Файл не загружен' });
-        }
+        const { rows } = await pool.query(
+        `SELECT e.*, COALESCE(p.status, 'none') AS status
+        FROM phrase_exercises e
+        LEFT JOIN exercise_progress p 
+            ON p.exercise_id = e.id AND p.exercise_type = 'phrase' AND p.user_id = $1
+        WHERE e.module_id = $2`,
+        [userId, moduleId]
+        );
+        res.json({ 
+            status: 200,
+            payload: 
+            {
+                exercises: rows
+            } 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+})
 
-    const formData = new FormData();
-    formData.append('file', fs.createReadStream(req.file.path), {
-        filename: 'audio.wav',
-        contentType: 'audio/wav',
-    });
-
-    const mlResponse = await axios.post('http://94.253.9.254:5001/transcribe', formData, {
-      headers: {
-        ...formData.getHeaders(),
-      },
-    });
-
-    fs.unlinkSync(req.file.path);
-
-    res.status(200).json({
-        status: 200,    
-        payload: {
-            transcription: mlResponse.data.transcription || '',
-        },
-    });
-
-  } catch (error) {
-        console.error('Ошибка:', error.message);
-        if (error.response?.status === 504) {
-            res.status(504).json({ error: 'Сервер ML недоступен, попробуйте позже' });
-        } else {
-            res.status(500).json({ error: 'Ошибка при обработке файла' });
-        }
-  }
+app.post('/apinode/exercise-progress', async (req, res) => {
+    const userId = 1;
+    const { exercise_id, exercise_type, status } = req.body;
+  
+    try {
+        await pool.query(`
+            INSERT INTO exercise_progress (user_id, exercise_id, exercise_type, status)
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (user_id, exercise_id, exercise_type)
+            DO UPDATE SET status = EXCLUDED.status, updated_at = CURRENT_TIMESTAMP
+        `, [userId, exercise_id, exercise_type, status]);
+    
+        res.status(200).json({ 
+            status: 200,
+            payload: {
+                message: 'Прогресс сохранён'
+            } 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
-const PORT = 3001;
+app.get('/apinode/word-modules', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT id, title FROM word_modules ORDER BY id');
+        res.status(200).json({ 
+            status: 200,
+            payload: {
+                modules: result.rows
+            } 
+        });
+    } catch (error) {
+        console.error('Ошибка при получении модулей слов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+app.get('/apinode/phrase-modules', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT id, title FROM phrase_modules ORDER BY id');
+        res.status(200).json({ 
+            status: 200,
+            payload: {
+                modules: result.rows
+            } 
+        });
+    } catch (error) {
+        console.error('Ошибка при получении модулей слов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+app.post('/apinode/transcribe-word', upload.single('audio'), async (req, res) => {
+
+    const audioPath = req.file?.path;
+
+    if (!audioPath) {
+        return res.status(400).json({ error: "Аудиофайл обязателен." });
+    }
+
+    try {
+        const form = new FormData();
+        form.append('file', fs.createReadStream(audioPath));
+
+        const response = await axios.post('http://94.253.9.254:5001/transcribe', form, {
+            headers: form.getHeaders(),
+        });
+
+        res.status(200).json({ 
+            status: 200,
+            payload: response.data
+
+        });
+    } catch (error) {
+        console.error('Ошибка при получении модулей слов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+})
+
+app.post('/apinode/transcribe-phrase', upload.single('audio'), async (req, res) => {
+
+    const audioPath = req.file?.path;
+
+    if (!audioPath) {
+        return res.status(400).json({ error: "Аудиофайл обязателен." });
+    }
+
+    try {
+        const form = new FormData();
+        form.append('file', fs.createReadStream(audioPath));
+
+        const response = await axios.post('http://94.253.9.254:5000/recognize_speech', form, {
+            headers: form.getHeaders(),
+        });
+
+        res.status(200).json({ 
+            status: 200,
+            payload: response.data
+
+        });
+    } catch (error) {
+        console.error('Ошибка при получении модулей слов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+})
+
+app.post('/apinode/get-ai-help', async (req, res) => {
+    try {
+        const {target, errors} = req.body
+        const inputText = `Ситуация: Человек произносил на английском языке: \"${target}\", и ошибся в произношении ${errors} раза.\nТебе задание A:\n1) Нужно сообщить ТОЛЬКО о ФАКТЕ ошибки (что она просто есть, БЕЗ ПОДРОБНОСТЕЙ),\n2) Нужно как-то мягко пошутить на этот счёт, и обязательно с эмодзи.\nНужен ТОЛЬКО ответ на два пункта задания A. НЕЛЬЗЯ писать то, что напрямую не относится к ответам на два пункта задания A! СТРОГО соблюдать этот формат ответа!!!`
+
+        const response = await axios.post(
+            'http://94.253.9.254:5002/get_helper_text',
+            { input_text: inputText },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        res.status(200).json({ 
+            status: 200,
+            payload: response.data
+
+        });
+    } catch (error) {
+        console.error('Ошибка при получении модулей слов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+})
+
+app.post('/apinode/get-ai-talk', async (req, res) => {
+    try {
+        const { message } = req.body
+
+        const response = await axios.post(
+            'http://94.253.9.254:5002/get_helper_text',
+            { input_text: message },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        res.status(200).json({ 
+            status: 200,
+            payload: response.data
+
+        });
+    } catch (error) {
+        console.error('Ошибка при получении модулей слов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+})
+
 app.listen(PORT, () => {
-    console.log(`Сервер запущен на http://localhost:${PORT}`);
+  console.log(`Сервер запущен на http://localhost:${PORT}`);
 });
