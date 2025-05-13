@@ -6,12 +6,15 @@ import { useAppDispatch, useAppSelector } from "@/hooks"
 import { RootState } from "@/redux/store"
 import { getWordTranscrible } from "@/api/api"
 import { setDetectedTranscription } from "@/redux/word"
+import { setShowLoadMessage } from "@/redux/aichat"
 
 const WordPronounce = ({handleNext}) => {
     const dispatch = useAppDispatch();
     const { targetWords, targetTranscriptions, targetAudioUrls } = useAppSelector((state: RootState) => state.word);
 
     const handleRecordingComplete = async (audio: Blob | string) => {
+
+        dispatch(setShowLoadMessage(true))
         const [status, response] = await getWordTranscrible(audio);
 
         const trans = []

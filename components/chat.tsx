@@ -34,11 +34,10 @@ const Chat = () => {
     const flatListRef = useRef<FlatList>(null);
     const { translatedTranscriptions, targetWords } = useAppSelector((state: RootState) => state.word);
     const { detectedPhrase, targetPhrase } = useAppSelector((state: RootState) => state.phrases);
-    const { messages } = useAppSelector((state: RootState) => state.aiChat);
+    const { messages, showLoadMessage } = useAppSelector((state: RootState) => state.aiChat);
 
     const fullchat = pathname == '/aichat'
 
-  // Отправка сообщения
     const handleSend = async () => {
         if (!inputText.trim()) return;
 
@@ -186,6 +185,18 @@ const Chat = () => {
             console.error('Ошибка при запросе расшифровке аудио')
         }
     }
+
+    useEffect(() => {
+        if (showLoadMessage) {
+            const loadMessage: Message = {
+                id: Date.now().toString(),
+                text: 'Обрабатываю Ваш запрос',
+                isUser: false,
+            }
+            setLocalMessages(prev => [...prev, loadMessage]);
+            console.log('добавил сообщение')
+        }
+    }, [showLoadMessage])
 
     return (
         <KeyboardAvoidingView

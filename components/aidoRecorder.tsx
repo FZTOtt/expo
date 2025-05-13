@@ -72,7 +72,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
         if (hasLongPressed.current) {
             if (isRecording) stopRecording();
             blockNextTap.current = true;
-            setTimeout(() => (blockNextTap.current = false), 300);
+            setTimeout(() => (blockNextTap.current = false), 50);
         }
     };
 

@@ -8,11 +8,13 @@ type Message = {
 };
 
 interface AiChat {
-    messages: Message[]
+    messages: Message[],
+    showLoadMessage: boolean,
 }
 
 const initialState: AiChat = {
-    messages: []
+    messages: [],
+    showLoadMessage: false,
 }
 
 const aiChatSlice = createSlice({
@@ -24,9 +26,12 @@ const aiChatSlice = createSlice({
         },
         writeMessage: (state, action: PayloadAction<Message>) => {
             state.messages.push(action.payload)
+        },
+        setShowLoadMessage: (state, action: PayloadAction<boolean>) => {
+            state.showLoadMessage = action.payload
         }
     }
 })
 
-export const { clearMessages, writeMessage } = aiChatSlice.actions;
+export const { clearMessages, writeMessage, setShowLoadMessage } = aiChatSlice.actions;
 export default aiChatSlice.reducer;
