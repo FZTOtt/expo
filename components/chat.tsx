@@ -1,6 +1,6 @@
 import { getAIHelp, getAITalk, getPhraseTranscrible } from "@/api/api";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import { writeMessage } from "@/redux/aichat";
+import { setShowLoadMessage, writeMessage } from "@/redux/aichat";
 import { RootState } from "@/redux/store";
 import { usePathname } from "expo-router";
 import React, { useState, useRef, useEffect } from "react";
@@ -38,6 +38,10 @@ const Chat = () => {
 
     const fullchat = pathname == '/aichat'
 
+    let showLoadId: string | null = null;
+
+    const failedRequsetMessage = 'Извините, сервер перегружен'
+
     const handleSend = async () => {
         if (!inputText.trim()) return;
 
@@ -59,10 +63,16 @@ const Chat = () => {
                     isUser: false,
                 }
                 dispatch(writeMessage(aiMessage));
+            } else {
+                const aiMessage: Message = {
+                    id: Date.now().toString(),
+                    text: failedRequsetMessage,
+                    isUser: false,
+                }
+                dispatch(writeMessage(aiMessage));
             }
             return;
         }
-
 
         setLocalMessages(prev => [...prev, userMessage]);
         setInputText("");
@@ -75,6 +85,13 @@ const Chat = () => {
                 isUser: false,
             }
             setLocalMessages(prev => [...prev, aiMessage]);
+        } else {
+            const aiMessage: Message = {
+                id: Date.now().toString(),
+                text: failedRequsetMessage,
+                isUser: false,
+            }
+            setLocalMessages(prev => [...prev, aiMessage]);
         }
     };
 
@@ -82,6 +99,13 @@ const Chat = () => {
         if (pathname == '/aichat') {
             if (messages.length > 0) {
                 flatListRef.current?.scrollToEnd({ animated: true });
+            } else {
+                const aiMessage: Message = {
+                    id: Date.now().toString(),
+                    text: 'Привет, здесь мы можем пообщаться на английском языке, запиши своё предложение, а я распознаю его на английском языке и продолжу беседу',
+                    isUser: false,
+                }
+                dispatch(writeMessage(aiMessage));
             }
         } else {
             if (localMessages.length > 0) {
@@ -123,6 +147,13 @@ const Chat = () => {
                 const aiMessage: Message = {
                     id: Date.now().toString(),
                     text: response.text,
+                    isUser: false,
+                }
+                setLocalMessages(prev => [...prev, aiMessage]);
+            } else {
+                const aiMessage: Message = {
+                    id: Date.now().toString(),
+                    text: failedRequsetMessage,
                     isUser: false,
                 }
                 setLocalMessages(prev => [...prev, aiMessage]);
@@ -188,13 +219,23 @@ const Chat = () => {
 
     useEffect(() => {
         if (showLoadMessage) {
+            showLoadId = Date.now().toString()
             const loadMessage: Message = {
-                id: Date.now().toString(),
+                id: showLoadId,
                 text: 'Обрабатываю Ваш запрос',
                 isUser: false,
             }
             setLocalMessages(prev => [...prev, loadMessage]);
             console.log('добавил сообщение')
+        } else {
+            console.log('123')
+            if (showLoadId !== null) {
+                setLocalMessages((prev) => {
+                    const newMessages = prev.filter(message => message.id == showLoadId)
+                    return newMessages
+                });
+                showLoadId = null
+            }
         }
     }, [showLoadMessage])
 
@@ -226,7 +267,7 @@ const Chat = () => {
                     onSubmitEditing={handleSend}
                 />
                 <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-                <Text style={styles.sendButtonText}>➤</Text>
+                    <Text style={styles.sendButtonText}>➤</Text>
                 </TouchableOpacity>
             </View>) }
 

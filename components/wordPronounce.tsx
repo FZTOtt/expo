@@ -21,6 +21,7 @@ const WordPronounce = ({handleNext}) => {
         trans[0] = response.transcription
         if (status === 200) {
             dispatch(setDetectedTranscription(trans));
+            dispatch(setShowLoadMessage(false))
         } else {
             console.error('Ошибка при запросе расшифровке аудио')
         }

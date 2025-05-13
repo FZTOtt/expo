@@ -199,7 +199,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
                     width: size,
                     height: size,
                     borderRadius: size / 2,
-                    backgroundColor: isRecording ? 'red' : 'gray',
+                    backgroundColor: isRecording ? 'rgba(63,133,167,1.00)' : 'rgba(19, 31, 36, 1)',
                     transform: [{ scale: scaleAnim }],
                     shadowColor: 'red',
                     shadowOffset: { width: 0, height: 0 },
