@@ -57,6 +57,10 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
     }, [isRecording]);
 
     const handlePressIn = () => {
+        
+        if (isRecording) {
+            return
+        }
         hasLongPressed.current = false;
         pressTimer.current = setTimeout(() => {
             hasLongPressed.current = true;
@@ -65,11 +69,11 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
     };
 
     const handlePressOut = () => {
-        if (pressTimer.current) {
-            clearTimeout(pressTimer.current);
-        }
 
         if (hasLongPressed.current) {
+            if (pressTimer.current) {
+                clearTimeout(pressTimer.current);
+            }
             if (isRecording) stopRecording();
             blockNextTap.current = true;
             setTimeout(() => (blockNextTap.current = false), 50);
@@ -77,6 +81,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
     };
 
     const handleTap = () => {
+        console.log('pressTap')
         if (blockNextTap.current) return;
 
         if (!hasLongPressed.current) {
@@ -176,7 +181,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
     return (
         <TouchableOpacity 
-            onPress={handleTap}
+            // onPress={handleTap}
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
             style={{
@@ -187,13 +192,6 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
             borderRadius: size / 2,
             }}
         >
-        {/* <View style={{ width: size, height: size}}>
-          {isRecording ? (
-            <OffStateIcon width="100%" height="100%" />
-          ) : (
-            <OnStateIcon width="100%" height="100%" />
-          )}
-        </View> */}
             <Animated.View
                 style={{
                     width: size,
