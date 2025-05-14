@@ -81,7 +81,6 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
     };
 
     const handleTap = () => {
-        console.log('pressTap')
         if (blockNextTap.current) return;
 
         if (!hasLongPressed.current) {
@@ -91,7 +90,6 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
     };
 
     const startRecording = async () => {
-        console.log('start')
         if (Platform.OS === 'web') {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -151,7 +149,6 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
     }
 
     async function stopRecording() {
-        console.log('stop')
         if (Platform.OS === 'web') {
             if (mediaRecorderRef.current) {
                 mediaRecorderRef.current.stop();

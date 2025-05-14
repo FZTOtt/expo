@@ -11,16 +11,10 @@ interface MediaViewerProps {
 }
 
 const MediaViewer: React.FC<MediaViewerProps> = ({ mediaUrl, style }) => {
-    console.log(mediaUrl)
     const { isVisibleMedia } = useAppSelector((state: RootState) => state.modal)
     const dispatch = useAppDispatch();
     const [mediaType, setMediaType] = useState<'image' | 'video' | 'unknown'>('unknown')
     const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        console.log('MOUNTED Component index');
-        return () => console.log('UNMOUNTED Component index');
-    }, []);
 
     useEffect(() => {
         const checkMediaType = async () => {

@@ -10,7 +10,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ buttonStyle, audioUrl, childr
     const [sound, setSound] = useState<Audio.Sound | null>(null);
 
     async function playRecording() {
-        console.log('play')
         onPress?.()
         try {
             if (audioUrl) {

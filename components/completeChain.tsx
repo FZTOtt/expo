@@ -35,7 +35,6 @@ const completeChain = ({handleNext}) => {
     }
 
     function checkChain() {
-        console.log(selectedWords)
         const isMatch = selectedWords.join(' ').toLowerCase() === sentence.toLowerCase();
         setCorrect(isMatch)
         setTimeout(()=>{

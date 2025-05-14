@@ -48,7 +48,6 @@ const Modules = () => {
             if (path == '/') {
                 const [status, response] = await getWordModules()
                 if (status == 200) {
-                    console.log(response)
                     refModules = response.modules.map((mod) => (
                         {
                             id: mod.id,
@@ -56,7 +55,6 @@ const Modules = () => {
                         }
                     ))
                 }
-            console.log(refModules)
             } else {
                 const [status, response] = await getPhraseModules()
                 if (status == 200) {
@@ -76,7 +74,6 @@ const Modules = () => {
     async function handleModuleSelect(id: number) {
         if (pathname == '/') {
             let [status, response] = await getWordModuleExercises(id);
-            console.log(response.exercises)
             if (status === 200) {
                 if (response.exercises.length != 0) {
                     dispatch(setCurrentWordModule({
@@ -95,7 +92,6 @@ const Modules = () => {
             }
         } else {
             let [status, response] = await getPhraseModuleExercises(id);
-            console.log(response.exercises)
             if (status === 200) {
                 if (response.exercises.length != 0) {
                     dispatch(setCurrentPhraseModule({

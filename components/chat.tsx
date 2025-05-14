@@ -36,9 +36,9 @@ const Chat = () => {
     const { detectedPhrase, targetPhrase } = useAppSelector((state: RootState) => state.phrases);
     const { messages, showLoadMessage } = useAppSelector((state: RootState) => state.aiChat);
 
-    const fullchat = pathname == '/aichat'
+    const [showLoadId, setShowLoadId] = useState<string | null>(null)
 
-    let showLoadId: string | null = null;
+    const fullchat = pathname == '/aichat'
 
     const failedRequsetMessage = 'Извините, сервер перегружен'
 
@@ -52,7 +52,6 @@ const Chat = () => {
         };
 
         if (pathname == '/aichat') {
-            console.log('aichat')
             dispatch(writeMessage(userMessage))
             setInputText("");
             const [status, response] = await getAITalk(inputText);
@@ -102,7 +101,7 @@ const Chat = () => {
             } else {
                 const aiMessage: Message = {
                     id: Date.now().toString(),
-                    text: 'Привет, здесь мы можем пообщаться на английском языке, запиши своё предложение, а я распознаю его на английском языке и продолжу беседу',
+                    text: 'Привет, в будущем мы можем пообщаться на английском языке, а пока я в разработке. Запиши своё предложение, а я распознаю его на английском языке и продолжу беседу',
                     isUser: false,
                 }
                 dispatch(writeMessage(aiMessage));
@@ -158,6 +157,8 @@ const Chat = () => {
                 }
                 setLocalMessages(prev => [...prev, aiMessage]);
             }
+            
+            dispatch(setShowLoadMessage(false))
         }
         if(pathname == '/') {
             console.log(translatedTranscriptions)
@@ -194,6 +195,8 @@ const Chat = () => {
     );
 
     const handleRecordingComplete = async (audio: Blob | string) => {
+        console.log('trns_phrase')
+        dispatch(setShowLoadMessage(true))
         const [status, response] = await getPhraseTranscrible(audio);
         if (status === 200) {
             const message = response.text
@@ -203,11 +206,18 @@ const Chat = () => {
                 isUser: true,
             };
             dispatch(writeMessage(userMessage))
-            const [status1, response1] = await getAITalk(inputText);
+            const [status1, response1] = await getAITalk(message);
             if (status1 == 200) {
                 const aiMessage: Message = {
                     id: Date.now().toString(),
                     text: response1.text,
+                    isUser: false,
+                }
+                dispatch(writeMessage(aiMessage));
+            } else {
+                const aiMessage: Message = {
+                    id: Date.now().toString(),
+                    text: failedRequsetMessage,
                     isUser: false,
                 }
                 dispatch(writeMessage(aiMessage));
@@ -218,23 +228,30 @@ const Chat = () => {
     }
 
     useEffect(() => {
+        console.log(showLoadMessage)
         if (showLoadMessage) {
-            showLoadId = Date.now().toString()
+            const currentId = Date.now().toString()
+            setShowLoadId(currentId)
+            console.log(showLoadId)
             const loadMessage: Message = {
-                id: showLoadId,
+                id: currentId,
                 text: 'Обрабатываю Ваш запрос',
                 isUser: false,
             }
-            setLocalMessages(prev => [...prev, loadMessage]);
-            console.log('добавил сообщение')
+            if (fullchat) {
+                dispatch(writeMessage(loadMessage));
+            } else {
+                setLocalMessages(prev => [...prev, loadMessage]);
+            }
         } else {
-            console.log('123')
+            console.log('delete ', showLoadId)
             if (showLoadId !== null) {
                 setLocalMessages((prev) => {
-                    const newMessages = prev.filter(message => message.id == showLoadId)
+                    const newMessages = prev.filter(message => message.id !== showLoadId)
+                    console.log(newMessages)
                     return newMessages
                 });
-                showLoadId = null
+                setShowLoadId(null)
             }
         }
     }, [showLoadMessage])
@@ -335,10 +352,8 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     audioInput: {
-        // flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        // height: 300
         borderTopWidth: 2,
         borderTopColor: 'rgba(82, 101, 109, 1)',
         paddingTop: 30,

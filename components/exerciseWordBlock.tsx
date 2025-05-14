@@ -25,10 +25,8 @@ const ExerciseWordBlock = () => {
         if (currentWordModuleId) return
         const init = async () => {
             const [status1, currentModule] = await getCurrentWordModule();
-            console.log(currentModule)
             if (status1 === 200) {
               const [status2, response] = await getWordModuleExercises(currentModule.module_id);
-              console.log(response)
               if (status2 === 200) {
                 dispatch(setCurrentWordModule({
                     id: currentModule.module_id,
@@ -52,7 +50,6 @@ const ExerciseWordBlock = () => {
             console.log("Модуль завершён");
             const getNextModule = async () => {
                 let [status, response] = await getWordModuleExercises(currentWordModuleId+1);
-                console.log(response.exercises)
                 if (status === 200) {
                     if (response.exercises.length != 0) {
                         dispatch(setCurrentWordModule({

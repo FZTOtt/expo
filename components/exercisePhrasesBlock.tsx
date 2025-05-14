@@ -18,10 +18,8 @@ const ExercisePhrasesBlock = () => {
         if (currentPhraseModuleId) return
         const init = async () => {
             const [status1, currentModule] = await getCurrentPhraseModule();
-            console.log(currentModule)
             if (status1 === 200) {
               const [status2, response] = await getPhraseModuleExercises(currentModule.module_id);
-              console.log(response)
               if (status2 === 200) {
                 dispatch(setCurrentPhraseModule({
                     id: currentModule.module_id,
@@ -45,7 +43,6 @@ const ExercisePhrasesBlock = () => {
             console.log("Модуль завершён");
             const getNextModule = async () => {
                 let [status, response] = await getPhraseModuleExercises(currentPhraseModuleId+1);
-                console.log(response.exercises)
                 if (status === 200) {
                     if (response.exercises.length != 0) {
                         dispatch(setCurrentPhraseModule({

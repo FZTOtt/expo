@@ -15,7 +15,6 @@ const PhrasePronounce = ({handleNext}) => {
     const handleRecordingComplete = async (audio: Blob | string) => {
         dispatch(setShowLoadMessage(true))
         const [status, response] = await getPhraseTranscrible(audio);
-        console.log(response)
         if (status === 200) {
             dispatch(setDetectedPhrase(response.text));
         } else {

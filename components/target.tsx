@@ -13,8 +13,6 @@ interface TargetProps {
 
 const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
 
-    console.log(audioUrl)
-
     const { translatedTranscriptions } = useAppSelector((state: RootState) => state.word)
     const { detectedPhrase } = useAppSelector((state: RootState) => state.phrases)
 

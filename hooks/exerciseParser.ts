@@ -28,7 +28,6 @@ export const useExerciseParser = () => {
             dispatch(setDetectedTranscription([]))
         } else if (response.exercise_type === 'guessWord') {
             const urls = response.audio.map((url) => `https://ouzistudy.ru/media${url}`);
-            console.log(response.words)
             const parsedWords: TargetWord = {
                 targetWords: response.words,
                 targetTranscriptions: response.transcriptions,
@@ -46,7 +45,6 @@ export const useExerciseParser = () => {
             // url = url.replace(/http:\/\/[^\/]+/, 'https://ouzistudy.ru/minio');
             // url = url.replace(/&/g, '\\u0026');
             url = 'https://ouzistudy.ru/media' + url
-            console.log(url)
             const parsedPhrase: TargetPhrase = {
                 targetPhrase: response.sentence ? response.sentence : null,
                 targetTranscription: response.transcription ? response.transcription : null,

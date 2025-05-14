@@ -39,7 +39,6 @@ const translatedSlice = createSlice({
             state.translatedAudio = action.payload;
             state.isCorrect = null
             if (state.targetTranscription) {
-                console.log(state.targetTranscription.replace(/[ˈˌ]/g, ''), state.translatedAudio.replace(/[ˈˌ]/g, ''))
                 state.isCorrect = state.targetTranscription.replace(/[ˈˌ]/g, '') === 
                  state.translatedAudio.replace(/[ˈˌ]/g, '');
             }

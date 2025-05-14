@@ -13,7 +13,6 @@ const WordGuess = ({handleNext}) => {
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
     const random = Math.round(Math.random());
-    console.log(random)
     const correctWord = targetWords[random];
 
     const handleWordPress = (word: string) => {
@@ -22,7 +21,6 @@ const WordGuess = ({handleNext}) => {
         const correct = word == correctWord;
         setSelectedWord(word)
         setIsCorrect(correct);
-        console.log(correct)
         
         // задержка до следующего задания
         setTimeout(() => {
