@@ -32,7 +32,12 @@ const ExercisePhrasesBlock = () => {
           init();
     }, [])
 
-    function handleNextExercise() {
+    function handleNextExercise(correct: boolean) {
+        if (correct) {
+            console.log('правильно')
+        } else {
+            console.log('неверно')
+        }
         const nextIndex = currentPhraseExerciseIndex + 1;
 
         if (nextIndex < phraseExercises.length) {
@@ -41,6 +46,7 @@ const ExercisePhrasesBlock = () => {
         } else {
             // Конец модуля
             console.log("Модуль завершён");
+            if (currentPhraseModuleId === null) return
             const getNextModule = async () => {
                 let [status, response] = await getPhraseModuleExercises(currentPhraseModuleId+1);
                 if (status === 200) {

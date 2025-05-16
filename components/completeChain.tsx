@@ -5,16 +5,9 @@ import AudioPlayer from "./audioPlayer"
 import PlaySound from '@/assets/icons/soundCurrentColor.svg'
 import { useEffect, useState } from "react"
 
-const completeChain = ({handleNext}) => {
+const completeChain = ({handleNext} : {handleNext: (correct: boolean) => void}) => {
     const { chain, audio, sentence } = useAppSelector((state: RootState) => state.phrases)
-    // const chain = [
-    //     'one',
-    //     'two',
-    //     'three',
-    //     'four',
-    //     'five',
-    //     'six'
-    // ]
+
     const [availableWords, setAvailableWords] = useState<string[]>([])
     const [selectedWords, setSelectedWords] = useState<string[]>([])
     const [correct, setCorrect] = useState<boolean|null>(null)
@@ -35,10 +28,11 @@ const completeChain = ({handleNext}) => {
     }
 
     function checkChain() {
+        if (sentence === null) return
         const isMatch = selectedWords.join(' ').toLowerCase() === sentence.toLowerCase();
         setCorrect(isMatch)
         setTimeout(()=>{
-            handleNext(selectedWords)
+            handleNext(isMatch)
             setCorrect(null)
         }, 1500)
     }

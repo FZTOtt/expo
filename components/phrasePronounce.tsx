@@ -8,7 +8,7 @@ import { getPhraseTranscrible } from "@/api/api"
 import { setDetectedPhrase } from "@/redux/phrases"
 import { setShowLoadMessage } from "@/redux/aichat"
 
-const PhrasePronounce = ({handleNext}) => {
+const PhrasePronounce = ({handleNext} : {handleNext: (correct: boolean) => void}) => {
     const dispatch = useAppDispatch();
     const { targetPhrase, targetAudioUrl, targetTranscription } = useAppSelector((state: RootState) => state.phrases);
 
@@ -30,7 +30,7 @@ const PhrasePronounce = ({handleNext}) => {
             word={targetPhrase}
             />
             <Chat/>
-            <Manage onRecordComplete={handleRecordingComplete} onNext={handleNext}/>
+            <Manage onRecordComplete={handleRecordingComplete} onNext={() => handleNext(false)}/>
         </View>
     )
 }

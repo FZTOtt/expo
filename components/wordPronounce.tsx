@@ -6,9 +6,9 @@ import { useAppDispatch, useAppSelector } from "@/hooks"
 import { RootState } from "@/redux/store"
 import { getWordTranscrible } from "@/api/api"
 import { setDetectedTranscription } from "@/redux/word"
-import { setShowLoadMessage } from "@/redux/aichat"
+import { clearWordsMessages, setShowLoadMessage } from "@/redux/aichat"
 
-const WordPronounce = ({handleNext}) => {
+const WordPronounce = ({handleNext} : {handleNext: (correct: boolean) => void}) => {
     const dispatch = useAppDispatch();
     const { targetWords, targetTranscriptions, targetAudioUrls } = useAppSelector((state: RootState) => state.word);
 
@@ -27,6 +27,12 @@ const WordPronounce = ({handleNext}) => {
         }
     }
 
+    const getNextExercise = () => {
+        // проверка результата
+        dispatch(clearWordsMessages())
+        handleNext(true)
+    }
+
     return (
         <View style={styles.container}>
             <Target mode="word" 
@@ -35,7 +41,7 @@ const WordPronounce = ({handleNext}) => {
             word={targetWords[0]}
             />
             <Chat/>
-            <Manage onRecordComplete={handleRecordingComplete} onNext={handleNext}/>
+            <Manage onRecordComplete={handleRecordingComplete} onNext={getNextExercise}/>
         </View>
     )
 }

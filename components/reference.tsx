@@ -165,7 +165,7 @@ const Reference = () => {
                 return (
                     <>
                         <Text style={styles.wordDescription}>
-                            {`${targetWords[0]} (${targetTranscriptions[0]}) - перевод`}
+                            {`${targetWords[0]} (${targetTranscriptions[0]}) - ${wordTranslations[0]}`}
                         </Text>
                         <FlatList 
                         data={phonemeDetails}

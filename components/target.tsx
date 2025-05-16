@@ -3,6 +3,7 @@ import { RootState } from '@/redux/store';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import AudioPlayer from './audioPlayer';
 import PlaySound from '@/assets/icons/playSound.svg'
+import { useTranscriptionParser } from '@/hooks';
 
 interface TargetProps {
     word: string;
@@ -15,10 +16,11 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
 
     const { translatedTranscriptions } = useAppSelector((state: RootState) => state.word)
     const { detectedPhrase } = useAppSelector((state: RootState) => state.phrases)
+    const { ParseWordTranscription, ParseWordsFromSentence} = useTranscriptionParser();
 
-    const HighlightedComparison = ({ original, detected }) => {
-        
-        const originalWords = original.trim().split(/\s+/);
+    const CompareWords = ({ original, detected }: { original: string; detected: string }) => {        
+        const originalWords = ParseWordsFromSentence(original);
+
         if (!detected) {
             return (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
@@ -39,10 +41,7 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
                 </View>
             )
         }
-        const detectedWords = detected
-        .replace(/[.,!?;:"“”()]/g, '')
-        .trim()
-        .split(/\s+/);
+        const detectedWords = ParseWordsFromSentence(detected);
     
         return (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap'}}>
@@ -65,12 +64,9 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
         );
     };
 
-    const cleanTranscription = (text: string) => 
-        text.replace(/[ˈˌ]/g, '').toLowerCase();
-
-    const HighlightedTranscription = ({ transcription, detectedTranscription }) => {
+    const HighlightedTranscription = ({ transcription, detectedTranscription }: {transcription: string, detectedTranscription: string}) => {
         
-        const originalPhonemes = transcription.trim().split('');
+        const originalPhonemes = ParseWordTranscription(transcription)
         if (!detectedTranscription) {
             return (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5 }}>
@@ -90,12 +86,12 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
             </View>
             )
         }
-        const detectedPhonemes = detectedTranscription.split('');
+        const detectedPhonemes = ParseWordTranscription(detectedTranscription);
     
         return (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5 }}>
                 {originalPhonemes.map((ph, index) => {
-                    const match = cleanTranscription(detectedPhonemes[index] || '') === cleanTranscription(ph);
+                    const match = detectedPhonemes[index] === ph;
                     return (
                         <Text
                             key={index}
@@ -131,7 +127,7 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
         } else return (
             <>
                 <View style={styles.wordContainer}>
-                    <HighlightedComparison original={word} detected={detectedPhrase} />
+                    <CompareWords original={word} detected={detectedPhrase ? detectedPhrase : ''} />
                     <AudioPlayer buttonStyle={styles.audioButton} audioUrl={audioUrl}>
                         <PlaySound 
                             width={30} height={30}

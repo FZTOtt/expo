@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: 'rgba(63, 133, 167, 1)',
         width: '100%',
-        height: 50,
+        paddingVertical: 15,
         justifyContent: 'center',
         marginVertical: 10
     },

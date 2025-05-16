@@ -80,10 +80,6 @@ export const useExerciseParser = () => {
         }
     }
 
-    const deletePhraseExercise = () => {
-
-    }
-
     return {
         parseWordExercise,
         parsePhrasesExercise    

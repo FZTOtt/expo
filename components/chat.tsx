@@ -1,6 +1,13 @@
 import { getAIHelp, getAITalk, getPhraseTranscrible } from "@/api/api";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import { setShowLoadMessage, writeMessage } from "@/redux/aichat";
+import { 
+    setShowLoadMessage, 
+    writeMessage,
+    writeWordsMessage,
+    setShowWordsLoad,
+    writePhrasesMessage,
+    setShowPhrasesLoad
+ } from "@/redux/aichat";
 import { RootState } from "@/redux/store";
 import { usePathname } from "expo-router";
 import React, { useState, useRef, useEffect } from "react";
@@ -29,12 +36,14 @@ const Chat = () => {
     const pathname = usePathname();
     const dispatch = useAppDispatch();
 
-    const [localMessages, setLocalMessages] = useState<Message[]>([]);
     const [inputText, setInputText] = useState("");
     const flatListRef = useRef<FlatList>(null);
     const { translatedTranscriptions, targetWords } = useAppSelector((state: RootState) => state.word);
     const { detectedPhrase, targetPhrase } = useAppSelector((state: RootState) => state.phrases);
-    const { messages, showLoadMessage } = useAppSelector((state: RootState) => state.aiChat);
+    const { messages, showLoadMessage, wordsMessages, showWordsLoad, phrasesMessages, showPhrasesLoad } = useAppSelector((state: RootState) => state.aiChat);
+
+    const wordHashRef = useRef<string>('');
+    const sentenceHashRef = useRef<string>('');
 
     const [showLoadId, setShowLoadId] = useState<string | null>(null)
 
@@ -42,6 +51,25 @@ const Chat = () => {
 
     const failedRequsetMessage = 'Извините, сервер перегружен'
 
+    let currentMessages, currentLoad, writeFunc, setLoad;
+
+    if (fullchat) {
+        currentMessages = messages;
+        currentLoad = showLoadMessage;
+        writeFunc = writeMessage;
+        setLoad = setShowLoadMessage;
+    } else if (pathname == '/') {
+        currentMessages = wordsMessages;
+        currentLoad = showWordsLoad;
+        writeFunc = writeWordsMessage;
+        setLoad = setShowWordsLoad;
+    } else {
+        currentMessages = phrasesMessages;
+        currentLoad = showPhrasesLoad;
+        writeFunc = writePhrasesMessage;
+        setLoad = setShowPhrasesLoad;
+    }
+                                    
     const handleSend = async () => {
         if (!inputText.trim()) return;
 
@@ -51,31 +79,8 @@ const Chat = () => {
             isUser: true,
         };
 
-        if (pathname == '/aichat') {
-            dispatch(writeMessage(userMessage))
-            setInputText("");
-            const [status, response] = await getAITalk(inputText);
-            if (status == 200) {
-                const aiMessage: Message = {
-                    id: Date.now().toString(),
-                    text: response.text,
-                    isUser: false,
-                }
-                dispatch(writeMessage(aiMessage));
-            } else {
-                const aiMessage: Message = {
-                    id: Date.now().toString(),
-                    text: failedRequsetMessage,
-                    isUser: false,
-                }
-                dispatch(writeMessage(aiMessage));
-            }
-            return;
-        }
-
-        setLocalMessages(prev => [...prev, userMessage]);
+        dispatch(writeFunc(userMessage))
         setInputText("");
-
         const [status, response] = await getAITalk(inputText);
         if (status == 200) {
             const aiMessage: Message = {
@@ -83,37 +88,29 @@ const Chat = () => {
                 text: response.text,
                 isUser: false,
             }
-            setLocalMessages(prev => [...prev, aiMessage]);
+            dispatch(writeFunc(aiMessage));
         } else {
             const aiMessage: Message = {
                 id: Date.now().toString(),
                 text: failedRequsetMessage,
                 isUser: false,
             }
-            setLocalMessages(prev => [...prev, aiMessage]);
+            dispatch(writeFunc(aiMessage));
         }
     };
 
     useEffect(() => {
-        if (pathname == '/aichat') {
-            if (messages.length > 0) {
-                flatListRef.current?.scrollToEnd({ animated: true });
-            } else {
-                const aiMessage: Message = {
-                    id: Date.now().toString(),
-                    text: 'Привет, в будущем мы можем пообщаться на английском языке, а пока я в разработке. Запиши своё предложение, а я распознаю его на английском языке и продолжу беседу',
-                    isUser: false,
-                }
-                dispatch(writeMessage(aiMessage));
+        if (currentMessages.length > 0) {
+            flatListRef.current?.scrollToEnd({ animated: true });
+        } else if (pathname == '/aichat') {
+            const aiMessage: Message = {
+                id: Date.now().toString(),
+                text: 'Привет, в будущем мы можем пообщаться на английском языке, а пока я в разработке. Запиши своё предложение, а я распознаю его на английском языке и продолжу беседу',
+                isUser: false,
             }
-        } else {
-            if (localMessages.length > 0) {
-                flatListRef.current?.scrollToEnd({ animated: true });
-            }   
+            dispatch(writeMessage(aiMessage));
         }
-        if (messages.length > 0) {
-        }
-    }, [localMessages, messages]);
+    }, [currentMessages, messages]);
 
     const cleanPhonemes = (str: string) => str.replace(/[ˈˌ]/g, '').split('');
 
@@ -140,6 +137,30 @@ const Chat = () => {
     }
 
     useEffect(() => {
+
+        let currentWordHash = '';
+        let currentSentenceHash = '';
+
+        if (pathname === '/' && translatedTranscriptions.length > 0) {
+            currentWordHash = `transcriptions:${translatedTranscriptions[0]}`;
+        } else if (pathname === '/phrases' && detectedPhrase) {
+            currentSentenceHash = `phrase:${detectedPhrase}`;
+        }
+
+        console.log(wordHashRef.current, currentWordHash, !wordHashRef.current)
+
+        if ((wordHashRef.current === currentWordHash || (currentMessages.length !== 0 && !wordHashRef.current)) && pathname === '/') {
+            return
+        } else if ((sentenceHashRef.current === currentSentenceHash || (currentMessages.length !== 0 && !sentenceHashRef.current)) && pathname === '/phrases') {
+            return
+        }
+
+        if (pathname === '/') {
+            wordHashRef.current = currentWordHash
+        } else if (pathname === '/phrases') {
+            sentenceHashRef.current = currentSentenceHash
+        }
+
         const getAISuggest = async (target:string, errors:number) => {
             const [status, response] = await getAIHelp(target, errors)
             if (status == 200) {
@@ -148,20 +169,20 @@ const Chat = () => {
                     text: response.text,
                     isUser: false,
                 }
-                setLocalMessages(prev => [...prev, aiMessage]);
+                dispatch(writeFunc(aiMessage));
             } else {
                 const aiMessage: Message = {
                     id: Date.now().toString(),
                     text: failedRequsetMessage,
                     isUser: false,
                 }
-                setLocalMessages(prev => [...prev, aiMessage]);
+                dispatch(writeFunc(aiMessage));
             }
             
             dispatch(setShowLoadMessage(false))
         }
+
         if(pathname == '/') {
-            console.log(translatedTranscriptions)
             if (translatedTranscriptions.length > 0) {
                 const originalPhonemes = cleanPhonemes(targetWords[0]);
                 const detectedPhonemes = cleanPhonemes(translatedTranscriptions[0]);
@@ -178,6 +199,7 @@ const Chat = () => {
             }
         } else if (pathname == '/phrases') {
             if (detectedPhrase) {
+                if (targetPhrase === null) return
                 const errors = countWordErrors(detectedPhrase, targetPhrase)
                 getAISuggest(targetPhrase, errors)
             }
@@ -195,7 +217,6 @@ const Chat = () => {
     );
 
     const handleRecordingComplete = async (audio: Blob | string) => {
-        console.log('trns_phrase')
         dispatch(setShowLoadMessage(true))
         const [status, response] = await getPhraseTranscrible(audio);
         if (status === 200) {
@@ -227,34 +248,30 @@ const Chat = () => {
         }
     }
 
-    useEffect(() => {
-        console.log(showLoadMessage)
-        if (showLoadMessage) {
-            const currentId = Date.now().toString()
-            setShowLoadId(currentId)
-            console.log(showLoadId)
-            const loadMessage: Message = {
-                id: currentId,
-                text: 'Обрабатываю Ваш запрос',
-                isUser: false,
-            }
-            if (fullchat) {
-                dispatch(writeMessage(loadMessage));
-            } else {
-                setLocalMessages(prev => [...prev, loadMessage]);
-            }
-        } else {
-            console.log('delete ', showLoadId)
-            if (showLoadId !== null) {
-                setLocalMessages((prev) => {
-                    const newMessages = prev.filter(message => message.id !== showLoadId)
-                    console.log(newMessages)
-                    return newMessages
-                });
-                setShowLoadId(null)
-            }
-        }
-    }, [showLoadMessage])
+    // useEffect(() => {
+    //     if (showLoadMessage) {
+    //         const currentId = Date.now().toString()
+    //         setShowLoadId(currentId)
+    //         const loadMessage: Message = {
+    //             id: currentId,
+    //             text: 'Обрабатываю Ваш запрос',
+    //             isUser: false,
+    //         }
+    //         if (fullchat) {
+    //             dispatch(writeMessage(loadMessage));
+    //         } else {
+    //             dispatch(writeMessage(loadMessage));
+    //         }
+    //     } else {
+    //         // if (showLoadId !== null) {
+    //         //     setLocalMessages((prev) => {
+    //         //         const newMessages = prev.filter(message => message.id !== showLoadId)
+    //         //         return newMessages
+    //         //     });
+    //         //     setShowLoadId(null)
+    //         // }
+    //     }
+    // }, [currentLoad])
 
     return (
         <KeyboardAvoidingView
@@ -263,7 +280,7 @@ const Chat = () => {
         >
         <FlatList
             ref={flatListRef}
-            data={fullchat ? messages : localMessages}
+            data={currentMessages}
             renderItem={renderMessage}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.messagesContainer}
