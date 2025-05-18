@@ -229,7 +229,7 @@ const Chat = () => {
             if (status1 == 200) {
                 const aiMessage: Message = {
                     id: Date.now().toString(),
-                    text: response1.text,
+                    text: response1.output_text,
                     isUser: false,
                 }
                 dispatch(writeMessage(aiMessage));

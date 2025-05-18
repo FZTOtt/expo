@@ -3,7 +3,7 @@ import { postRequest, getRequest } from "./ajax";
 import { PhrasesExerciseApiResponse, WordExerciseApiResponse } from "@/interfaces/apiResponses";
 
 const API_BASE_URL = "https://ouzistudy.ru/api";
-const NODE_API_URL = "http://localhost:3000";
+const NODE_API_URL = "http://localhost:3001";
 const NODE_API_DEPLOY = "https://ouzistudy.ru";
 const CURRENT_API = NODE_API_URL;
 // https://ouzistudy.ru
@@ -215,3 +215,44 @@ export const getAITalk = async (message: string): Promise<[number, any]> => {
 
     return postRequest(`${CURRENT_API}/apinode/get-ai-talk`, data, headers)
 }
+
+export const apiRegister = async (email: string, password: string): Promise<[number, any]> => {
+
+    const data = JSON.stringify({ 
+        email: email,
+        password: password
+    })
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+
+    return postRequest(`${CURRENT_API}/apinode/register`, data, headers);
+};
+
+export const apiLogin = async (email: string, password: string) => {
+
+    const data = JSON.stringify({ 
+        email: email,
+        password: password
+    })
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+    
+    return postRequest(`${CURRENT_API}/apinode/login`, data, headers);
+};
+
+export const apiUpdatePassword = async (token: string, oldPassword: string, newPassword: string) => {
+
+    const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+    }
+
+    const data = JSON.stringify({ 
+        oldPassword: oldPassword,
+        newPassword: newPassword
+    })
+    
+    return postRequest(`${CURRENT_API}/apinode/change-password`, data, headers);
+};

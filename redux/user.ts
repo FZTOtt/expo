@@ -1,39 +1,60 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { apiLogin, apiRegister } from "@/api/api";
 
-// Пример API-запросов (замените на свои)
-const apiRegister = async (email: string, password: string) => {
-    // Здесь должен быть реальный запрос к серверу
-    return { email };
-};
-const apiUpdatePassword = async (oldPassword: string, newPassword: string) => {
-    // Здесь должен быть реальный запрос к серверу
-    return true;
-};
+export const restoreSession = createAsyncThunk(
+  "user/restoreSession",
+  async (_, thunkAPI) => {
+    const token = await AsyncStorage.getItem('userToken');
+    if (token) {
+      // Можно сделать запрос к серверу для получения данных пользователя по токену
+      return { token }; // или вернуть email, если храните его
+    }
+    return thunkAPI.rejectWithValue("Нет сессии");
+  }
+);
 
 // Асинхронные экшены
 export const registerUser = createAsyncThunk(
     "user/registerUser",
     async ({ email, password }: { email: string; password: string }, thunkAPI) => {
         try {
-            const response = await apiRegister(email, password);
-            return response.email;
+            const [status, response] = await apiRegister(email, password);
+            if (status === 200) {
+                await AsyncStorage.setItem('userToken', response.token);
+                return response.email;
+            }
         } catch (error: any) {
             return thunkAPI.rejectWithValue(error.message || "Ошибка регистрации");
         }
     }
 );
 
-export const updatePassword = createAsyncThunk(
-    "user/updatePassword",
-    async ({ oldPassword, newPassword }: { oldPassword: string; newPassword: string }, thunkAPI) => {
+export const loginUser = createAsyncThunk(
+    "user/loginUser",
+    async ({ email, password }: { email: string; password: string }, thunkAPI) => {
         try {
-            await apiUpdatePassword(oldPassword, newPassword);
-            return true;
+            const [status, response] = await apiLogin(email, password);
+            if (status === 200) {
+                await AsyncStorage.setItem('userToken', response.token);
+                return response.email;
+            }
         } catch (error: any) {
-            return thunkAPI.rejectWithValue(error.message || "Ошибка смены пароля");
+            return thunkAPI.rejectWithValue(error.message || "Ошибка входа");
         }
     }
+);
+
+export const updatePassword = createAsyncThunk(
+    // "user/updatePassword",
+    // async ({ oldPassword, newPassword }: { oldPassword: string; newPassword: string }, thunkAPI) => {
+    //     try {
+    //         await apiUpdatePassword(oldPassword, newPassword);
+    //         return true;
+    //     } catch (error: any) {
+    //         return thunkAPI.rejectWithValue(error.message || "Ошибка смены пароля");
+    //     }
+    // }
 );
 
 interface UserState {

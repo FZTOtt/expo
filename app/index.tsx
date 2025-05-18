@@ -2,8 +2,16 @@ import LeftBar from "@/components/leftBar";
 import RightBar from "@/components/rightBar";
 import { View, StyleSheet } from "react-native";
 import ExerciseWordBlock from "@/components/exerciseWordBlock";
+import { useEffect } from "react";
+import { useAppDispatch } from "@/hooks";
+import { restoreSession } from "@/redux/user";
 
 export default function Index() {
+
+    const dispatch = useAppDispatch();
+    useEffect(() => {
+        dispatch(restoreSession());
+    }, []);
 
     return (
         <View style={styles.container}>

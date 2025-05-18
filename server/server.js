@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 const pool = require('./db');
 const multer = require('multer');
 const path = require('path');
@@ -8,6 +8,9 @@ const fs = require('fs');
 const cors = require('cors');
 const axios = require('axios');
 const FormData = require('form-data');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const { WordExerciseSchema, PhraseExerciseSchema, ModuleSchema } = require('./schemas');
 
@@ -33,7 +36,19 @@ app.use('/uploads/audio', express.static(path.join(__dirname, 'uploads/audio')))
 app.use(cors({
     origin: ['http://localhost:8081', 'https://ouzistudy.ru'], 
     credentials: true,
-  }));
+}));
+
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (!token) return res.status(401).json({ error: "Нет токена" });
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) return res.status(403).json({ error: "Неверный токен" });
+        req.user = user;
+        next();
+    });
+}
 
 app.get('/apinode/', (req, res) => {
   res.send('Главная страница 🚀');
@@ -479,6 +494,53 @@ app.post('/apinode/get-ai-talk', async (req, res) => {
         res.status(500).json({ error: 'Ошибка сервера' });
     }
 })
+
+app.post('/apinode/register', async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ error: "Email и пароль обязательны" });
+
+    try {
+        const hash = await bcrypt.hash(password, 10);
+        const { rows } = await pool.query(
+            'INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email',
+            [email, hash]
+        );
+        const user = rows[0];
+        const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+        res.status(200).json({ 
+            status: 200,
+            payload: {
+                token,
+                email: user.email
+            }
+        });
+    } catch (err) {
+        if (err.code === '23505') {
+            res.status(400).json({ error: "Пользователь уже существует" });
+        } else {
+            res.status(500).json({ error: "Ошибка сервера" });
+        }
+    }
+});
+
+app.post('/apinode/login', async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ error: "Email и пароль обязательны" });
+
+    try {
+        const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        const user = rows[0];
+        if (!user) return res.status(400).json({ error: "Неверный email или пароль" });
+
+        const valid = await bcrypt.compare(password, user.password_hash);
+        if (!valid) return res.status(400).json({ error: "Неверный email или пароль" });
+
+        const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+        res.status(200).json({ token, email: user.email });
+    } catch (err) {
+        res.status(500).json({ error: "Ошибка сервера" });
+    }
+});
 
 app.listen(PORT, () => {
   console.log(`Сервер запущен на http://localhost:${PORT}`);
