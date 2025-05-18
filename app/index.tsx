@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'flex-start',
         backgroundColor: 'rgba(19, 31, 36, 1)',
-        flexDirection: 'row'
+        flexDirection: 'row',
+        minWidth: 1200,
     },
 });

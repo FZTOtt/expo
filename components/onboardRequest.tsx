@@ -19,7 +19,7 @@ const OnboardRequest = () => {
     const acceptOnboard = () => {
         dispatch(setRequestOnboard(false))
         dispatch(setOnboarding(true))
-        router.navigate('/onboarding')
+        // router.navigate('/onboarding')
     }
     return (
         <View style={styles.container}>

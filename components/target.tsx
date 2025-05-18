@@ -6,25 +6,25 @@ import PlaySound from '@/assets/icons/playSound.svg'
 import { useTranscriptionParser } from '@/hooks';
 
 interface TargetProps {
-    word: string;
-    transcription: string;
+    word?: string;
+    target: string[];
+    answer: string[];
     audioUrl: string;
     mode: 'word' | 'phrase';
 }
+const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
 
-const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
+    
+    const { targetTranscription } = useAppSelector((state: RootState) => state.phrases)
 
-    const { translatedTranscriptions } = useAppSelector((state: RootState) => state.word)
-    const { detectedPhrase } = useAppSelector((state: RootState) => state.phrases)
-    const { ParseWordTranscription, ParseWordsFromSentence} = useTranscriptionParser();
-
-    const CompareWords = ({ original, detected }: { original: string; detected: string }) => {        
-        const originalWords = ParseWordsFromSentence(original);
-
-        if (!detected) {
+    const CompareWords = ({ targetWords, detectedWords }: { targetWords: string[]; detectedWords: string[] }) => {        
+        
+        console.log(detectedWords.length)
+        console.log(answer)
+        if (detectedWords[0] === '') {
             return (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                    {originalWords.map((word, index) => {
+                    {targetWords.map((word, index) => {
                         return (
                             <Text
                                 key={index}
@@ -41,11 +41,11 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
                 </View>
             )
         }
-        const detectedWords = ParseWordsFromSentence(detected);
+        
     
         return (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap'}}>
-                {originalWords.map((word, index) => {
+                {targetWords.map((word, index) => {
                     const match = detectedWords[index]?.toLowerCase() === word.toLowerCase();
                     return (
                         <Text
@@ -64,13 +64,13 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
         );
     };
 
-    const HighlightedTranscription = ({ transcription, detectedTranscription }: {transcription: string, detectedTranscription: string}) => {
+    const HighlightedTranscription = ({ targetPhonemes, detectedPhonemes }: {targetPhonemes: string[], detectedPhonemes: string[]}) => {
         
-        const originalPhonemes = ParseWordTranscription(transcription)
-        if (!detectedTranscription) {
+        if (detectedPhonemes.length === 0) {
+            
             return (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5 }}>
-                {originalPhonemes.map((ph, index) => {
+                {targetPhonemes.map((ph, index) => {
                     return (
                         <Text
                             key={index}
@@ -86,11 +86,10 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
             </View>
             )
         }
-        const detectedPhonemes = ParseWordTranscription(detectedTranscription);
     
         return (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5 }}>
-                {originalPhonemes.map((ph, index) => {
+                {targetPhonemes.map((ph, index) => {
                     const match = detectedPhonemes[index] === ph;
                     return (
                         <Text
@@ -112,7 +111,7 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
             return (
                 <>
                     <View style={styles.wordContainer}>
-                        <HighlightedTranscription transcription={transcription} detectedTranscription={translatedTranscriptions[0]} />
+                        <HighlightedTranscription targetPhonemes={target} detectedPhonemes={answer} />
                         <AudioPlayer buttonStyle={styles.audioButton} audioUrl={audioUrl}>
                             <PlaySound 
                                 width={30} height={30}
@@ -127,7 +126,7 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
         } else return (
             <>
                 <View style={styles.wordContainer}>
-                    <CompareWords original={word} detected={detectedPhrase ? detectedPhrase : ''} />
+                    <CompareWords targetWords={target} detectedWords={answer} />
                     <AudioPlayer buttonStyle={styles.audioButton} audioUrl={audioUrl}>
                         <PlaySound 
                             width={30} height={30}
@@ -135,7 +134,7 @@ const Target = ({word, transcription, audioUrl, mode}: TargetProps) => {
                     </AudioPlayer>
                 </View>
                 <Text style={styles.word}>
-                    {transcription} 
+                    {targetTranscription} 
                 </Text>
             </>            
         )

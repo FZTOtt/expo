@@ -14,7 +14,7 @@ const LeftBar = () => {
       { path: '/', label: 'СЛОВА', Icon: WordsIcon },
       { path: '/phrases', label: 'ФРАЗЫ', Icon: Phrases },
       { path: '/aichat', label: 'ОБЩЕНИЕ', Icon: ChatIcon },
-      // { path: '/account', label: 'АККАУНТ', Icon: AccountIcon },
+      { path: '/account', label: 'АККАУНТ', Icon: AccountIcon },
     ];
 
     return (
@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         backgroundColor: 'rgba(19, 31, 36, 1)',
         maxWidth: 300,
+        minWidth: 250,
         width: '30%',
         paddingHorizontal: 30,
         alignItems: 'center',

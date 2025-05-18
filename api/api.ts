@@ -5,6 +5,7 @@ import { PhrasesExerciseApiResponse, WordExerciseApiResponse } from "@/interface
 const API_BASE_URL = "https://ouzistudy.ru/api";
 const NODE_API_URL = "http://localhost:3000";
 const NODE_API_DEPLOY = "https://ouzistudy.ru";
+const CURRENT_API = NODE_API_URL;
 // https://ouzistudy.ru
 
 export const translateAudio = async (audioData: string | Blob, word: string): Promise<[number, any]> => {
@@ -122,32 +123,32 @@ export const getPhraseExercise = async (module: string): Promise<[number, Phrase
 
 export const getCurrentWordModule = async (): Promise<[number, any]> => {
 
-    return getRequest(`${NODE_API_DEPLOY}/apinode/current-word-module/`)
+    return getRequest(`${CURRENT_API}/apinode/current-word-module/`)
 }
 
 export const getWordModuleExercises = async (id: number): Promise<[number, any]> => {
 
-    return getRequest(`${NODE_API_DEPLOY}/apinode/word-modules/${id}/exercises`)
+    return getRequest(`${CURRENT_API}/apinode/word-modules/${id}/exercises`)
 }
 
 export const getCurrentPhraseModule = async (): Promise<[number, any]> => {
 
-    return getRequest(`${NODE_API_DEPLOY}/apinode/current-phrase-module/`)
+    return getRequest(`${CURRENT_API}/apinode/current-phrase-module/`)
 }
 
 export const getPhraseModuleExercises = async (id: number): Promise<[number, any]> => {
 
-    return getRequest(`${NODE_API_DEPLOY}/apinode/phrase-modules/${id}/exercises`)
+    return getRequest(`${CURRENT_API}/apinode/phrase-modules/${id}/exercises`)
 }
 
 export const getWordModules = async (): Promise<[number, any]> => {
-
-    return getRequest(`${NODE_API_DEPLOY}/apinode/word-modules`)
+CURRENT_API
+    return getRequest(`${CURRENT_API}/apinode/word-modules`)
 }
 
 export const getPhraseModules = async (): Promise<[number, any]> => {
 
-    return getRequest(`${NODE_API_DEPLOY}/apinode/phrase-modules`)
+    return getRequest(`${CURRENT_API}/apinode/phrase-modules`)
 }
 
 export const getWordTranscrible = async (audioData: string | Blob): Promise<[number, any]> => {
@@ -167,7 +168,7 @@ export const getWordTranscrible = async (audioData: string | Blob): Promise<[num
         'Content-Type': 'multipart/form-data'
     };
     
-    return postRequest(`${NODE_API_DEPLOY}/apinode/transcribe-word`, formData, headers);
+    return postRequest(`${CURRENT_API}/apinode/transcribe-word`, formData, headers);
 };
 
 export const getPhraseTranscrible = async (audioData: string | Blob): Promise<[number, any]> => {
@@ -187,7 +188,7 @@ export const getPhraseTranscrible = async (audioData: string | Blob): Promise<[n
         'Content-Type': 'multipart/form-data'
     };
     
-    return postRequest(`${NODE_API_DEPLOY}/apinode/transcribe-phrase`, formData, headers);
+    return postRequest(`${CURRENT_API}/apinode/transcribe-phrase`, formData, headers);
 };
 
 export const getAIHelp = async (target: string, errors: number): Promise<[number, any]> => {
@@ -200,7 +201,7 @@ export const getAIHelp = async (target: string, errors: number): Promise<[number
         'Content-Type': 'application/json',
     };
     
-    return postRequest(`${NODE_API_DEPLOY}/apinode/get-ai-help`, data, headers)
+    return postRequest(`${CURRENT_API}/apinode/get-ai-help`, data, headers)
 }
 
 export const getAITalk = async (message: string): Promise<[number, any]> => {
@@ -212,5 +213,5 @@ export const getAITalk = async (message: string): Promise<[number, any]> => {
         'Content-Type': 'application/json',
     };
 
-    return postRequest(`${NODE_API_DEPLOY}/apinode/get-ai-talk`, data, headers)
+    return postRequest(`${CURRENT_API}/apinode/get-ai-talk`, data, headers)
 }

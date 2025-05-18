@@ -1,28 +1,28 @@
-import { useAppDispatch, useAppSelector } from "@/hooks";
+import { useAppDispatch, useAppSelector, useTranscriptionParser } from "@/hooks";
 import { RootState } from "@/redux/store";
-import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import Manage from "./manage";
-import { getWordTranscrible, translateAudio } from "@/api/api";
+import { getWordTranscrible } from "@/api/api";
 import { setDetectedTranscription } from "@/redux/word";
 import AudioPlayer from "./audioPlayer";
 
-const PronounceFiew = ({handleNext}) => {
+const PronounceFiew = ({handleNext} : {handleNext: (correct: boolean) => void}) => {
 
     const dispatch = useAppDispatch();
+    const { ParseWordTranscription } = useTranscriptionParser();
 
-    const { targetWords, targetAudioUrls } = useAppSelector((state: RootState) => state.word);
+    const { targetWords, targetAudioUrls, targetTranscriptions } = useAppSelector((state: RootState) => state.word);
     
     const [selectedWord, setSelectedWord] = useState<number | null>(null);
     const [isCorrect, setIsCorrect] = useState<(boolean | null)[]>(targetWords.map(() => null));
+    const [completed, setCompleted] = useState<boolean>(false)
 
 
 
     const handleWordPress = (index: number) => {
         setSelectedWord(index);
     };
-
-    const cleanPhonemes = (str: string) => str.replace(/[ˈˌ]/g, '').split('');
 
     const handleRecordingComplete = async (audio: Blob | string) => {
         const [status, response] = await getWordTranscrible(audio);
@@ -31,8 +31,9 @@ const PronounceFiew = ({handleNext}) => {
         } else {
             console.error('Ошибка при запросе расшифровке аудио')
         }
-        const originalPhonemes = cleanPhonemes(targetWords[selectedWord]);
-        const detectedPhonemes = cleanPhonemes(response.transcription);
+        if (selectedWord === null) return
+        const originalPhonemes = ParseWordTranscription(targetTranscriptions[selectedWord]);
+        const detectedPhonemes = ParseWordTranscription(response.transcription);
 
         const areEqual = (
             originalPhonemes.length === detectedPhonemes.length &&
@@ -46,6 +47,17 @@ const PronounceFiew = ({handleNext}) => {
             return newStatus
         })
     }
+
+    useEffect(() => {
+        console.log('ttt')
+        for (let i = 0; i < isCorrect.length; i++) {
+            if (isCorrect[i] !== true) {
+                setCompleted(false)
+                // return
+            }
+        }
+        setCompleted(true)
+    }, [isCorrect])
 
     return (
         <View style={styles.container}>
@@ -70,7 +82,9 @@ const PronounceFiew = ({handleNext}) => {
                     </AudioPlayer>
                 ))}
             </View>
-            <Manage onNext={handleNext} onRecordComplete={handleRecordingComplete}/>
+            <Manage onNext={() => handleNext(completed)} 
+            onRecordComplete={handleRecordingComplete}
+            completed={completed}/>
         </View>
     )
 }
@@ -78,12 +92,7 @@ const PronounceFiew = ({handleNext}) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        maxWidth: 1200,
-        borderRightWidth: 2,
-        borderColor: 'rgba(82, 101, 109, 1)',
-        paddingTop: '5%',
         gap: 50,
-        paddingBottom: 50,
         alignItems: 'center'
     },
     exerciseText: {

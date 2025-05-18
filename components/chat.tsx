@@ -147,8 +147,6 @@ const Chat = () => {
             currentSentenceHash = `phrase:${detectedPhrase}`;
         }
 
-        console.log(wordHashRef.current, currentWordHash, !wordHashRef.current)
-
         if ((wordHashRef.current === currentWordHash || (currentMessages.length !== 0 && !wordHashRef.current)) && pathname === '/') {
             return
         } else if ((sentenceHashRef.current === currentSentenceHash || (currentMessages.length !== 0 && !sentenceHashRef.current)) && pathname === '/phrases') {

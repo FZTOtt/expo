@@ -165,7 +165,10 @@ const Reference = () => {
                 return (
                     <>
                         <Text style={styles.wordDescription}>
-                            {`${targetWords[0]} (${targetTranscriptions[0]}) - ${wordTranslations[0]}`}
+                            Прослушайте слово и произнесите его. 
+                            Дождитесь сообщения в чате с обратной связью.{'\n'}
+                            {`${targetWords[0]} (${targetTranscriptions[0]}) - ${wordTranslations[0]}.\n`}
+                            Нажмите на интересующую фонему и получите справку по произношению.
                         </Text>
                         <FlatList 
                         data={phonemeDetails}
@@ -219,7 +222,8 @@ const Reference = () => {
             } else if (phraseExercise === 'pronounce') {
                 return (
                     <Text style={styles.wordDescription}>
-                        Прослушайте предложение и произнесите его
+                        Прослушайте предложение и произнесите его.{'\n'}
+                        Дождитесь сообщения в чате с обратной связью
                     </Text>                    
                 )
             }

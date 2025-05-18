@@ -48,7 +48,7 @@ const Modules = () => {
             if (path == '/') {
                 const [status, response] = await getWordModules()
                 if (status == 200) {
-                    refModules = response.modules.map((mod) => (
+                    refModules = response.modules.map((mod : Module) => (
                         {
                             id: mod.id,
                             title: mod.title 
@@ -58,7 +58,7 @@ const Modules = () => {
             } else {
                 const [status, response] = await getPhraseModules()
                 if (status == 200) {
-                    refModules = response.modules.map((mod) => (
+                    refModules = response.modules.map((mod : Module) => (
                         {
                             id: mod.id,
                             title: mod.title 
@@ -122,7 +122,7 @@ const Modules = () => {
             <FlatList 
             data={modules}
             renderItem={renderModule}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item : Module) => item.id.toString()}
             showsVerticalScrollIndicator={false}
             />
         </View>

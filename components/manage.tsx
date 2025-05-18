@@ -7,19 +7,20 @@ import AudioRecorder from './aidoRecorder';
 type ManageProps = {
     onRecordComplete: (audio: Blob | string) => Promise<void>;
     onNext: () => void;
+    completed?: boolean 
   };
 
-const Manage = ({onRecordComplete, onNext}: ManageProps) => {
+const Manage = ({onRecordComplete, onNext, completed}: ManageProps) => {
     return (
         <View style={styles.container}>
             <View style={styles.buttonsContainer}>                
                 <AudioRecorder onState={MicOn} offState={MicOff} size={90} onRecordComplete={onRecordComplete}></AudioRecorder>
                 <TouchableOpacity style={[styles.button]} onPress={onNext}>
-                    <Text style={styles.buttonSkipText}>Пропустить</Text>
+                    <Text style={styles.buttonSkipText}>{completed ? 'Завершить' : 'Пропустить'}</Text>
                 </TouchableOpacity>
             </View>
             <Text style={styles.textDescription}>
-                Варианты записи: 1) Зажать, записать, отпустить; 2) Нажать, записать, нажать
+                Запишите произношение при помощи кнопки микрофона, а мы проверим
             </Text>
         </View>
     );

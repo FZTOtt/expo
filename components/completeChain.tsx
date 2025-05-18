@@ -86,12 +86,8 @@ const completeChain = ({handleNext} : {handleNext: (correct: boolean) => void}) 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        borderRightWidth: 2,
-        borderColor: 'rgba(82, 101, 109, 1)',
-        paddingTop: '5%',
-        alignItems: 'center',
         gap: 50,
-        paddingBottom: 50,
+        alignItems: 'center',
     },
     exerciseText: {
         fontSize: 40,

@@ -4,9 +4,9 @@ import { View, StyleSheet } from 'react-native';
 const Navbar = () => {
     return (
         <View style={styles.navbar}>
-            <Link href="/statistic" style={styles.linkLeft}>Статистика</Link>
+            {/* <Link href="/statistic" style={styles.linkLeft}>Статистика</Link> */}
             <Link href="/" style={styles.logo}>OUZI</Link>
-            <Link href="/themes" style={styles.linkRight}>Темы</Link>
+            {/* <Link href="/themes" style={styles.linkRight}>Темы</Link> */}
         </View>
     )
 }

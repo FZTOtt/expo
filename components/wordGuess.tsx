@@ -5,7 +5,7 @@ import AudioPlayer from "./audioPlayer";
 import PlaySound from '@/assets/icons/soundCurrentColor.svg'
 import { useState } from "react";
 
-const WordGuess = ({handleNext}) => {
+const WordGuess = ({handleNext} : {handleNext: (correct: boolean) => void}) => {
 
     const { targetWords, targetAudioUrls } = useAppSelector((state: RootState) => state.word);
 
@@ -24,7 +24,7 @@ const WordGuess = ({handleNext}) => {
         
         // задержка до следующего задания
         setTimeout(() => {
-            handleNext()
+            handleNext(correct)
         }, 1500);
     };
 
@@ -62,12 +62,7 @@ const WordGuess = ({handleNext}) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        maxWidth: 1200,
-        borderRightWidth: 2,
-        borderColor: 'rgba(82, 101, 109, 1)',
-        paddingTop: '5%',
         gap: 50,
-        paddingBottom: 50,
         alignItems: 'center'
     },
     exerciseText: {

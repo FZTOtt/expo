@@ -6,10 +6,11 @@ import PhrasePronounce from "./phrasePronounce"
 import CompleteChain from "./completeChain"
 import { getCurrentPhraseModule, getPhraseModuleExercises } from "@/api/api"
 import { nextPhraseExercise, setCurrentPhraseModule } from "@/redux/module"
+import { View, StyleSheet } from 'react-native'
 
 const ExercisePhrasesBlock = () => {
 
-    const dispatch = useAppDispatch()
+    const dispatch = useAppDispatch();
     const { parsePhrasesExercise } = useExerciseParser();
     const { phraseExercise } = useAppSelector((state: RootState) => state.exercise);
     const { currentPhraseModuleId, currentPhraseExerciseIndex, phraseExercises } = useAppSelector((state: RootState) => state.module);
@@ -71,13 +72,22 @@ const ExercisePhrasesBlock = () => {
     }
     
     return (
-        <>
+        <View style={styles.mainContainer}>
             {phraseExercise === 'pronounce' && <PhrasePronounce handleNext={handleNextExercise}/>}
             {phraseExercise === 'completeChain' && <CompleteChain handleNext={handleNextExercise}/>}
-        </>
+        </View>
     )
 }
 
-
+const styles = StyleSheet.create({
+    mainContainer: {
+        flex: 1,
+        borderRightWidth: 2,
+        borderColor: 'rgba(82, 101, 109, 1)',
+        paddingTop: 50,
+        paddingBottom: 50,
+        minWidth: 700
+    }
+})
 
 export default ExercisePhrasesBlock;

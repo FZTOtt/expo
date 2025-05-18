@@ -1,14 +1,13 @@
 import LeftBar from "@/components/leftBar";
 import RightBar from "@/components/rightBar";
-import WordPage from "@/components/exerciseWordBlock";
 import { View, StyleSheet } from "react-native";
+import Account from "@/components/account";
 
-const Account = () => {
+const AccountPage = () => {
     return (
         <View style={styles.container}>
             <LeftBar />
-            <WordPage />
-            <RightBar />
+            <Account />
         </View>
     );
 }
@@ -21,4 +20,4 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     },
 });
-export default Account;
+export default AccountPage;

@@ -15,7 +15,7 @@ const ExerciseWordBlock = () => {
     const { wordExercise } = useAppSelector((state: RootState) => state.exercise);
     const { currentWordModuleId, currentWordExerciseIndex, wordExercises } = useAppSelector((state: RootState) => state.module);
 
-    const [isModalVisible, setIsModalVisible] = useState(false); // Состояние для модального окна
+    const [isModalVisible, setIsModalVisible] = useState(false);
     const [fadeAnim] = useState(new Animated.Value(0)); // Анимация для модального окна
 
 
@@ -31,7 +31,7 @@ const ExerciseWordBlock = () => {
                 dispatch(setCurrentWordModule({
                     id: currentModule.module_id,
                     exercises: response.exercises}));
-                parseWordExercise(response.exercises[0]); // первый — текущий
+                parseWordExercise(response.exercises[0]);
               }
             }
           };
@@ -40,6 +40,7 @@ const ExerciseWordBlock = () => {
     }, [])
 
     function handleNextExercise() {
+
         const nextIndex = currentWordExerciseIndex + 1;
 
         if (nextIndex < wordExercises.length) {
@@ -47,6 +48,7 @@ const ExerciseWordBlock = () => {
             parseWordExercise(wordExercises[nextIndex]);
         } else {
             // Конец модуля
+            if (currentWordModuleId === null) return
             console.log("Модуль завершён");
             const getNextModule = async () => {
                 let [status, response] = await getWordModuleExercises(currentWordModuleId+1);
@@ -71,8 +73,10 @@ const ExerciseWordBlock = () => {
         }
     }
 
-    const handleTaskComplete = () => {
+    const handleTaskComplete = (correct: boolean) => {
         setIsModalVisible(true);
+
+        console.log('Заглушка выполнения задания на сервере, результат: ', correct)
 
         Animated.timing(fadeAnim, {
             toValue: 1,
@@ -93,7 +97,7 @@ const ExerciseWordBlock = () => {
     };
     
     return (
-        <>
+        <View style={styles.mainContainer}>
             <Modal transparent visible={isModalVisible} animationType="none">
                     <View style={styles.modalContainer}>
                         <Animated.View style={[styles.modalContent, { opacity: fadeAnim }]}>
@@ -105,7 +109,7 @@ const ExerciseWordBlock = () => {
             {wordExercise === 'pronounce' && <WordPronounce handleNext={handleTaskComplete}/>}
             {wordExercise === 'guessWord' && <WordGuess handleNext={handleTaskComplete}/>}
             {wordExercise === 'pronounceFiew' && <PronounceFiew handleNext={handleTaskComplete}/>}
-        </>
+        </View>
         
     )
 }
@@ -128,6 +132,15 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "white",
     },
+    mainContainer: {
+        flex: 1,
+        borderRightWidth: 2,
+        borderColor: 'rgba(82, 101, 109, 1)',
+        paddingTop: 50,
+        gap: 50,
+        paddingBottom: 50,
+        minWidth: 700
+    }
 });
 
 export default ExerciseWordBlock;

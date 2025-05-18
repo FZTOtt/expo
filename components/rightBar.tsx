@@ -18,7 +18,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',
-        maxWidth: 400
+        maxWidth: 400,
+        minWidth: 250
     },
     modules: {
         borderColor: 'rgba(82, 101, 109, 1)',

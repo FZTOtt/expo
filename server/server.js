@@ -460,7 +460,7 @@ app.post('/apinode/get-ai-talk', async (req, res) => {
         const { message } = req.body
 
         const response = await axios.post(
-            'http://94.253.9.254:5002/get_helper_text',
+            'http://94.253.9.254:5003/generate_dialog',
             { input_text: message },
             {
                 headers: {
