@@ -107,42 +107,48 @@ export const getWordNode = async (): Promise<[number, any]> => {
     return getRequest(`http://localhost:3001/word/random`)
 }
 
-export const getWordExercise = async (module: string): Promise<[number, WordExerciseApiResponse]> => {
+export const getCurrentWordModule = async (token?: string | null): Promise<[number, any]> => {
+    
+    const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+    }
 
-    const data = JSON.stringify({ module: module })
-
-    return postRequest(`${API_BASE_URL}/getExrcise/word`, data)
+    return getRequest(`${CURRENT_API}/apinode/current-word-module/`, token ? headers : {})
 }
 
-export const getPhraseExercise = async (module: string): Promise<[number, PhrasesExerciseApiResponse]> => {
+export const getWordModuleExercises = async (id: number, token?: string | null): Promise<[number, any]> => {
 
-    const data = JSON.stringify({ module: module })
+    const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+    }
 
-    return postRequest(`${API_BASE_URL}/getExrcise/phrase`, data)
+    return getRequest(`${CURRENT_API}/apinode/word-modules/${id}/exercises`, token ? headers : {})
 }
 
-export const getCurrentWordModule = async (): Promise<[number, any]> => {
+export const getCurrentPhraseModule = async (token?: string | null): Promise<[number, any]> => {
 
-    return getRequest(`${CURRENT_API}/apinode/current-word-module/`)
+    const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+    }
+
+    return getRequest(`${CURRENT_API}/apinode/current-phrase-module/`, token ? headers : {})
 }
 
-export const getWordModuleExercises = async (id: number): Promise<[number, any]> => {
+export const getPhraseModuleExercises = async (id: number, token?: string | null): Promise<[number, any]> => {
 
-    return getRequest(`${CURRENT_API}/apinode/word-modules/${id}/exercises`)
-}
+    const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+    }
 
-export const getCurrentPhraseModule = async (): Promise<[number, any]> => {
-
-    return getRequest(`${CURRENT_API}/apinode/current-phrase-module/`)
-}
-
-export const getPhraseModuleExercises = async (id: number): Promise<[number, any]> => {
-
-    return getRequest(`${CURRENT_API}/apinode/phrase-modules/${id}/exercises`)
+    return getRequest(`${CURRENT_API}/apinode/phrase-modules/${id}/exercises`, token ? headers : {})
 }
 
 export const getWordModules = async (): Promise<[number, any]> => {
-CURRENT_API
+
     return getRequest(`${CURRENT_API}/apinode/word-modules`)
 }
 
@@ -216,11 +222,12 @@ export const getAITalk = async (message: string): Promise<[number, any]> => {
     return postRequest(`${CURRENT_API}/apinode/get-ai-talk`, data, headers)
 }
 
-export const apiRegister = async (email: string, password: string): Promise<[number, any]> => {
+export const apiRegister = async (email: string, password: string, name: string): Promise<[number, any]> => {
 
     const data = JSON.stringify({ 
         email: email,
-        password: password
+        password: password,
+        name: name
     })
     const headers = {
         'Content-Type': 'application/json',
@@ -256,3 +263,31 @@ export const apiUpdatePassword = async (token: string, oldPassword: string, newP
     
     return postRequest(`${CURRENT_API}/apinode/change-password`, data, headers);
 };
+
+export const sendExerciseProgress = async (
+    exercise_id: number, 
+    exercise_type: 'phrase' | 'word', 
+    status: string,
+    token?: string | null
+) : Promise<[number, any]> => {
+
+    const data = JSON.stringify({ 
+        exercise_id: exercise_id,
+        exercise_type: exercise_type,
+        status: status
+    })
+
+    let headers;
+    if (token) {
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+        }
+    } else {
+        headers = {
+            "Content-Type": "application/json",
+        }
+    }
+    
+    return postRequest(`${CURRENT_API}/apinode/exercise-progress`, data, headers);
+}

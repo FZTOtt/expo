@@ -17,12 +17,17 @@ export const restoreSession = createAsyncThunk(
 // Асинхронные экшены
 export const registerUser = createAsyncThunk(
     "user/registerUser",
-    async ({ email, password }: { email: string; password: string }, thunkAPI) => {
+    async ({ email, password, name }: { email: string; password: string, name: string }, thunkAPI) => {
         try {
-            const [status, response] = await apiRegister(email, password);
+            const [status, response] = await apiRegister(email, password, name);
+            console.log(status,response)
             if (status === 200) {
                 await AsyncStorage.setItem('userToken', response.token);
                 return response.email;
+            } else if (response && response.error) {
+                return thunkAPI.rejectWithValue(response.error);
+            } else {
+                return thunkAPI.rejectWithValue("Ошибка регистрации");
             }
         } catch (error: any) {
             return thunkAPI.rejectWithValue(error.message || "Ошибка регистрации");
@@ -38,6 +43,10 @@ export const loginUser = createAsyncThunk(
             if (status === 200) {
                 await AsyncStorage.setItem('userToken', response.token);
                 return response.email;
+            } else if (response && response.error) {
+                return thunkAPI.rejectWithValue(response.error);
+            } else {
+                return thunkAPI.rejectWithValue("Ошибка входа");
             }
         } catch (error: any) {
             return thunkAPI.rejectWithValue(error.message || "Ошибка входа");
@@ -81,6 +90,12 @@ const userSlice = createSlice({
             state.status = "idle";
             state.error = null;
         },
+        clearError: (state) => {
+            state.error = null;
+        },
+        setError: (state, action: PayloadAction<string>) => {
+            state.error = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -109,9 +124,23 @@ const userSlice = createSlice({
             .addCase(updatePassword.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.payload as string;
+            })
+            // Логин
+            .addCase(loginUser.pending, (state) => {
+                state.status = "loading";
+                state.error = null;
+            })
+            .addCase(loginUser.fulfilled, (state, action: PayloadAction<string>) => {
+                state.status = "succeeded";
+                state.email = action.payload;
+                state.isAuthorized = true;
+            })
+            .addCase(loginUser.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.payload as string;
             });
     },
 });
 
-export const { logout } = userSlice.actions;
+export const { logout, clearError, setError } = userSlice.actions;
 export default userSlice.reducer;

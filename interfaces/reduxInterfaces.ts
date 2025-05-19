@@ -3,6 +3,7 @@ export interface TargetWord {
     targetTranscriptions: string[];
     targetAudioUrls: string[];
     wordTranslations: string[];
+    id: number | null;
 }
 
 export interface TargetPhrase {
@@ -10,10 +11,12 @@ export interface TargetPhrase {
     targetAudioUrl: string | null;
     targetTranscription: string | null;
     translatedPhrase: string | null;
+    id: number | null;
 }
 
 export interface PhraseChain {
     chain: string[];
     sentence: string;
     audio: string | null;
+    id: number | null;
 }

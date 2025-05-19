@@ -8,6 +8,9 @@ interface PhraseState {
     targetTranscription: string | null;
     detectedPhrase: string | null;
 
+
+    id: number | null;
+
     chain: string[];
     sentence: string | null;
     audio: string | null;
@@ -21,6 +24,8 @@ const initialState: PhraseState = {
     targetTranscription: null,
     detectedPhrase: null,
 
+    id: null,
+
     chain: [],
     sentence: null,
     audio: null,
@@ -32,18 +37,20 @@ const phraseSlice = createSlice({
     initialState,
     reducers: {
         setTargetPhrase: (state, action: PayloadAction<TargetPhrase> ) => {
-            state.targetPhrase = action.payload.targetPhrase
-            state.targetAudioUrl = action.payload.targetAudioUrl
-            state.targetTranscription = action.payload.targetTranscription
-            state.translatedPhrase = action.payload.translatedPhrase
+            state.targetPhrase = action.payload.targetPhrase;
+            state.targetAudioUrl = action.payload.targetAudioUrl;
+            state.targetTranscription = action.payload.targetTranscription;
+            state.translatedPhrase = action.payload.translatedPhrase;
+            state.id = action.payload.id;
         },
         setDetectedPhrase: (state, action: PayloadAction<string>) => {
-            state.detectedPhrase = action.payload
+            state.detectedPhrase = action.payload;
         },
         setChain: (state, action: PayloadAction<PhraseChain>) => {
             state.chain = action.payload.chain;
             state.sentence = action.payload.sentence;
             state.audio = action.payload.audio;
+            state.id = action.payload.id;
         },
         setCurrentChain: (state, action: PayloadAction<string[]>) => {
             state.currentChain = action.payload;

@@ -38,14 +38,19 @@ app.use(cors({
     credentials: true,
 }));
 
-function authenticateToken(req, res, next) {
+function authenticateTokenOptional(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    if (!token) return res.status(401).json({ error: "Нет токена" });
-
+    if (!token) {
+        req.user = undefined;
+        return next();
+    }
     jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ error: "Неверный токен" });
-        req.user = user;
+        if (err) {
+            req.user = undefined;
+        } else {
+            req.user = user;
+        }
         next();
     });
 }
@@ -147,7 +152,6 @@ app.post('/apinode/word-exercises', upload.array('audio', 2), async (req, res) =
         res.status(200).json({
             status: 200,
             payload: {
-                status: "success",
                 id: rows[0].id
             }
         });
@@ -230,8 +234,17 @@ app.get('/apinode/debug/phrases-exercises', async (req, res) => {
     })
 });
 
-app.get('/apinode/current-word-module/', async (req, res) => {
-    const userId = 1
+app.get('/apinode/current-word-module/', authenticateTokenOptional, async (req, res) => {
+
+    const userId = req.user?.id;
+    console.log(userId)
+
+    if (!userId) {
+        return res.json({
+            status: 200,
+            payload: { module_id: 1 }
+        });
+    }
 
     try {
         const { rows } = await pool.query(
@@ -258,33 +271,16 @@ app.get('/apinode/current-word-module/', async (req, res) => {
     }
 });
 
-app.get('/apinode/word-modules/:id/exercises', async (req, res) => {
-    const moduleId = parseInt(req.params.id);
-    const userId = 1;
-    try {
-        const { rows } = await pool.query(
-        `SELECT e.*, COALESCE(p.status, 'none') AS status
-        FROM word_exercises e
-        LEFT JOIN exercise_progress p 
-            ON p.exercise_id = e.id AND p.exercise_type = 'word' AND p.user_id = $1
-        WHERE e.module_id = $2`,
-        [userId, moduleId]
-        );
-        res.json({ 
-            status: 200,
-            payload: 
-            {
-                exercises: rows
-            } 
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
-    }
-})
+app.get('/apinode/current-phrase-module/', authenticateTokenOptional, async (req, res) => {
+    
+    const userId = req.user?.id;
 
-app.get('/apinode/current-phrase-module/', async (req, res) => {
-    const userId = 1
+    if (!userId) {
+        return res.json({
+            status: 200,
+            payload: { module_id: 1 }
+        });
+    }
 
     try {
         const { rows } = await pool.query(
@@ -311,18 +307,34 @@ app.get('/apinode/current-phrase-module/', async (req, res) => {
     }
 });
 
-app.get('/apinode/phrase-modules/:id/exercises', async (req, res) => {
+
+app.get('/apinode/word-modules/:id/exercises', authenticateTokenOptional, async (req, res) => {
     const moduleId = parseInt(req.params.id);
-    const userId = 1;
+    const userId = req.user?.id;
     try {
-        const { rows } = await pool.query(
-        `SELECT e.*, COALESCE(p.status, 'none') AS status
-        FROM phrase_exercises e
-        LEFT JOIN exercise_progress p 
-            ON p.exercise_id = e.id AND p.exercise_type = 'phrase' AND p.user_id = $1
-        WHERE e.module_id = $2`,
-        [userId, moduleId]
-        );
+        let rows;
+        if (userId) {
+            // Если пользователь авторизован — возвращаем статус выполнения
+            const result = await pool.query(
+                `SELECT e.*, 
+                    COALESCE(p.status, 'none') AS status
+                FROM word_exercises e
+                LEFT JOIN exercise_progress p 
+                    ON p.exercise_id = e.id AND p.exercise_type = 'word' AND p.user_id = $1
+                    WHERE e.module_id = $2`,
+                [userId, moduleId]
+            );
+            rows = result.rows;
+        } else {
+            // Если не авторизован — возвращаем без статистики
+            const result = await pool.query(
+                `SELECT e.*, 'none' AS status
+                FROM word_exercises e
+                WHERE e.module_id = $1`,
+                [moduleId]
+            );
+            rows = result.rows;
+        }
         res.json({ 
             status: 200,
             payload: 
@@ -336,11 +348,59 @@ app.get('/apinode/phrase-modules/:id/exercises', async (req, res) => {
     }
 })
 
-app.post('/apinode/exercise-progress', async (req, res) => {
-    const userId = 1;
+
+app.get('/apinode/phrase-modules/:id/exercises', authenticateTokenOptional, async (req, res) => {
+    const moduleId = parseInt(req.params.id);
+    const userId = req.user?.id;
+    try {
+        let rows;
+        if (userId) {
+            const { rows } = await pool.query(
+                `SELECT e.*, 
+                    COALESCE(p.status, 'none') AS status
+                FROM phrase_exercises e
+                LEFT JOIN exercise_progress p 
+                    ON p.exercise_id = e.id AND p.exercise_type = 'phrase' AND p.user_id = $1
+                    WHERE e.module_id = $2`,
+                [userId, moduleId]
+            );
+            rows = result.rows; 
+        } else {
+            const result = await pool.query(
+                `SELECT e.*, 'none' AS status
+                FROM phrase_exercises e
+                WHERE e.module_id = $1`,
+                [moduleId]
+            );
+            rows = result.rows;
+        }
+        
+        res.json({ 
+            status: 200,
+            payload: 
+            {
+                exercises: rows
+            } 
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+})
+
+app.post('/apinode/exercise-progress', authenticateTokenOptional, async (req, res) => {
+    const userId = req.user?.id;
     const { exercise_id, exercise_type, status } = req.body;
   
     try {
+        if (!userId) {
+            res.status(200).json({ 
+                status: 200,
+                payload: {
+                    message: 'Пользователь не авторизован'
+                } 
+            });
+        }
         await pool.query(`
             INSERT INTO exercise_progress (user_id, exercise_id, exercise_type, status)
             VALUES ($1, $2, $3, $4)
@@ -496,14 +556,14 @@ app.post('/apinode/get-ai-talk', async (req, res) => {
 })
 
 app.post('/apinode/register', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
     if (!email || !password) return res.status(400).json({ error: "Email и пароль обязательны" });
 
     try {
         const hash = await bcrypt.hash(password, 10);
         const { rows } = await pool.query(
-            'INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email',
-            [email, hash]
+            'INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3) RETURNING id, email',
+            [email, hash, name]
         );
         const user = rows[0];
         const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
@@ -515,6 +575,7 @@ app.post('/apinode/register', async (req, res) => {
             }
         });
     } catch (err) {
+        console.log(err)
         if (err.code === '23505') {
             res.status(400).json({ error: "Пользователь уже существует" });
         } else {
@@ -536,7 +597,13 @@ app.post('/apinode/login', async (req, res) => {
         if (!valid) return res.status(400).json({ error: "Неверный email или пароль" });
 
         const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-        res.status(200).json({ token, email: user.email });
+        res.status(200).json({ 
+            status: 200,
+            payload: {
+                token,
+                email: user.email 
+            }
+        });
     } catch (err) {
         res.status(500).json({ error: "Ошибка сервера" });
     }

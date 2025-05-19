@@ -7,6 +7,7 @@ import { RootState } from "@/redux/store";
 import { getPhraseModuleExercises, getPhraseModules, getWordModuleExercises, getWordModules } from "@/api/api";
 import { setCurrentPhraseModule, setCurrentWordModule } from "@/redux/module";
 import { useExerciseParser } from "@/hooks/exerciseParser";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Module = {
     id: number;
@@ -72,8 +73,9 @@ const Modules = () => {
     }, [])
 
     async function handleModuleSelect(id: number) {
+        const token = await AsyncStorage.getItem('userToken');
         if (pathname == '/') {
-            let [status, response] = await getWordModuleExercises(id);
+            let [status, response] = await getWordModuleExercises(id, token);
             if (status === 200) {
                 if (response.exercises.length != 0) {
                     dispatch(setCurrentWordModule({
@@ -81,7 +83,7 @@ const Modules = () => {
                         exercises: response.exercises}));
                     parseWordExercise(response.exercises[0]);
                 } else {
-                    [status, response] = await getWordModuleExercises(1);
+                    [status, response] = await getWordModuleExercises(1, token);
                     if (status === 200) {
                         dispatch(setCurrentWordModule({
                             id: 1,
@@ -91,7 +93,7 @@ const Modules = () => {
                 } 
             }
         } else {
-            let [status, response] = await getPhraseModuleExercises(id);
+            let [status, response] = await getPhraseModuleExercises(id, token);
             if (status === 200) {
                 if (response.exercises.length != 0) {
                     dispatch(setCurrentPhraseModule({
@@ -99,7 +101,7 @@ const Modules = () => {
                         exercises: response.exercises}));
                     parsePhrasesExercise(response.exercises[0]);
                 } else {
-                    [status, response] = await getPhraseModuleExercises(1);
+                    [status, response] = await getPhraseModuleExercises(1, token);
                     if (status === 200) {
                         dispatch(setCurrentPhraseModule({
                             id: 1,

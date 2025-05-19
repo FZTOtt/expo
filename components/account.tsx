@@ -2,30 +2,31 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/hooks";
 import { RootState } from "@/redux/store";
-import { registerUser, updatePassword } from "@/redux/user";
+import { loginUser, registerUser, updatePassword, logout, clearError, setError } from "@/redux/user";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Account = () => {
     const dispatch = useAppDispatch();
     const user = useAppSelector((state: RootState) => state.user);
 
-    const [password, setPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [regEmail, setRegEmail] = useState("");
-    const [regPassword, setRegPassword] = useState("");
-    const [regConfirmPassword, setRegConfirmPassword] = useState("");
+    const [password, setPassword] = useState<string>("");
+    const [newPassword, setNewPassword] = useState<string>("");
+    const [confirmPassword, setConfirmPassword] = useState<string>("");
 
-    // Для отображения ошибок и статусов
-    useEffect(() => {
-        if (user.error) {
-            Alert.alert("Ошибка", user.error);
-        }
-    }, [user.error]);
+    const [regEmail, setRegEmail] = useState<string>("");
+    const [regPassword, setRegPassword] = useState<string>("");
+    const [regConfirmPassword, setRegConfirmPassword] = useState<string>("");
+    const [regName, setRegName] = useState<string>('')
+
+    const [loginEmail, setLoginEmail] = useState<string>("");
+    const [loginPassword, setLoginPassword] = useState<string>("");
+    const [showRegister, setShowRegister] = useState(false);
 
     // Смена пароля
     const handleChangePassword = () => {
+        dispatch(clearError())
         if (!password || !newPassword || newPassword !== confirmPassword) {
-            Alert.alert("Ошибка", "Пароли не совпадают или не заполнены");
+            dispatch(setError("Пароли не совпадают или не заполнены"));
             return;
         }
         dispatch(updatePassword({ oldPassword: password, newPassword }));
@@ -36,14 +37,34 @@ const Account = () => {
 
     // Регистрация
     const handleRegister = () => {
+        dispatch(clearError())
         if (!regEmail || !regPassword || regPassword !== regConfirmPassword) {
-            Alert.alert("Ошибка", "Проверьте правильность заполнения полей");
+            dispatch(setError("Проверьте правильность заполнения полей"));
             return;
         }
-        dispatch(registerUser({ email: regEmail, password: regPassword }));
+        dispatch(registerUser({ email: regEmail, password: regPassword, name: regName }));
         setRegEmail("");
         setRegPassword("");
         setRegConfirmPassword("");
+        setRegName("");
+    };
+
+    const handleLogin = () => {
+        dispatch(clearError())
+        if (!loginEmail || !loginPassword) {
+            dispatch(setError("Введите почту и пароль"));
+            return;
+        }
+        dispatch(loginUser({ email: loginEmail, password: loginPassword }));
+        setLoginEmail("");
+        setLoginPassword("");
+    };
+
+    const handleLogout = async () => {
+        try {
+            await AsyncStorage.removeItem('userToken');
+        } catch (e) {}
+        dispatch(logout());
     };
 
     return (
@@ -51,6 +72,9 @@ const Account = () => {
             {user.status === "loading" && (
                 <ActivityIndicator size="large" color="#3f85a7" style={{ marginBottom: 16 }} />
             )}
+            {user.error ? (
+                <Text style={styles.errorText}>{user.error}</Text>
+            ) : null}
             {user.isAuthorized ? (
                 <>
                     <View style={styles.infoBlock}>
@@ -83,36 +107,79 @@ const Account = () => {
                         <TouchableOpacity style={styles.button} onPress={handleChangePassword} disabled={user.status === "loading"}>
                             <Text style={styles.buttonText}>Сменить пароль</Text>
                         </TouchableOpacity>
+                        <TouchableOpacity style={[styles.button, { backgroundColor: "#b23b3b", marginTop: 16 }]} onPress={handleLogout}>
+                            <Text style={styles.buttonText}>Выйти</Text>
+                        </TouchableOpacity>
                     </View>
                 </>
             ) : (
                 <View style={styles.formBlock}>
-                    <Text style={styles.formTitle}>Регистрация</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Почта"
-                        value={regEmail}
-                        onChangeText={setRegEmail}
-                        autoCapitalize="none"
-                        keyboardType="email-address"
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Пароль"
-                        secureTextEntry
-                        value={regPassword}
-                        onChangeText={setRegPassword}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Повторите пароль"
-                        secureTextEntry
-                        value={regConfirmPassword}
-                        onChangeText={setRegConfirmPassword}
-                    />
-                    <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={user.status === "loading"}>
-                        <Text style={styles.buttonText}>Зарегистрироваться</Text>
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: "row", justifyContent: "center", marginBottom: 16 }}>
+                        <TouchableOpacity onPress={() => setShowRegister(false)} style={[styles.switchButton, !showRegister && styles.switchButtonActive]}>
+                            <Text style={[styles.switchButtonText, !showRegister && styles.switchButtonTextActive]}>Войти</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setShowRegister(true)} style={[styles.switchButton, showRegister && styles.switchButtonActive]}>
+                            <Text style={[styles.switchButtonText, showRegister && styles.switchButtonTextActive]}>Регистрация</Text>
+                        </TouchableOpacity>
+                    </View>
+                    {showRegister ? (
+                        <>
+                            <Text style={styles.formTitle}>Регистрация</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Почта"
+                                value={regEmail}
+                                onChangeText={setRegEmail}
+                                autoCapitalize="none"
+                                keyboardType="email-address"
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Имя"
+                                value={regName}
+                                onChangeText={setRegName}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Пароль"
+                                secureTextEntry
+                                value={regPassword}
+                                onChangeText={setRegPassword}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Повторите пароль"
+                                secureTextEntry
+                                value={regConfirmPassword}
+                                onChangeText={setRegConfirmPassword}
+                            />
+                            <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={user.status === "loading"}>
+                                <Text style={styles.buttonText}>Зарегистрироваться</Text>
+                            </TouchableOpacity>
+                        </>
+                    ) : (
+                        <>
+                            <Text style={styles.formTitle}>Вход</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Почта"
+                                value={loginEmail}
+                                onChangeText={setLoginEmail}
+                                autoCapitalize="none"
+                                keyboardType="email-address"
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Пароль"
+                                secureTextEntry
+                                value={loginPassword}
+                                onChangeText={setLoginPassword}
+                            />
+                            <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={user.status === "loading"}>
+                                <Text style={styles.buttonText}>Войти</Text>
+                            </TouchableOpacity>
+                        </>
+                    )}
                 </View>
             )}
         </View>
@@ -180,6 +247,31 @@ const styles = StyleSheet.create({
     buttonText: {
         color: "white",
         fontSize: 18,
+        fontWeight: "bold",
+    },
+    switchButton: {
+        flex: 1,
+        paddingVertical: 10,
+        borderBottomWidth: 2,
+        borderColor: 'transparent',
+        alignItems: 'center',
+    },
+    switchButtonActive: {
+        borderColor: "#3f85a7",
+    },
+    switchButtonText: {
+        color: "#3f85a7",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    switchButtonTextActive: {
+        color: "white",
+    },
+    errorText: {
+        color: "#b23b3b",
+        fontSize: 16,
+        marginBottom: 12,
+        textAlign: "center",
         fontWeight: "bold",
     },
 });

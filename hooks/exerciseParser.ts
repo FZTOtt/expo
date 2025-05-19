@@ -22,7 +22,8 @@ export const useExerciseParser = () => {
                 targetWords: response.words,
                 targetTranscriptions: response.transcriptions,
                 targetAudioUrls: urls,
-                wordTranslations: response.translations
+                wordTranslations: response.translations,
+                id: response.id
             }
             dispatch(setWordDetails(parsedWords))
             dispatch(setDetectedTranscription([]))
@@ -32,7 +33,8 @@ export const useExerciseParser = () => {
                 targetWords: response.words,
                 targetTranscriptions: response.transcriptions,
                 targetAudioUrls: urls,
-                wordTranslations: response.translations
+                wordTranslations: response.translations,
+                id: response.id
             }
             dispatch(setWordDetails(parsedWords))
         }
@@ -50,13 +52,15 @@ export const useExerciseParser = () => {
                 targetTranscription: response.transcription ? response.transcription : null,
                 targetAudioUrl: url,
                 translatedPhrase: response.translate ? response.translate : null,
+                id: response.id
             }
             dispatch(setTargetPhrase(parsedPhrase))
             dispatch(setDetectedPhrase(''))
             dispatch(setChain({
                 chain: [],
                 audio: '',
-                sentence: ''
+                sentence: '',
+                id: response.id
             }))
         } else if (response.exercise_type === 'completeChain') {
             let url = response.audio;
@@ -68,7 +72,8 @@ export const useExerciseParser = () => {
             const parsedChain: PhraseChain = {
                 chain: response.chain ? response.chain : [],
                 sentence: response.sentence ? response.sentence : '',
-                audio: url
+                audio: url,
+                id: response.id
             }
             dispatch(setChain(parsedChain))
             dispatch(setTargetPhrase({
@@ -76,6 +81,7 @@ export const useExerciseParser = () => {
                 targetPhrase: null,
                 targetTranscription: null,
                 translatedPhrase: null,
+                id: response.id
             }))
         }
     }

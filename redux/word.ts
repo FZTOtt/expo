@@ -7,6 +7,7 @@ interface WordState {
     targetAudioUrls: string[];
     translatedTranscriptions: string[];
     wordTranslations: string[];
+    id: number | null;
 }
 
 const initialState: WordState = {
@@ -15,6 +16,7 @@ const initialState: WordState = {
     targetAudioUrls: [],
     translatedTranscriptions: [],
     wordTranslations: [],
+    id: null,
 }
 
 const wordSlice = createSlice({
@@ -26,6 +28,7 @@ const wordSlice = createSlice({
             state.targetTranscriptions = action.payload.targetTranscriptions
             state.targetAudioUrls = action.payload.targetAudioUrls
             state.wordTranslations = action.payload.wordTranslations
+            state.id = action.payload.id
         },
         setDetectedTranscription: (state, action: PayloadAction<string[]>) => {
             state.translatedTranscriptions = action.payload

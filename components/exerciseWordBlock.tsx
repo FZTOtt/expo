@@ -3,16 +3,18 @@ import WordPronounce from "./wordPronounce"
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { RootState } from "@/redux/store";
 import WordGuess from "./wordGuess";
-import { getCurrentWordModule, getWordModuleExercises } from "@/api/api";
+import { getCurrentWordModule, getWordModuleExercises, sendExerciseProgress } from "@/api/api";
 import { useExerciseParser } from "@/hooks/exerciseParser";
 import PronounceFiew from "./pronounceFiew";
 import { nextWordExercise, setCurrentWordModule } from "@/redux/module";
 import { Animated, StyleSheet, View, Text, Modal } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ExerciseWordBlock = () => {
     const dispatch = useAppDispatch()
     const { parseWordExercise } = useExerciseParser();
     const { wordExercise } = useAppSelector((state: RootState) => state.exercise);
+    const { id } = useAppSelector((state: RootState) => state.word);
     const { currentWordModuleId, currentWordExerciseIndex, wordExercises } = useAppSelector((state: RootState) => state.module);
 
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -24,7 +26,8 @@ const ExerciseWordBlock = () => {
     useEffect(() => {
         if (currentWordModuleId) return
         const init = async () => {
-            const [status1, currentModule] = await getCurrentWordModule();
+            const token = await AsyncStorage.getItem('userToken');
+            const [status1, currentModule] = await getCurrentWordModule(token);
             if (status1 === 200) {
               const [status2, response] = await getWordModuleExercises(currentModule.module_id);
               if (status2 === 200) {
@@ -50,8 +53,10 @@ const ExerciseWordBlock = () => {
             // Конец модуля
             if (currentWordModuleId === null) return
             console.log("Модуль завершён");
+            
             const getNextModule = async () => {
-                let [status, response] = await getWordModuleExercises(currentWordModuleId+1);
+                const token = await AsyncStorage.getItem('userToken');
+                let [status, response] = await getWordModuleExercises(currentWordModuleId+1, token);
                 if (status === 200) {
                     if (response.exercises.length != 0) {
                         dispatch(setCurrentWordModule({
@@ -59,7 +64,7 @@ const ExerciseWordBlock = () => {
                             exercises: response.exercises}));
                         parseWordExercise(response.exercises[0]);
                     } else {
-                        [status, response] = await getWordModuleExercises(1);
+                        [status, response] = await getWordModuleExercises(1, token);
                         if (status === 200) {
                             dispatch(setCurrentWordModule({
                                 id: 1,
@@ -76,7 +81,17 @@ const ExerciseWordBlock = () => {
     const handleTaskComplete = (correct: boolean) => {
         setIsModalVisible(true);
 
-        console.log('Заглушка выполнения задания на сервере, результат: ', correct)
+        const sendResult = async () => {
+            if (id === null) return
+            const token = await AsyncStorage.getItem('userToken');
+            const [status, response] = await sendExerciseProgress(id, 'word', correct ? 'completed' : 'failed', token)
+            if (status === 200) {
+                console.log('результат записан')
+            } else {
+                console.error('ошибка при записи статистики')
+            }
+        }
+        sendResult()
 
         Animated.timing(fadeAnim, {
             toValue: 1,
