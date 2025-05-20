@@ -55,6 +55,18 @@ function authenticateTokenOptional(req, res, next) {
     });
 }
 
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (!token) return res.status(401).json({ error: "Нет токена" });
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) return res.status(403).json({ error: "Неверный токен" });
+        req.user = user;
+        next();
+    });
+}
+
 app.get('/apinode/', (req, res) => {
   res.send('Главная страница 🚀');
 });
@@ -237,7 +249,6 @@ app.get('/apinode/debug/phrases-exercises', async (req, res) => {
 app.get('/apinode/current-word-module/', authenticateTokenOptional, async (req, res) => {
 
     const userId = req.user?.id;
-    console.log(userId)
 
     if (!userId) {
         return res.json({
@@ -579,7 +590,6 @@ app.post('/apinode/register', async (req, res) => {
             }
         });
     } catch (err) {
-        console.log(err)
         if (err.code === '23505') {
             res.status(400).json({ error: "Пользователь уже существует" });
         } else {
@@ -609,6 +619,51 @@ app.post('/apinode/login', async (req, res) => {
             }
         });
     } catch (err) {
+        res.status(500).json({ error: "Ошибка сервера" });
+    }
+});
+
+app.get('/apinode/me', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { rows } = await pool.query(
+            'SELECT email, name FROM users WHERE id = $1',
+            [userId]
+        );
+        if (!rows[0]) {
+            return res.status(404).json({ error: "Пользователь не найден" });
+        }
+        res.json({ email: rows[0].email, name: rows[0].name });
+    } catch (err) {
+        res.status(500).json({ error: "Ошибка сервера" });
+    }
+});
+
+app.post('/apinode/change-password', authenticateToken, async (req, res) => {
+    const userId = req.user.id;
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+        return res.status(400).json({ error: "Оба поля обязательны" });
+    }
+
+    try {
+        const { rows } = await pool.query('SELECT password_hash FROM users WHERE id = $1', [userId]);
+        if (!rows[0]) {
+            return res.status(404).json({ error: "Пользователь не найден" });
+        }
+
+        const valid = await bcrypt.compare(oldPassword, rows[0].password_hash);
+        if (!valid) {
+            return res.status(400).json({ error: "Старый пароль неверен" });
+        }
+
+        const newHash = await bcrypt.hash(newPassword, 10);
+        await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [newHash, userId]);
+
+        res.status(200).json({ status: 200, message: "Пароль успешно изменён" });
+    } catch (err) {
+        console.error(err);
         res.status(500).json({ error: "Ошибка сервера" });
     }
 });

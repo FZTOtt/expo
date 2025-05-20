@@ -1,16 +1,24 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { apiLogin, apiRegister } from "@/api/api";
+import { apiLogin, apiRegister, apiUpdatePassword } from "@/api/api";
 
 export const restoreSession = createAsyncThunk(
   "user/restoreSession",
   async (_, thunkAPI) => {
     const token = await AsyncStorage.getItem('userToken');
     if (token) {
-      // Можно сделать запрос к серверу для получения данных пользователя по токену
-      return { token }; // или вернуть email, если храните его
+        try {
+            const res = await fetch('http://localhost:3001/apinode/me', {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error("Ошибка авторизации");
+            const data = await res.json();
+            return { token, email: data.email };
+        } catch (e: any) {
+            return thunkAPI.rejectWithValue("Сессия истекла");
+        }
     }
-    return thunkAPI.rejectWithValue("Нет сессии");
+    return thunkAPI.rejectWithValue("Ввойдите или зарегистрируйтесь");
   }
 );
 
@@ -55,15 +63,23 @@ export const loginUser = createAsyncThunk(
 );
 
 export const updatePassword = createAsyncThunk(
-    // "user/updatePassword",
-    // async ({ oldPassword, newPassword }: { oldPassword: string; newPassword: string }, thunkAPI) => {
-    //     try {
-    //         await apiUpdatePassword(oldPassword, newPassword);
-    //         return true;
-    //     } catch (error: any) {
-    //         return thunkAPI.rejectWithValue(error.message || "Ошибка смены пароля");
-    //     }
-    // }
+    "user/updatePassword",
+    async ({ oldPassword, newPassword }: { oldPassword: string; newPassword: string }, thunkAPI) => {
+        try {
+            const token = await AsyncStorage.getItem('userToken');
+            if (!token) throw new Error("Нет токена авторизации");
+            const [status, response] = await apiUpdatePassword(token, oldPassword, newPassword);
+            if (status === 200) {
+                return true;
+            } else if (response && response.error) {
+                return thunkAPI.rejectWithValue(response.error);
+            } else {
+                return thunkAPI.rejectWithValue("Ошибка смены пароля");
+            }
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue(error.message || "Ошибка смены пароля");
+        }
+    }
 );
 
 interface UserState {
@@ -136,6 +152,18 @@ const userSlice = createSlice({
                 state.isAuthorized = true;
             })
             .addCase(loginUser.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.payload as string;
+            })
+            // Восстановление сессии
+            .addCase(restoreSession.fulfilled, (state, action) => {
+                state.isAuthorized = true;
+                state.email = action.payload.email;
+                state.status = "succeeded";
+            })
+            .addCase(restoreSession.rejected, (state, action) => {
+                state.isAuthorized = false;
+                state.email = null;
                 state.status = "failed";
                 state.error = action.payload as string;
             });

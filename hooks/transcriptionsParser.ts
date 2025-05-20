@@ -30,7 +30,9 @@ export const useTranscriptionParser = () => {
     }
 
     const ParseWordsFromSentence = (sentence: string) => {
-        return sentence.replace(/[.,!?;:"“”()]/g, '')
+        return sentence
+            .toLowerCase()
+            .replace(/[.,!?;:"“”()]/g, '')
             .trim()
             .split(/\s+/);
     }

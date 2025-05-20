@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "@/hooks"
 import { useExerciseParser } from "@/hooks/exerciseParser"
 import { RootState } from "@/redux/store"
@@ -6,7 +6,7 @@ import PhrasePronounce from "./phrasePronounce"
 import CompleteChain from "./completeChain"
 import { getCurrentPhraseModule, getPhraseModuleExercises, sendExerciseProgress } from "@/api/api"
 import { nextPhraseExercise, setCurrentPhraseModule } from "@/redux/module"
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, Animated, Modal, Text } from 'react-native'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 const ExercisePhrasesBlock = () => {
@@ -16,6 +16,11 @@ const ExercisePhrasesBlock = () => {
     const { phraseExercise } = useAppSelector((state: RootState) => state.exercise);
     const { currentPhraseModuleId, currentPhraseExerciseIndex, phraseExercises } = useAppSelector((state: RootState) => state.module);
     const { id } = useAppSelector((state: RootState) => state.phrases);
+
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [fadeAnim] = useState(new Animated.Value(0));
+
+
     // запрашиваем упражнение для слова, после его парсинга отрисовываем соответствующие
     useEffect(() => {
         if (currentPhraseModuleId) return
@@ -36,18 +41,8 @@ const ExercisePhrasesBlock = () => {
           init();
     }, [])
 
-    function handleNextExercise(correct: boolean) {
-        const sendResult = async () => {
-            if (id === null) return
-            const token = await AsyncStorage.getItem('userToken');
-            const [status, response] = await sendExerciseProgress(id, 'phrase', correct ? 'completed' : 'failed', token)
-            if (status === 200) {
-                console.log('результат записан')
-            } else {
-                console.error('ошибка при записи статистики')
-            }
-        }
-        sendResult()
+    function handleNextExercise() {
+
         const nextIndex = currentPhraseExerciseIndex + 1;
 
         if (nextIndex < phraseExercises.length) {
@@ -80,11 +75,51 @@ const ExercisePhrasesBlock = () => {
             getNextModule()
         }
     }
+
+    const handleTaskComplete = (correct: boolean) => {
+        setIsModalVisible(true);
+
+        const sendResult = async () => {
+            if (id === null) return
+            const token = await AsyncStorage.getItem('userToken');
+            const [status, response] = await sendExerciseProgress(id, 'phrase', correct ? 'completed' : 'failed', token)
+            if (status === 200) {
+                console.log('результат записан')
+            } else {
+                console.error('ошибка при записи статистики')
+            }
+        }
+        sendResult()
+
+        Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+        }).start();
+
+        setTimeout(() => {
+            Animated.timing(fadeAnim, {
+                toValue: 0,
+                duration: 500,
+                useNativeDriver: true,
+            }).start(() => {
+                setIsModalVisible(false);
+                handleNextExercise();
+            });
+        }, 2000);
+    };
     
     return (
         <View style={styles.mainContainer}>
-            {phraseExercise === 'pronounce' && <PhrasePronounce handleNext={handleNextExercise}/>}
-            {phraseExercise === 'completeChain' && <CompleteChain handleNext={handleNextExercise}/>}
+            <Modal transparent visible={isModalVisible} animationType="none">
+                <View style={styles.modalContainer}>
+                    <Animated.View style={[styles.modalContent, { opacity: fadeAnim }]}>
+                        <Text style={styles.modalText}>Переходим к следующему заданию...</Text>
+                    </Animated.View>
+                </View>
+            </Modal>
+            {phraseExercise === 'pronounce' && <PhrasePronounce handleNext={handleTaskComplete}/>}
+            {phraseExercise === 'completeChain' && <CompleteChain handleNext={handleTaskComplete}/>}
         </View>
     )
 }
@@ -97,7 +132,24 @@ const styles = StyleSheet.create({
         paddingTop: 50,
         paddingBottom: 50,
         minWidth: 700
-    }
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+        backgroundColor: "rgba(32,47,54,1.00)",
+        padding: 20,
+        borderRadius: 10,
+        alignItems: "center",
+    },
+    modalText: {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: "white",
+    },
 })
 
 export default ExercisePhrasesBlock;

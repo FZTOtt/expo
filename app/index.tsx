@@ -8,11 +8,6 @@ import { restoreSession } from "@/redux/user";
 
 export default function Index() {
 
-    const dispatch = useAppDispatch();
-    useEffect(() => {
-        dispatch(restoreSession());
-    }, []);
-
     return (
         <View style={styles.container}>
             <LeftBar />

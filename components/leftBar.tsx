@@ -5,10 +5,21 @@ import ChatIcon from '@/assets/icons/chat.svg';
 import AccountIcon from '@/assets/icons/account.svg';
 import Phrases from '@/assets/icons/phrases.svg';
 import { router, usePathname } from "expo-router";
+import { useAppDispatch, useAppSelector } from "@/hooks";
+import { useEffect } from "react";
+import { restoreSession } from "@/redux/user";
+import { RootState } from "@/redux/store";
 
 const LeftBar = () => {
 
     const pathname = usePathname();
+    const {isAuthorized} = useAppSelector((state: RootState) => state.user)
+
+    const dispatch = useAppDispatch();
+    useEffect(() => {
+        if (isAuthorized) return
+        dispatch(restoreSession());
+    }, [isAuthorized]);
 
     const navItems = [
       { path: '/', label: 'СЛОВА', Icon: WordsIcon },

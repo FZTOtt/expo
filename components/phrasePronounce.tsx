@@ -29,6 +29,7 @@ const PhrasePronounce = ({handleNext} : {handleNext: (correct: boolean) => void}
     }
 
     useEffect(() => {
+        console.log(originalWords, detectedWords)
         if (originalWords.length !== detectedWords.length) {
             setCompleted(false)
             return

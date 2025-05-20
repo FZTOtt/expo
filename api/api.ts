@@ -4,7 +4,7 @@ import { PhrasesExerciseApiResponse, WordExerciseApiResponse } from "@/interface
 
 const API_BASE_URL = "https://ouzistudy.ru/api";
 const NODE_API_URL = "http://localhost:3001/apinode";
-const NODE_API_DEPLOY = "https://ouzistudy.ru";
+const NODE_API_DEPLOY = "https://ouzistudy.ru/apinode";
 const CURRENT_API = NODE_API_URL;
 // https://ouzistudy.ru
 
@@ -292,4 +292,13 @@ export const sendExerciseProgress = async (
     }
     
     return postRequest(`${CURRENT_API}/exercise-progress`, data, headers);
+}
+
+export const restoreSession = async(token: string | null) : Promise<[number, any]> => {
+    const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+    }
+
+    return getRequest(`${CURRENT_API}/me`, token ? headers : {})
 }
