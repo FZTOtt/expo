@@ -3,7 +3,7 @@ import { postRequest, getRequest } from "./ajax";
 import { PhrasesExerciseApiResponse, WordExerciseApiResponse } from "@/interfaces/apiResponses";
 
 const API_BASE_URL = "https://ouzistudy.ru/api";
-const NODE_API_URL = "http://localhost:3001";
+const NODE_API_URL = "http://localhost:3001/apinode";
 const NODE_API_DEPLOY = "https://ouzistudy.ru";
 const CURRENT_API = NODE_API_URL;
 // https://ouzistudy.ru
@@ -114,7 +114,7 @@ export const getCurrentWordModule = async (token?: string | null): Promise<[numb
         "Authorization": `Bearer ${token}`,
     }
 
-    return getRequest(`${CURRENT_API}/apinode/current-word-module/`, token ? headers : {})
+    return getRequest(`${CURRENT_API}/current-word-module/`, token ? headers : {})
 }
 
 export const getWordModuleExercises = async (id: number, token?: string | null): Promise<[number, any]> => {
@@ -124,7 +124,7 @@ export const getWordModuleExercises = async (id: number, token?: string | null):
         "Authorization": `Bearer ${token}`,
     }
 
-    return getRequest(`${CURRENT_API}/apinode/word-modules/${id}/exercises`, token ? headers : {})
+    return getRequest(`${CURRENT_API}/word-modules/${id}/exercises`, token ? headers : {})
 }
 
 export const getCurrentPhraseModule = async (token?: string | null): Promise<[number, any]> => {
@@ -134,7 +134,7 @@ export const getCurrentPhraseModule = async (token?: string | null): Promise<[nu
         "Authorization": `Bearer ${token}`,
     }
 
-    return getRequest(`${CURRENT_API}/apinode/current-phrase-module/`, token ? headers : {})
+    return getRequest(`${CURRENT_API}/current-phrase-module/`, token ? headers : {})
 }
 
 export const getPhraseModuleExercises = async (id: number, token?: string | null): Promise<[number, any]> => {
@@ -144,17 +144,17 @@ export const getPhraseModuleExercises = async (id: number, token?: string | null
         "Authorization": `Bearer ${token}`,
     }
 
-    return getRequest(`${CURRENT_API}/apinode/phrase-modules/${id}/exercises`, token ? headers : {})
+    return getRequest(`${CURRENT_API}/phrase-modules/${id}/exercises`, token ? headers : {})
 }
 
 export const getWordModules = async (): Promise<[number, any]> => {
 
-    return getRequest(`${CURRENT_API}/apinode/word-modules`)
+    return getRequest(`${CURRENT_API}/word-modules`)
 }
 
 export const getPhraseModules = async (): Promise<[number, any]> => {
 
-    return getRequest(`${CURRENT_API}/apinode/phrase-modules`)
+    return getRequest(`${CURRENT_API}/phrase-modules`)
 }
 
 export const getWordTranscrible = async (audioData: string | Blob): Promise<[number, any]> => {
@@ -174,7 +174,7 @@ export const getWordTranscrible = async (audioData: string | Blob): Promise<[num
         'Content-Type': 'multipart/form-data'
     };
     
-    return postRequest(`${CURRENT_API}/apinode/transcribe-word`, formData, headers);
+    return postRequest(`${CURRENT_API}/transcribe-word`, formData, headers);
 };
 
 export const getPhraseTranscrible = async (audioData: string | Blob): Promise<[number, any]> => {
@@ -194,20 +194,22 @@ export const getPhraseTranscrible = async (audioData: string | Blob): Promise<[n
         'Content-Type': 'multipart/form-data'
     };
     
-    return postRequest(`${CURRENT_API}/apinode/transcribe-phrase`, formData, headers);
+    return postRequest(`${CURRENT_API}/transcribe-phrase`, formData, headers);
 };
 
-export const getAIHelp = async (target: string, errors: number): Promise<[number, any]> => {
+export const getAIHelp = async (flag: number, target: string, predict: string, eng_target: string): Promise<[number, any]> => {
 
     const data = JSON.stringify({ 
+        flag: flag,
         target: target,
-        errors: errors
+        predict: predict,
+        eng_target: eng_target
     })
     const headers = {
         'Content-Type': 'application/json',
     };
     
-    return postRequest(`${CURRENT_API}/apinode/get-ai-help`, data, headers)
+    return postRequest(`${CURRENT_API}/get-ai-help`, data, headers)
 }
 
 export const getAITalk = async (message: string): Promise<[number, any]> => {
@@ -219,7 +221,7 @@ export const getAITalk = async (message: string): Promise<[number, any]> => {
         'Content-Type': 'application/json',
     };
 
-    return postRequest(`${CURRENT_API}/apinode/get-ai-talk`, data, headers)
+    return postRequest(`${CURRENT_API}/get-ai-talk`, data, headers)
 }
 
 export const apiRegister = async (email: string, password: string, name: string): Promise<[number, any]> => {
@@ -233,7 +235,7 @@ export const apiRegister = async (email: string, password: string, name: string)
         'Content-Type': 'application/json',
     };
 
-    return postRequest(`${CURRENT_API}/apinode/register`, data, headers);
+    return postRequest(`${CURRENT_API}/register`, data, headers);
 };
 
 export const apiLogin = async (email: string, password: string) => {
@@ -246,7 +248,7 @@ export const apiLogin = async (email: string, password: string) => {
         'Content-Type': 'application/json',
     };
     
-    return postRequest(`${CURRENT_API}/apinode/login`, data, headers);
+    return postRequest(`${CURRENT_API}/login`, data, headers);
 };
 
 export const apiUpdatePassword = async (token: string, oldPassword: string, newPassword: string) => {
@@ -261,7 +263,7 @@ export const apiUpdatePassword = async (token: string, oldPassword: string, newP
         newPassword: newPassword
     })
     
-    return postRequest(`${CURRENT_API}/apinode/change-password`, data, headers);
+    return postRequest(`${CURRENT_API}/change-password`, data, headers);
 };
 
 export const sendExerciseProgress = async (
@@ -289,5 +291,5 @@ export const sendExerciseProgress = async (
         }
     }
     
-    return postRequest(`${CURRENT_API}/apinode/exercise-progress`, data, headers);
+    return postRequest(`${CURRENT_API}/exercise-progress`, data, headers);
 }

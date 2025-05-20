@@ -506,12 +506,16 @@ app.post('/apinode/transcribe-phrase', upload.single('audio'), async (req, res) 
 
 app.post('/apinode/get-ai-help', async (req, res) => {
     try {
-        const {target, errors} = req.body
-        const inputText = `Ситуация: Человек произносил на английском языке: \"${target}\", и ошибся в произношении ${errors} раза.\nТебе задание A:\n1) Нужно сообщить ТОЛЬКО о ФАКТЕ ошибки (что она просто есть, БЕЗ ПОДРОБНОСТЕЙ),\n2) Нужно как-то мягко пошутить на этот счёт, и обязательно с эмодзи.\nНужен ТОЛЬКО ответ на два пункта задания A. НЕЛЬЗЯ писать то, что напрямую не относится к ответам на два пункта задания A! СТРОГО соблюдать этот формат ответа!!!`
+        const {flag, target, predict, eng_target} = req.body
 
         const response = await axios.post(
             'http://94.253.9.254:5002/get_helper_text',
-            { input_text: inputText },
+            { 
+                flag: flag,
+                target: target,
+                predict: predict,
+                eng_target: eng_target
+            },
             {
                 headers: {
                     'Content-Type': 'application/json',

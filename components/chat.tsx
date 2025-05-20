@@ -38,7 +38,7 @@ const Chat = () => {
 
     const [inputText, setInputText] = useState("");
     const flatListRef = useRef<FlatList>(null);
-    const { translatedTranscriptions, targetWords } = useAppSelector((state: RootState) => state.word);
+    const { translatedTranscriptions, targetWords, targetTranscriptions } = useAppSelector((state: RootState) => state.word);
     const { detectedPhrase, targetPhrase } = useAppSelector((state: RootState) => state.phrases);
     const { messages, showLoadMessage, wordsMessages, showWordsLoad, phrasesMessages, showPhrasesLoad } = useAppSelector((state: RootState) => state.aiChat);
 
@@ -58,16 +58,40 @@ const Chat = () => {
         currentLoad = showLoadMessage;
         writeFunc = writeMessage;
         setLoad = setShowLoadMessage;
+        console.log('полноценный чат')
     } else if (pathname == '/') {
         currentMessages = wordsMessages;
         currentLoad = showWordsLoad;
         writeFunc = writeWordsMessage;
         setLoad = setShowWordsLoad;
+        console.log('вспомогательный чат слов')
     } else {
         currentMessages = phrasesMessages;
         currentLoad = showPhrasesLoad;
         writeFunc = writePhrasesMessage;
         setLoad = setShowPhrasesLoad;
+        console.log('вспомогательный чат фраз')
+    }
+
+    const getAISuggest = async (flag: number, target: string, predict: string, eng_target: string) => {
+        const [status, response] = await getAIHelp(flag, target, predict, eng_target)
+        if (status == 200) {
+            const aiMessage: Message = {
+                id: Date.now().toString(),
+                text: response.text,
+                isUser: false,
+            }
+            dispatch(writeFunc(aiMessage));
+        } else {
+            const aiMessage: Message = {
+                id: Date.now().toString(),
+                text: failedRequsetMessage,
+                isUser: false,
+            }
+            dispatch(writeFunc(aiMessage));
+        }
+        
+        dispatch(setShowLoadMessage(false))
     }
                                     
     const handleSend = async () => {
@@ -82,10 +106,15 @@ const Chat = () => {
         dispatch(writeFunc(userMessage))
         setInputText("");
         const [status, response] = await getAITalk(inputText);
+        if (pathname === '/') {
+            wordHashRef.current = inputText
+        } else if (pathname === '/phrase') {
+            sentenceHashRef.current = inputText
+        }
         if (status == 200) {
             const aiMessage: Message = {
                 id: Date.now().toString(),
-                text: response.text,
+                text: response.output_text,
                 isUser: false,
             }
             dispatch(writeFunc(aiMessage));
@@ -152,54 +181,21 @@ const Chat = () => {
         } else if ((sentenceHashRef.current === currentSentenceHash || (currentMessages.length !== 0 && !sentenceHashRef.current)) && pathname === '/phrases') {
             return
         }
-
+        
         if (pathname === '/') {
             wordHashRef.current = currentWordHash
         } else if (pathname === '/phrases') {
             sentenceHashRef.current = currentSentenceHash
         }
 
-        const getAISuggest = async (target:string, errors:number) => {
-            const [status, response] = await getAIHelp(target, errors)
-            if (status == 200) {
-                const aiMessage: Message = {
-                    id: Date.now().toString(),
-                    text: response.text,
-                    isUser: false,
-                }
-                dispatch(writeFunc(aiMessage));
-            } else {
-                const aiMessage: Message = {
-                    id: Date.now().toString(),
-                    text: failedRequsetMessage,
-                    isUser: false,
-                }
-                dispatch(writeFunc(aiMessage));
-            }
-            
-            dispatch(setShowLoadMessage(false))
-        }
-
         if(pathname == '/') {
             if (translatedTranscriptions.length > 0) {
-                const originalPhonemes = cleanPhonemes(targetWords[0]);
-                const detectedPhonemes = cleanPhonemes(translatedTranscriptions[0]);
-        
-                const maxLength = Math.max(originalPhonemes.length, detectedPhonemes.length);
-                let errors = 0;
-            
-                for (let i = 0; i < maxLength; i++) {
-                    if (originalPhonemes[i] !== detectedPhonemes[i]) {
-                        errors++;
-                    }
-                }
-                getAISuggest(targetWords[0], errors)
+                getAISuggest(0, targetTranscriptions[0], translatedTranscriptions[0], targetWords[0])
             }
         } else if (pathname == '/phrases') {
             if (detectedPhrase) {
                 if (targetPhrase === null) return
-                const errors = countWordErrors(detectedPhrase, targetPhrase)
-                getAISuggest(targetPhrase, errors)
+                getAISuggest(1, targetPhrase, detectedPhrase, targetPhrase)
             }
         }
 
