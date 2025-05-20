@@ -570,6 +570,11 @@ app.post('/apinode/get-ai-talk', async (req, res) => {
     }
 })
 
+app.post('/apinode/get-ai-text-help', async (req, res) => {
+    const { message } = req.body;
+    console.log(message)
+})
+
 app.post('/apinode/register', async (req, res) => {
     const { email, password, name } = req.body;
     if (!email || !password) return res.status(400).json({ error: "Email и пароль обязательны" });
@@ -667,6 +672,8 @@ app.post('/apinode/change-password', authenticateToken, async (req, res) => {
         res.status(500).json({ error: "Ошибка сервера" });
     }
 });
+
+
 
 app.listen(PORT, () => {
   console.log(`Сервер запущен на http://localhost:${PORT}`);

@@ -1,4 +1,4 @@
-import { getAIHelp, getAITalk, getPhraseTranscrible } from "@/api/api";
+import { getAIHelp, getAITalk, getAITextHelp, getPhraseTranscrible } from "@/api/api";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { 
     setShowLoadMessage, 
@@ -105,12 +105,18 @@ const Chat = () => {
 
         dispatch(writeFunc(userMessage))
         setInputText("");
-        const [status, response] = await getAITalk(inputText);
         if (pathname === '/') {
             wordHashRef.current = inputText
-        } else if (pathname === '/phrase') {
+        } else if (pathname === '/phrases') {
             sentenceHashRef.current = inputText
         }
+        let status, response;
+        if (fullchat) {
+            [status, response] = await getAITalk(inputText);
+        } else {
+            [status, response] = await getAITextHelp(inputText);
+        }
+        
         if (status == 200) {
             const aiMessage: Message = {
                 id: Date.now().toString(),
@@ -179,6 +185,7 @@ const Chat = () => {
         if ((wordHashRef.current === currentWordHash || (currentMessages.length !== 0 && !wordHashRef.current)) && pathname === '/') {
             return
         } else if ((sentenceHashRef.current === currentSentenceHash || (currentMessages.length !== 0 && !sentenceHashRef.current)) && pathname === '/phrases') {
+            console.log('Вышли', sentenceHashRef.current === currentSentenceHash, sentenceHashRef.current, currentSentenceHash)
             return
         }
         

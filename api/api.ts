@@ -302,3 +302,15 @@ export const restoreSession = async(token: string | null) : Promise<[number, any
 
     return getRequest(`${CURRENT_API}/me`, token ? headers : {})
 }
+
+export const getAITextHelp = async(message: string) : Promise<[number, any]> => {
+    const headers = {
+        "Content-Type": "application/json",
+    }
+
+    const data = JSON.stringify({
+        message: message
+    })
+
+    return postRequest(`${CURRENT_API}/get-ai-text-help`, data, headers)
+}
