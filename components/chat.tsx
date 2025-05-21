@@ -58,19 +58,19 @@ const Chat = () => {
         currentLoad = showLoadMessage;
         writeFunc = writeMessage;
         setLoad = setShowLoadMessage;
-        console.log('полноценный чат')
+        // console.log('полноценный чат')
     } else if (pathname == '/') {
         currentMessages = wordsMessages;
         currentLoad = showWordsLoad;
         writeFunc = writeWordsMessage;
         setLoad = setShowWordsLoad;
-        console.log('вспомогательный чат слов')
+        // console.log('вспомогательный чат слов')
     } else {
         currentMessages = phrasesMessages;
         currentLoad = showPhrasesLoad;
         writeFunc = writePhrasesMessage;
         setLoad = setShowPhrasesLoad;
-        console.log('вспомогательный чат фраз')
+        // console.log('вспомогательный чат фраз')
     }
 
     const getAISuggest = async (flag: number, target: string, predict: string, eng_target: string) => {
@@ -118,7 +118,7 @@ const Chat = () => {
         }
         
         if (status == 200) {
-            console.log(response)
+            // console.log(response)
             const aiMessage: Message = {
                 id: Date.now().toString(),
                 text: response.output_text,
@@ -141,7 +141,7 @@ const Chat = () => {
         } else if (pathname == '/aichat') {
             const aiMessage: Message = {
                 id: Date.now().toString(),
-                text: 'Привет, в будущем мы можем пообщаться на английском языке, а пока я в разработке. Запиши своё предложение, а я распознаю его на английском языке и продолжу беседу',
+                text: 'Привет! Здесь мы можем пообщаться на английском языке. Запиши своё предложение, а я распознаю его на английском языке и продолжу беседу',
                 isUser: false,
             }
             dispatch(writeMessage(aiMessage));
@@ -186,7 +186,7 @@ const Chat = () => {
         if ((wordHashRef.current === currentWordHash || (currentMessages.length !== 0 && !wordHashRef.current)) && pathname === '/') {
             return
         } else if ((sentenceHashRef.current === currentSentenceHash || (currentMessages.length !== 0 && !sentenceHashRef.current)) && pathname === '/phrases') {
-            console.log('Вышли', sentenceHashRef.current === currentSentenceHash, sentenceHashRef.current, currentSentenceHash)
+            // console.log('Вышли', sentenceHashRef.current === currentSentenceHash, sentenceHashRef.current, currentSentenceHash)
             return
         }
         
@@ -298,7 +298,7 @@ const Chat = () => {
                     style={styles.input}
                     value={inputText}
                     onChangeText={setInputText}
-                    placeholder="Напишите сообщение..."
+                    placeholder="Напишите для получения справки"
                     placeholderTextColor="#999"
                     onSubmitEditing={handleSend}
                 />

@@ -49,7 +49,6 @@ const PronounceFiew = ({handleNext} : {handleNext: (correct: boolean) => void}) 
     }
 
     useEffect(() => {
-        console.log('ttt')
         for (let i = 0; i < isCorrect.length; i++) {
             if (isCorrect[i] !== true) {
                 setCompleted(false)

@@ -28,7 +28,7 @@ export const registerUser = createAsyncThunk(
     async ({ email, password, name }: { email: string; password: string, name: string }, thunkAPI) => {
         try {
             const [status, response] = await apiRegister(email, password, name);
-            console.log(status,response)
+            // console.log(status,response)
             if (status === 200) {
                 await AsyncStorage.setItem('userToken', response.token);
                 return response.email;

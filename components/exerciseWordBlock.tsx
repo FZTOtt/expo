@@ -52,7 +52,7 @@ const ExerciseWordBlock = () => {
         } else {
             // Конец модуля
             if (currentWordModuleId === null) return
-            console.log("Модуль завершён");
+            // console.log("Модуль завершён");
             
             const getNextModule = async () => {
                 const token = await AsyncStorage.getItem('userToken');
@@ -85,11 +85,11 @@ const ExerciseWordBlock = () => {
             if (id === null) return
             const token = await AsyncStorage.getItem('userToken');
             const [status, response] = await sendExerciseProgress(id, 'word', correct ? 'completed' : 'failed', token)
-            if (status === 200) {
-                console.log('результат записан')
-            } else {
-                console.error('ошибка при записи статистики')
-            }
+            // if (status === 200) {
+            //     console.log('результат записан')
+            // } else {
+            //     console.error('ошибка при записи статистики')
+            // }
         }
         sendResult()
 

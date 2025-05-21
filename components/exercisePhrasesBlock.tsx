@@ -50,7 +50,7 @@ const ExercisePhrasesBlock = () => {
             parsePhrasesExercise(phraseExercises[nextIndex]);
         } else {
             // Конец модуля
-            console.log("Модуль завершён");
+            // console.log("Модуль завершён");
             if (currentPhraseModuleId === null) return
             const getNextModule = async () => {
                 const token = await AsyncStorage.getItem('userToken');
@@ -83,11 +83,11 @@ const ExercisePhrasesBlock = () => {
             if (id === null) return
             const token = await AsyncStorage.getItem('userToken');
             const [status, response] = await sendExerciseProgress(id, 'phrase', correct ? 'completed' : 'failed', token)
-            if (status === 200) {
-                console.log('результат записан')
-            } else {
-                console.error('ошибка при записи статистики')
-            }
+            // if (status === 200) {
+            //     console.log('результат записан')
+            // } else {
+            //     console.error('ошибка при записи статистики')
+            // }
         }
         sendResult()
 

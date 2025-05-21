@@ -72,7 +72,7 @@ const Reference = () => {
                 phonemes.map(async _symbol => {
                     if (_symbol == 'p') return {
                         phonema: 'p',
-                        text: 'а вот нет, давайте сами',
+                        text: 'Извините, мы не нашли подсказку',
                         // audio_link: url,
                         // media_link: videoUrl
                     } as PhonemeReference;

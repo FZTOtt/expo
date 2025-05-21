@@ -19,8 +19,8 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
 
     const CompareWords = ({ targetWords, detectedWords }: { targetWords: string[]; detectedWords: string[] }) => {        
         
-        console.log(detectedWords.length)
-        console.log(answer)
+        // console.log(detectedWords.length)
+        // console.log(answer)
         if (detectedWords[0] === '') {
             return (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
