@@ -28,7 +28,7 @@ const ExercisePhrasesBlock = () => {
             const token = await AsyncStorage.getItem('userToken');
             const [status1, currentModule] = await getCurrentPhraseModule(token);
             if (status1 === 200) {
-              const [status2, response] = await getPhraseModuleExercises(currentModule.module_id);
+              const [status2, response] = await getPhraseModuleExercises(currentModule.module_id, token);
               if (status2 === 200) {
                 dispatch(setCurrentPhraseModule({
                     id: currentModule.module_id,

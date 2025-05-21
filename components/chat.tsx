@@ -78,7 +78,7 @@ const Chat = () => {
         if (status == 200) {
             const aiMessage: Message = {
                 id: Date.now().toString(),
-                text: response.text,
+                text: response.output_text,
                 isUser: false,
             }
             dispatch(writeFunc(aiMessage));
@@ -118,6 +118,7 @@ const Chat = () => {
         }
         
         if (status == 200) {
+            console.log(response)
             const aiMessage: Message = {
                 id: Date.now().toString(),
                 text: response.output_text,

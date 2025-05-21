@@ -327,6 +327,10 @@ app.get('/apinode/word-modules/:id/exercises', authenticateTokenOptional, async 
         if (userId) {
             // Если пользователь авторизован — возвращаем статус выполнения
             const result = await pool.query(
+                // `SELECT e.*, 'none' AS status
+                // FROM word_exercises e
+                // WHERE e.module_id = $1`,
+                // [moduleId]
                 `SELECT e.*, 
                     COALESCE(p.status, 'none') AS status
                 FROM word_exercises e
@@ -365,8 +369,12 @@ app.get('/apinode/phrase-modules/:id/exercises', authenticateTokenOptional, asyn
     const userId = req.user?.id;
     try {
         let rows;
-        if (userId) {
-            const { rows } = await pool.query(
+        if (userId !== undefined) {
+            const result = await pool.query(
+                // `SELECT e.*, 'none' AS status
+                // FROM phrase_exercises e
+                // WHERE e.module_id = $1`,
+                // [moduleId]
                 `SELECT e.*, 
                     COALESCE(p.status, 'none') AS status
                 FROM phrase_exercises e
@@ -572,7 +580,28 @@ app.post('/apinode/get-ai-talk', async (req, res) => {
 
 app.post('/apinode/get-ai-text-help', async (req, res) => {
     const { message } = req.body;
-    console.log(message)
+
+    try {
+
+        const response = await axios.post(
+            'http://94.253.9.254:5002/get_helper_userchat',
+            { input_text: message },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        res.status(200).json({ 
+            status: 200,
+            payload: response.data
+
+        });
+    } catch (error) {
+        console.error('Ошибка при получении модулей слов:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
 })
 
 app.post('/apinode/register', async (req, res) => {
