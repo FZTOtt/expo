@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import Button from "./button";
 import WordsIcon from '@/assets/icons/words.svg';
 import ChatIcon from '@/assets/icons/chat.svg';
@@ -9,8 +9,8 @@ import { useAppDispatch, useAppSelector } from "@/hooks";
 import { useEffect } from "react";
 import { restoreSession } from "@/redux/user";
 import { RootState } from "@/redux/store";
-
-const LeftBar = () => {
+import { COLORS, FONT_SIZES, SPACING } from "@/constants/theme";
+const Navigation = () => {
 
     const pathname = usePathname();
     const {isAuthorized} = useAppSelector((state: RootState) => state.user)
@@ -21,6 +21,10 @@ const LeftBar = () => {
         dispatch(restoreSession());
     }, [isAuthorized]);
 
+
+    const {width} = useWindowDimensions();
+    const isMobile = width < 768;
+
     const navItems = [
       { path: '/', label: 'СЛОВА', Icon: WordsIcon },
       { path: '/phrases', label: 'ФРАЗЫ', Icon: Phrases },
@@ -28,18 +32,24 @@ const LeftBar = () => {
       { path: '/account', label: 'АККАУНТ', Icon: AccountIcon },
     ];
 
+    
+    // if (isMobile) return null;
     return (
-        <View style={styles.container}>
-          <Text style={styles.logo}>OUZI</Text>
+        <View style={[
+          !isMobile && styles.mainContainer,
+          isMobile && styles.mobileContainer
+          ]}>
+          {!isMobile && <Text style={styles.logo}>OUZI</Text>}
           {navItems.map((item) => (
             <Button
               key={item.path}
               mode="navigation"
               active={pathname === item.path}
               Icon={item.Icon}
-              onClick={() => router.push(item.path)}
+              onClick={() => router.push(item.path as any)}
+              isMobile={isMobile}
             >
-              {item.label}
+              {!isMobile && item.label}
             </Button>
           ))}
         </View>
@@ -47,23 +57,33 @@ const LeftBar = () => {
 }
 
 const styles = StyleSheet.create({
-    container: {
+    mainContainer: {
         flex: 1,
         flexDirection: 'column',
         backgroundColor: 'rgba(19, 31, 36, 1)',
-        maxWidth: 300,
+        maxWidth: 250,
         minWidth: 250,
-        width: '30%',
         paddingHorizontal: 30,
         alignItems: 'center',
         borderRightColor: 'rgba(82, 101, 109, 1)',
         borderRightWidth: 2,
     },
+    mobileContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        borderTopWidth: 1,
+        borderTopColor: COLORS.borderPrimary,
+        paddingVertical: SPACING.sm,
+    },
     logo: {
-        fontSize: 30,
+        fontSize: FONT_SIZES.logo,
         color: 'white',
         paddingVertical: 30,
     }
 })
 
-export default LeftBar;
+export default Navigation;

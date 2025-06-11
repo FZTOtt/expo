@@ -1,16 +1,16 @@
 // import 'react-native-gesture-handler'
 
 import ExercisePhrasesBlock from "@/components/exercisePhrasesBlock";
-import LeftBar from "@/components/leftBar";
-import RightBar from "@/components/rightBar";
+import Navigation from "@/components/navigation";
+import ModAndRefs from "@/components/modAndRefs";
 import { View, StyleSheet } from "react-native";
 
 const Phrases = () => {
     return (
         <View style={styles.container}>
-            <LeftBar />
+            <Navigation />
             <ExercisePhrasesBlock />
-            <RightBar />
+            <ModAndRefs />
         </View>
     );
 }

@@ -8,6 +8,7 @@ export interface ButtonProps {
     Icon?: React.FC<SvgProps>;
     onClick?: () => void;
     children?: React.ReactNode;
+    isMobile?: boolean;
 }
 
 export interface AudioPlayerProps {

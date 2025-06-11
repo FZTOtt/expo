@@ -1,12 +1,11 @@
-import LeftBar from "@/components/leftBar";
-import RightBar from "@/components/rightBar";
+import Navigation from "@/components/navigation";
 import { View, StyleSheet } from "react-native";
 import Account from "@/components/account";
 
 const AccountPage = () => {
     return (
         <View style={styles.container}>
-            <LeftBar />
+            <Navigation />
             <Account />
         </View>
     );

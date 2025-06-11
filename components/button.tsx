@@ -1,16 +1,17 @@
 import React from "react";
 import { ButtonProps } from "@/interfaces/componentsProps";
 import { StyleSheet, TouchableOpacity, View, Image, Text } from "react-native";
+import { BORDER_RADIUS, BORDER_WIDTH, COLORS, FONT_SIZES } from "@/constants/theme";
 
-const Button: React.FC<ButtonProps> = ({mode, active=false, size='lg', Icon, onClick, children}) => {
+const Button: React.FC<ButtonProps> = ({mode, active=false, size='lg', Icon, onClick, children, isMobile}) => {
     return (
         <TouchableOpacity onPress={onClick} style={[styles[size], styles[mode], active && styles[mode+'_active']]}>
             {mode === 'navigation' ?
                 <View style={styles.navigationContent}>
                     {Icon && <Icon width={30} height={30}/>}
-                    <Text style={styles.navigationText}>
+                    {!isMobile && <Text style={styles.navigationText}>
                         {children}
-                    </Text>
+                    </Text>}
                     
                 </View>
                 :
@@ -27,21 +28,21 @@ const Button: React.FC<ButtonProps> = ({mode, active=false, size='lg', Icon, onC
 
 const styles = StyleSheet.create({
     lg: {
-        fontSize: 20,
+        fontSize: FONT_SIZES.large,
         color: 'white',
-        borderRadius: 12,
+        borderRadius: BORDER_RADIUS.lg,
         paddingHorizontal: 20
     },
     navigation: {
-        borderRadius: 12,
-        borderColor: 'rgba(63, 133, 167, 1)',
-        width: '100%',
+        borderRadius: BORDER_RADIUS.lg,
+        borderColor: COLORS.borderPrimary,
+        // width: '100%',
         height: 70,
         justifyContent: 'center',
         marginVertical: 15
     },
     navigation_active: {
-        borderWidth: 2,
+        borderWidth: BORDER_WIDTH.md,   
         backgroundColor: 'rgba(32, 47, 54, 1)'
     },
     navigationContent: {
@@ -51,14 +52,14 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     navigationText: {
-        fontSize: 20,
+        fontSize: FONT_SIZES.large,
         color: 'white',
         paddingLeft: 10
     },
     modules: {
-        borderRadius: 12,
-        borderWidth: 2,
-        borderColor: 'rgba(63, 133, 167, 1)',
+        borderRadius: BORDER_RADIUS.lg,
+        borderWidth: BORDER_WIDTH.md,
+        borderColor: COLORS.borderPrimary,
         width: '100%',
         paddingVertical: 15,
         justifyContent: 'center',
@@ -66,16 +67,16 @@ const styles = StyleSheet.create({
     },
     modules_activeText: {
         color: 'rgba(73, 192, 248, 1)',
-        fontSize: 20
+        fontSize: FONT_SIZES.large
     },
     modules_passiveText: {
         color: 'white',
-        fontSize: 20
+        fontSize: FONT_SIZES.large
     },
     references: {
-        borderRadius: 12,
-        borderWidth: 2,
-        borderColor: 'rgba(63, 133, 167, 1)',
+        borderRadius: BORDER_RADIUS.lg,
+        borderWidth: BORDER_WIDTH.md,
+        borderColor: COLORS.borderPrimary,
         width: '100%',
         height: 50,
         justifyContent: 'center',
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
     },
     references_passiveText: {
         color: 'white',
-        fontSize: 20
+        fontSize: FONT_SIZES.large
     }
 })
 

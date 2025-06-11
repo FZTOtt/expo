@@ -1,8 +1,9 @@
-import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text, useWindowDimensions } from 'react-native';
 import React from 'react';
 import MicOn from '@/assets/icons/micon.svg';
 import MicOff from '@/assets/icons/micoff.svg';
 import AudioRecorder from './aidoRecorder';
+import Next from '@/assets/icons/Next.svg';
 
 type ManageProps = {
     onRecordComplete: (audio: Blob | string) => Promise<void>;
@@ -11,16 +12,24 @@ type ManageProps = {
   };
 
 const Manage = ({onRecordComplete, onNext, completed}: ManageProps) => {
+
+    const {width} = useWindowDimensions();
+    const isMobile = width < 768;
+
     return (
         <View style={styles.container}>
             <View style={styles.buttonsContainer}>                
                 <AudioRecorder onState={MicOn} offState={MicOff} size={90} onRecordComplete={onRecordComplete}></AudioRecorder>
                 <TouchableOpacity style={[styles.button]} onPress={onNext}>
-                    <Text style={styles.buttonSkipText}>{completed ? 'Завершить' : 'Пропустить'}</Text>
+                    {isMobile ? 
+                        <Next width={30} height={30}/>
+                    :
+                        <Text style={styles.buttonSkipText}>{completed ? 'Завершить' : 'Пропустить'}</Text>
+                    }
                 </TouchableOpacity>
             </View>
             <Text style={styles.textDescription}>
-                Запишите произношение при помощи кнопки микрофона, а мы проверим
+                Используйте микрофон для записи произношения
             </Text>
         </View>
     );
@@ -37,8 +46,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 30,
-        marginLeft: 170
+        position: 'relative',
     },
     recognizedText: {
         marginTop: 20,
@@ -51,6 +59,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     button: {
+        position: 'absolute',
+        left: 100,
         paddingHorizontal: 15,
         paddingVertical: 8,
         justifyContent: 'center',
@@ -66,7 +76,8 @@ const styles = StyleSheet.create({
     textDescription: {
         fontSize: 16,
         paddingTop: 20,
-        color: 'white'
+        color: 'white',
+        textAlign: 'center'
     }
 });
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, useWindowDimensions } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/hooks";
 import { RootState } from "@/redux/store";
 import { loginUser, registerUser, updatePassword, logout, clearError, setError } from "@/redux/user";
@@ -21,6 +21,17 @@ const Account = () => {
     const [loginEmail, setLoginEmail] = useState<string>("");
     const [loginPassword, setLoginPassword] = useState<string>("");
     const [showRegister, setShowRegister] = useState(false);
+
+    const { width } = useWindowDimensions();
+    
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(()=>{
+        console.log(width)
+        if (width < 700) {
+            setIsMobile(true);
+        }
+    }, [width])
 
     // Смена пароля
     const handleChangePassword = () => {
@@ -68,7 +79,7 @@ const Account = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, , isMobile && {marginBottom: 100, borderRightWidth: 0}]}>
             {user.status === "loading" && (
                 <ActivityIndicator size="large" color="#3f85a7" style={{ marginBottom: 16 }} />
             )}

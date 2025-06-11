@@ -1,13 +1,26 @@
-import LeftBar from "@/components/leftBar";
-import RightBar from "@/components/rightBar";
-import { View, StyleSheet } from "react-native";
+import Navigation from "@/components/navigation";
+import { View, StyleSheet, useWindowDimensions } from "react-native";
 import Chat from "@/components/chat";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const AIChat = () => {
+
+    const { width } = useWindowDimensions();
+    
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(()=>{
+        console.log(width)
+        if (width < 700) {
+            setIsMobile(true);
+        }
+    }, [width])
+    
     return (
         <View style={styles.container}>
-            <LeftBar />
-            <View style={styles.chatContainer}>
+            <Navigation />
+            <View style={[styles.chatContainer, isMobile && {marginBottom: 100, borderRightWidth: 0}]}>
                 <Chat />
             </View>
         </View>
