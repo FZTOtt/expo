@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, useWindowDimensions } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useAppSelector, useAppDispatch } from "@/hooks";
 import { RootState } from "@/redux/store";
 import { loginUser, registerUser, updatePassword, logout, clearError, setError } from "@/redux/user";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { FONT_SIZES } from '@/constants/theme'
+import { useWindowDimensions } from "@/hooks/useWindowDimensions";
 
 const Account = () => {
     const dispatch = useAppDispatch();
@@ -22,16 +24,7 @@ const Account = () => {
     const [loginPassword, setLoginPassword] = useState<string>("");
     const [showRegister, setShowRegister] = useState(false);
 
-    const { width } = useWindowDimensions();
-    
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(()=>{
-        console.log(width)
-        if (width < 700) {
-            setIsMobile(true);
-        }
-    }, [width])
+    const { deviceType } = useWindowDimensions();
 
     // Смена пароля
     const handleChangePassword = () => {
@@ -79,7 +72,7 @@ const Account = () => {
     };
 
     return (
-        <View style={[styles.container, , isMobile && {marginBottom: 100, borderRightWidth: 0}]}>
+        <View style={[styles.container, deviceType === 'mobile' && {marginBottom: 100, borderRightWidth: 0}]}>
             {user.status === "loading" && (
                 <ActivityIndicator size="large" color="#3f85a7" style={{ marginBottom: 16 }} />
             )}
@@ -124,7 +117,7 @@ const Account = () => {
                     </View>
                 </>
             ) : (
-                <View style={styles.formBlock}>
+                <View style={[styles.formBlock, deviceType === 'mobile' && {width: '100%'}]}>
                     <View style={{ flexDirection: "row", justifyContent: "center", marginBottom: 16 }}>
                         <TouchableOpacity onPress={() => setShowRegister(false)} style={[styles.switchButton, !showRegister && styles.switchButtonActive]}>
                             <Text style={[styles.switchButtonText, !showRegister && styles.switchButtonTextActive]}>Войти</Text>
@@ -231,7 +224,7 @@ const styles = StyleSheet.create({
         width: '50%',
     },
     formTitle: {
-        fontSize: 20,
+        fontSize: FONT_SIZES.large,
         color: "white",
         fontWeight: "bold",
         marginBottom: 12,

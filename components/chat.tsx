@@ -1,5 +1,6 @@
 import { getAIHelp, getAITalk, getAITextHelp, getPhraseTranscrible } from "@/api/api";
 import { useAppDispatch, useAppSelector } from "@/hooks";
+import { useWindowDimensions } from "@/hooks/useWindowDimensions";
 import { 
     setShowLoadMessage, 
     writeMessage,
@@ -147,8 +148,6 @@ const Chat = () => {
             dispatch(writeMessage(aiMessage));
         }
     }, [currentMessages, messages]);
-
-    const cleanPhonemes = (str: string) => str.replace(/[ˈˌ]/g, '').split('');
 
     function countWordErrors(detectedPhrase: string, sentence: string): number {
         const normalize = (str: string) =>
@@ -373,8 +372,6 @@ const styles = StyleSheet.create({
     audioInput: {
         alignItems: 'center',
         justifyContent: 'center',
-        borderTopWidth: 2,
-        borderTopColor: 'rgba(82, 101, 109, 1)',
         paddingTop: 30,
         marginTop: 20
     }

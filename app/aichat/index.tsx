@@ -1,26 +1,18 @@
 import Navigation from "@/components/navigation";
-import { View, StyleSheet, useWindowDimensions } from "react-native";
+import { View, StyleSheet } from "react-native";
 import Chat from "@/components/chat";
 import { useState } from "react";
 import { useEffect } from "react";
+import { useWindowDimensions } from "@/hooks/useWindowDimensions";
 
 const AIChat = () => {
 
-    const { width } = useWindowDimensions();
-    
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(()=>{
-        console.log(width)
-        if (width < 700) {
-            setIsMobile(true);
-        }
-    }, [width])
+    const { deviceType } = useWindowDimensions();
     
     return (
         <View style={styles.container}>
             <Navigation />
-            <View style={[styles.chatContainer, isMobile && {marginBottom: 100, borderRightWidth: 0}]}>
+            <View style={[styles.chatContainer, deviceType === 'mobile' && {marginBottom: 100, borderRightWidth: 0}]}>
                 <Chat />
             </View>
         </View>

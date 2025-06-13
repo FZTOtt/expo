@@ -1,4 +1,4 @@
-import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Button from "./button";
 import WordsIcon from '@/assets/icons/words.svg';
 import ChatIcon from '@/assets/icons/chat.svg';
@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { restoreSession } from "@/redux/user";
 import { RootState } from "@/redux/store";
 import { COLORS, FONT_SIZES, SPACING } from "@/constants/theme";
+import { useWindowDimensions } from "@/hooks/useWindowDimensions";
 const Navigation = () => {
 
     const pathname = usePathname();
@@ -22,8 +23,7 @@ const Navigation = () => {
     }, [isAuthorized]);
 
 
-    const {width} = useWindowDimensions();
-    const isMobile = width < 768;
+    const { deviceType } = useWindowDimensions();
 
     const navItems = [
       { path: '/', label: 'СЛОВА', Icon: WordsIcon },
@@ -36,10 +36,10 @@ const Navigation = () => {
     // if (isMobile) return null;
     return (
         <View style={[
-          !isMobile && styles.mainContainer,
-          isMobile && styles.mobileContainer
+          deviceType !== 'mobile' && styles.mainContainer,
+          deviceType === 'mobile' && styles.mobileContainer
           ]}>
-          {!isMobile && <Text style={styles.logo}>OUZI</Text>}
+          {deviceType !== 'mobile' && <Text style={styles.logo}>OUZI</Text>}
           {navItems.map((item) => (
             <Button
               key={item.path}
@@ -47,9 +47,9 @@ const Navigation = () => {
               active={pathname === item.path}
               Icon={item.Icon}
               onClick={() => router.push(item.path as any)}
-              isMobile={isMobile}
+              isMobile={deviceType === 'mobile'}
             >
-              {!isMobile && item.label}
+              {deviceType !== 'mobile' && item.label}
             </Button>
           ))}
         </View>

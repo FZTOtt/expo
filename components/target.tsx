@@ -3,7 +3,8 @@ import { RootState } from '@/redux/store';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import AudioPlayer from './audioPlayer';
 import PlaySound from '@/assets/icons/playSound.svg'
-import { useTranscriptionParser } from '@/hooks';
+import { FONT_SIZES } from '@/constants/theme';
+import { useTheme } from '@/hooks/useThemes';
 
 interface TargetProps {
     word?: string;
@@ -16,6 +17,8 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
 
     
     const { targetTranscription } = useAppSelector((state: RootState) => state.phrases)
+
+    const { fontSizes } = useTheme();
 
     const CompareWords = ({ targetWords, detectedWords }: { targetWords: string[]; detectedWords: string[] }) => {        
         
@@ -30,7 +33,7 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
                                 key={index}
                                 style={{
                                     color: 'white',
-                                    fontSize: 60,
+                                    fontSize: fontSizes.xlarge,
                                     paddingLeft: 15
                                 }}
                             >
@@ -57,7 +60,7 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
                             key={index}
                             style={{
                                 color: match ? 'green' : 'red',
-                                fontSize: 60,
+                                fontSize: fontSizes.xlarge,
                                 paddingLeft: 15
                             }}
                         >
@@ -86,7 +89,7 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
                                 key={index}
                                 style={{
                                     color: 'white',
-                                    fontSize: 60
+                                    fontSize: fontSizes.xlarge
                                 }}
                             >
                                 {ph}
@@ -106,7 +109,7 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
                             key={index}
                             style={{
                                 color: match ? 'green' : 'red',
-                                fontSize: 60
+                                fontSize: fontSizes.xlarge
                             }}
                         >
                             {ph}
@@ -122,13 +125,13 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
                 <View style={styles.container}>
                     <View style={styles.wordContainer}>
                         <HighlightedTranscription targetPhonemes={target} detectedPhonemes={answer} />
-                        <AudioPlayer buttonStyle={styles.audioButton} audioUrl={audioUrl}>
+                        <AudioPlayer buttonStyle={[styles.audioButton, {left: fontSizes.leftDis, bottom: fontSizes.botDis}]} audioUrl={audioUrl}>
                             <PlaySound 
                                 width={30} height={30}
                             />
                         </AudioPlayer>
                     </View>
-                    <Text style={styles.word}>
+                    <Text style={[styles.word, {fontSize: fontSizes.large}]}>
                         {word ? word.charAt(0).toUpperCase() + word.slice(1) : ''}
                     </Text>
                 </View>
@@ -137,9 +140,8 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
             <View style={styles.container}>
                 <View style={styles.wordContainer}>
                     <CompareWords targetWords={target} detectedWords={answer} />
-                    
                 </View>
-                <Text style={styles.word}>
+                <Text style={[styles.word, {fontSize: fontSizes.large}]}>
                     {targetTranscription} 
                 </Text>
             </View>            
@@ -162,7 +164,6 @@ const styles = StyleSheet.create({
         position: 'relative'
     },
     word: {
-        fontSize: 20,
         marginTop: 10,
         color: 'white',
     },
@@ -174,8 +175,6 @@ const styles = StyleSheet.create({
     },
     audioButton: {
         position: 'absolute',
-        left: 150,
-        bottom: 20
     },
     referenceButton: {
         position: 'absolute',

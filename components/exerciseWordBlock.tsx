@@ -7,8 +7,9 @@ import { getCurrentWordModule, getWordModuleExercises, sendExerciseProgress } fr
 import { useExerciseParser } from "@/hooks/exerciseParser";
 import PronounceFiew from "./pronounceFiew";
 import { nextWordExercise, setCurrentWordModule } from "@/redux/module";
-import { Animated, StyleSheet, View, Text, Modal, useWindowDimensions } from "react-native";
+import { Animated, StyleSheet, View, Text, Modal } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useWindowDimensions } from '@/hooks/useWindowDimensions'
 
 const ExerciseWordBlock = () => {
     const dispatch = useAppDispatch()
@@ -20,16 +21,7 @@ const ExerciseWordBlock = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [fadeAnim] = useState(new Animated.Value(0)); // Анимация для модального окна
 
-    const { width } = useWindowDimensions();
-    
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(()=>{
-        console.log(width)
-        if (width < 700) {
-            setIsMobile(true);
-        }
-    }, [width])
+    const { deviceType } = useWindowDimensions();
 
     // запрашиваем упражнение для слова, 
     // парсим, устанавливаем тип упражнения и используем сооветствующие компоненты
@@ -121,7 +113,7 @@ const ExerciseWordBlock = () => {
         }, 2000);
     };
     return (
-        <View style={[styles.mainContainer, isMobile && {marginBottom: 100, borderRightWidth: 0}]}>
+        <View style={[styles.mainContainer, deviceType === 'mobile' && {marginBottom: 100, borderRightWidth: 0}]}>
             <Modal transparent visible={isModalVisible} animationType="none">
                     <View style={styles.modalContainer}>
                         <Animated.View style={[styles.modalContent, { opacity: fadeAnim }]}>

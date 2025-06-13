@@ -6,8 +6,9 @@ import PhrasePronounce from "./phrasePronounce"
 import CompleteChain from "./completeChain"
 import { getCurrentPhraseModule, getPhraseModuleExercises, sendExerciseProgress } from "@/api/api"
 import { nextPhraseExercise, setCurrentPhraseModule } from "@/redux/module"
-import { View, StyleSheet, Animated, Modal, Text, useWindowDimensions } from 'react-native'
+import { View, StyleSheet, Animated, Modal, Text } from 'react-native'
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { useWindowDimensions } from "@/hooks/useWindowDimensions"
 
 const ExercisePhrasesBlock = () => {
 
@@ -20,16 +21,7 @@ const ExercisePhrasesBlock = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [fadeAnim] = useState(new Animated.Value(0));
 
-    const { width } = useWindowDimensions();
-    
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(()=>{
-        console.log(width)
-        if (width < 700) {
-            setIsMobile(true);
-        }
-    }, [width])
+    const { deviceType } = useWindowDimensions();
 
 
     // запрашиваем упражнение для слова, после его парсинга отрисовываем соответствующие
@@ -121,7 +113,7 @@ const ExercisePhrasesBlock = () => {
     };
     
     return (
-        <View style={[styles.mainContainer, isMobile && {marginBottom: 100, borderRightWidth: 0}]}>
+        <View style={[styles.mainContainer, deviceType === 'mobile' && {marginBottom: 100, borderRightWidth: 0}]}>
             <Modal transparent visible={isModalVisible} animationType="none">
                 <View style={styles.modalContainer}>
                     <Animated.View style={[styles.modalContent, { opacity: fadeAnim }]}>
