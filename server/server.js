@@ -481,7 +481,7 @@ app.post('/apinode/transcribe-word', upload.single('audio'), async (req, res) =>
         const form = new FormData();
         form.append('file', fs.createReadStream(audioPath));
 
-        const response = await axios.post('http://94.253.41.203:5001/transcribe', form, {
+        const response = await axios.post('http://178.57.255.90:5001/transcribe', form, {
             headers: form.getHeaders(),
         });
 
@@ -508,7 +508,7 @@ app.post('/apinode/transcribe-phrase', upload.single('audio'), async (req, res) 
         const form = new FormData();
         form.append('file', fs.createReadStream(audioPath));
 
-        const response = await axios.post('http://94.253.41.203:5000/recognize_speech', form, {
+        const response = await axios.post('http://178.57.255.90:5000/recognize_speech', form, {
             headers: form.getHeaders(),
         });
 
@@ -528,7 +528,7 @@ app.post('/apinode/get-ai-help', async (req, res) => {
         const {flag, target, predict, eng_target} = req.body
 
         const response = await axios.post(
-            'http://94.253.41.203:5002/get_helper_text',
+            'http://178.57.255.90:5002/get_helper_text',
             { 
                 flag: flag,
                 target: target,
@@ -558,7 +558,7 @@ app.post('/apinode/get-ai-talk', async (req, res) => {
         const { message } = req.body
 
         const response = await axios.post(
-            'http://94.253.41.203:5003/generate_dialog',
+            'http://178.57.255.90:5003/generate_dialog',
             { input_text: message },
             {
                 headers: {
@@ -584,7 +584,7 @@ app.post('/apinode/get-ai-text-help', async (req, res) => {
     try {
 
         const response = await axios.post(
-            'http://94.253.41.203:5002/get_helper_userchat',
+            'http://178.57.255.90:5002/get_helper_userchat',
             { input_text: message },
             {
                 headers: {
