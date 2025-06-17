@@ -472,6 +472,7 @@ app.get('/apinode/phrase-modules', async (req, res) => {
 app.post('/apinode/transcribe-word', upload.single('audio'), async (req, res) => {
 
     const audioPath = req.file?.path;
+    const target = req.body.target;
 
     if (!audioPath) {
         return res.status(400).json({ error: "Аудиофайл обязателен." });
@@ -480,6 +481,7 @@ app.post('/apinode/transcribe-word', upload.single('audio'), async (req, res) =>
     try {
         const form = new FormData();
         form.append('file', fs.createReadStream(audioPath));
+        form.append('target', target);
 
         const response = await axios.post('http://178.57.255.90:5001/transcribe', form, {
             headers: form.getHeaders(),

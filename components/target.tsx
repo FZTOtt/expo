@@ -78,6 +78,8 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
     };
 
     const HighlightedTranscription = ({ targetPhonemes, detectedPhonemes }: {targetPhonemes: string[], detectedPhonemes: string[]}) => {
+
+        const phonemeCount = targetPhonemes.length
         
         if (detectedPhonemes.length === 0) {
             
@@ -96,6 +98,11 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
                             </Text>
                         );
                     })}
+                    <AudioPlayer buttonStyle={[styles.audioButton, {left: phonemeCount * fontSizes.leftDis, bottom: fontSizes.botDis}]} audioUrl={audioUrl}>
+                        <PlaySound 
+                            width={30} height={30}
+                        />
+                    </AudioPlayer>
                 </View>
             )
         }
@@ -116,6 +123,11 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
                         </Text>
                     );
                 })}
+                <AudioPlayer buttonStyle={[styles.audioButton, {left: phonemeCount * fontSizes.leftDis, bottom: fontSizes.botDis}]} audioUrl={audioUrl}>
+                    <PlaySound 
+                        width={30} height={30}
+                    />
+                </AudioPlayer>
             </View>
         );
     };
@@ -125,11 +137,6 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
                 <View style={styles.container}>
                     <View style={styles.wordContainer}>
                         <HighlightedTranscription targetPhonemes={target} detectedPhonemes={answer} />
-                        <AudioPlayer buttonStyle={[styles.audioButton, {left: fontSizes.leftDis, bottom: fontSizes.botDis}]} audioUrl={audioUrl}>
-                            <PlaySound 
-                                width={30} height={30}
-                            />
-                        </AudioPlayer>
                     </View>
                     <Text style={[styles.word, {fontSize: fontSizes.large}]}>
                         {word ? word.charAt(0).toUpperCase() + word.slice(1) : ''}

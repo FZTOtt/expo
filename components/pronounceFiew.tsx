@@ -25,13 +25,15 @@ const PronounceFiew = ({handleNext} : {handleNext: (correct: boolean) => void}) 
     };
 
     const handleRecordingComplete = async (audio: Blob | string) => {
-        const [status, response] = await getWordTranscrible(audio);
+        if (selectedWord === null) return
+
+        const [status, response] = await getWordTranscrible(audio, targetTranscriptions[selectedWord]);
         if (status === 200) {
             dispatch(setDetectedTranscription(response.transcription));
         } else {
             console.error('Ошибка при запросе расшифровке аудио')
         }
-        if (selectedWord === null) return
+        
         const originalPhonemes = ParseWordTranscription(targetTranscriptions[selectedWord]);
         const detectedPhonemes = ParseWordTranscription(response.transcription);
 

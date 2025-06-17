@@ -45,7 +45,7 @@ export const getFontSizes = (deviceType: 'pc' | 'tablet' | 'mobile') => {
         large: 20,
         xlarge: 60,
         logo: 30,
-        leftDis: 150,
+        leftDis: 50,
         botDis: 20
     };
 
@@ -56,7 +56,7 @@ export const getFontSizes = (deviceType: 'pc' | 'tablet' | 'mobile') => {
             large: 16,
             xlarge: 40,
             logo: 26,
-            leftDis: 110,
+            leftDis: 35,
             botDis: 7
         };
     }

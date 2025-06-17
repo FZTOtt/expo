@@ -157,9 +157,11 @@ export const getPhraseModules = async (): Promise<[number, any]> => {
     return getRequest(`${CURRENT_API}/phrase-modules`)
 }
 
-export const getWordTranscrible = async (audioData: string | Blob): Promise<[number, any]> => {
+export const getWordTranscrible = async (audioData: string | Blob, target: string): Promise<[number, any]> => {
     const formData = new FormData();
     
+    formData.append('target', target);
+
     if (typeof audioData === 'string') {
         const filename = audioData.split('/').pop() || 'audio.wav';
         formData.append('audio', {
@@ -170,6 +172,7 @@ export const getWordTranscrible = async (audioData: string | Blob): Promise<[num
     } else {
         formData.append('audio', audioData, 'audio.wav');
     }
+
     const headers: Record<string, string> = Platform.OS === 'web' ? {} : {
         'Content-Type': 'multipart/form-data'
     };

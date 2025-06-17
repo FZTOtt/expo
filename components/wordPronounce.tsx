@@ -19,13 +19,12 @@ const WordPronounce = ({handleNext} : {handleNext: (correct: boolean) => void}) 
     
     const originalPhonemes = ParseWordTranscription(targetTranscriptions[0])
     let detectedPhonemes: string[];
-    // console.log(translatedTranscriptions[0])
     translatedTranscriptions[0] ? detectedPhonemes = ParseWordTranscription(translatedTranscriptions[0]) : detectedPhonemes = []
 
     const handleRecordingComplete = async (audio: Blob | string) => {
 
         dispatch(setShowLoadMessage(true))
-        const [status, response] = await getWordTranscrible(audio);
+        const [status, response] = await getWordTranscrible(audio, targetTranscriptions[0]);
 
         const trans = []
         trans[0] = response.transcription
