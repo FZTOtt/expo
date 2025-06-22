@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View, Text, Modal } from "react-native"
+import { StyleSheet, TouchableOpacity, View, Text, Modal, Platform } from "react-native"
 import Modules from "./modules";
 import Reference from "./reference";
 import { useWindowDimensions } from "@/hooks/useWindowDimensions";
@@ -40,7 +40,7 @@ const ModAndRefs = () => {
                     onRequestClose={handleCloseModal}
                 >
                     <View style={styles.modalOverlay}>
-                        <View style={styles.modalContent}>
+                        <View style={[styles.modalContent, Platform.OS === 'android' && {flex: 1}]}>
                             <View style={styles.modalHeader}>
                                 <Text style={[styles.modalTitle, {fontSize: fontSizes.large}]}>Справка</Text>
                                 <TouchableOpacity 

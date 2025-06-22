@@ -26,7 +26,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
     const [isRecording, setIsRecording] = useState<boolean>(false);
     const [recording, setRecording] = useState<Audio.Recording | undefined>();
-    const [permissionResponse, requestPermission] = Audio.usePermissions();
+    // const [permissionResponse, requestPermission] = Audio.usePermissions();
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
 
@@ -90,6 +90,14 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
     };
 
     const startRecording = async () => {
+        let permission = await Audio.getPermissionsAsync();
+        if (permission.status !== 'granted') {
+            permission = await Audio.requestPermissionsAsync();
+        }
+        if (permission.status !== 'granted') {
+            alert('Нет доступа к микрофону');
+            return;
+        }
         if (Platform.OS === 'web') {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -114,9 +122,9 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
             }
         } else {
             try {
-                if (permissionResponse?.status !== 'granted') {
-                    await requestPermission();
-                }
+                // if (permissionResponse?.status !== 'granted') {
+                //     await requestPermission();
+                // }
                 await Audio.setAudioModeAsync({
                     allowsRecordingIOS: true,
                     playsInSilentModeIOS: true,

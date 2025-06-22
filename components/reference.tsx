@@ -265,7 +265,6 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(63, 133, 167, 1)',
         width: '100%',
         minHeight: 50,
-        // justifyContent: 'center',
         marginVertical: 10,
         paddingHorizontal: 20,
         paddingTop: 7
@@ -273,7 +272,6 @@ const styles = StyleSheet.create({
     references_passiveText: {
         color: 'white',
         fontSize: 20,
-        // paddingTop: 10
     },
     phonemeInfo: {
         paddingTop: 15,
