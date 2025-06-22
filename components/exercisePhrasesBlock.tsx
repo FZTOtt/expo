@@ -9,6 +9,7 @@ import { nextPhraseExercise, setCurrentPhraseModule } from "@/redux/module"
 import { View, StyleSheet, Animated, Modal, Text } from 'react-native'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useWindowDimensions } from "@/hooks/useWindowDimensions"
+import { useTheme } from "@/hooks/useThemes"
 
 const ExercisePhrasesBlock = () => {
 
@@ -22,6 +23,7 @@ const ExercisePhrasesBlock = () => {
     const [fadeAnim] = useState(new Animated.Value(0));
 
     const { deviceType } = useWindowDimensions();
+    const { fontSizes } = useTheme();
 
 
     // запрашиваем упражнение для слова, после его парсинга отрисовываем соответствующие
@@ -113,11 +115,11 @@ const ExercisePhrasesBlock = () => {
     };
     
     return (
-        <View style={[styles.mainContainer, deviceType === 'mobile' && {marginBottom: 100, borderRightWidth: 0}]}>
+        <View style={[styles.mainContainer, deviceType === 'mobile' && {marginBottom: 100, borderRightWidth: 0, paddingBottom: 0}]}>
             <Modal transparent visible={isModalVisible} animationType="none">
                 <View style={styles.modalContainer}>
                     <Animated.View style={[styles.modalContent, { opacity: fadeAnim }]}>
-                        <Text style={styles.modalText}>Переходим к следующему заданию...</Text>
+                        <Text style={[styles.modalText, {fontSize: fontSizes.medium}]}>Переходим к следующему заданию...</Text>
                     </Animated.View>
                 </View>
             </Modal>
@@ -134,7 +136,6 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(82, 101, 109, 1)',
         paddingTop: 50,
         paddingBottom: 50,
-        // minWidth: 700
     },
     modalContainer: {
         flex: 1,
@@ -147,9 +148,9 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 10,
         alignItems: "center",
+        maxWidth: '80%'
     },
     modalText: {
-        fontSize: 20,
         fontWeight: "bold",
         color: "white",
     },

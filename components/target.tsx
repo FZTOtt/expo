@@ -22,8 +22,6 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
 
     const CompareWords = ({ targetWords, detectedWords }: { targetWords: string[]; detectedWords: string[] }) => {        
         
-        // console.log(detectedWords.length)
-        // console.log(answer)
         if (detectedWords[0] === '') {
             return (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -183,21 +181,10 @@ const styles = StyleSheet.create({
     audioButton: {
         position: 'absolute',
     },
-    referenceButton: {
-        position: 'absolute',
-        height: 60,
-        left: -40,
-        justifyContent: 'center',
-    },
     playButton: {
         width: 30,
         height: 30,
     },
-    transcription: {
-        fontSize: 60,
-        lineHeight: 60,
-        color: 'white'
-    }
 });
 
 

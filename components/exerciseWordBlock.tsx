@@ -10,6 +10,7 @@ import { nextWordExercise, setCurrentWordModule } from "@/redux/module";
 import { Animated, StyleSheet, View, Text, Modal } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useWindowDimensions } from '@/hooks/useWindowDimensions'
+import { useTheme } from "@/hooks/useThemes";
 
 const ExerciseWordBlock = () => {
     const dispatch = useAppDispatch()
@@ -22,6 +23,7 @@ const ExerciseWordBlock = () => {
     const [fadeAnim] = useState(new Animated.Value(0)); // Анимация для модального окна
 
     const { deviceType } = useWindowDimensions();
+    const { fontSizes } = useTheme()
 
     // запрашиваем упражнение для слова, 
     // парсим, устанавливаем тип упражнения и используем сооветствующие компоненты
@@ -113,11 +115,11 @@ const ExerciseWordBlock = () => {
         }, 2000);
     };
     return (
-        <View style={[styles.mainContainer, deviceType === 'mobile' && {marginBottom: 100, borderRightWidth: 0}]}>
+        <View style={[styles.mainContainer, deviceType === 'mobile' && {marginBottom: 100, borderRightWidth: 0, paddingBottom: 0}]}>
             <Modal transparent visible={isModalVisible} animationType="none">
                     <View style={styles.modalContainer}>
                         <Animated.View style={[styles.modalContent, { opacity: fadeAnim }]}>
-                            <Text style={styles.modalText}>Переходим к следующему заданию...</Text>
+                            <Text style={[styles.modalText, {fontSize: fontSizes.medium}]}>Переходим к следующему заданию...</Text>
                         </Animated.View>
                     </View>
             </Modal>
@@ -142,9 +144,9 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 10,
         alignItems: "center",
+        maxWidth: '80%',
     },
     modalText: {
-        fontSize: 20,
         fontWeight: "bold",
         color: "white",
     },
@@ -155,7 +157,6 @@ const styles = StyleSheet.create({
         paddingTop: 50,
         gap: 50,
         paddingBottom: 50,
-        // minWidth: 500
     }
 });
 

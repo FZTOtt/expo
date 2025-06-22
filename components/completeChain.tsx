@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
 import AudioPlayer from "./audioPlayer"
 import PlaySound from '@/assets/icons/soundCurrentColor.svg'
 import { useEffect, useState } from "react"
+import { useTheme } from "@/hooks/useThemes"
 
 const completeChain = ({handleNext} : {handleNext: (correct: boolean) => void}) => {
     const { chain, audio, sentence } = useAppSelector((state: RootState) => state.phrases)
@@ -11,6 +12,8 @@ const completeChain = ({handleNext} : {handleNext: (correct: boolean) => void}) 
     const [availableWords, setAvailableWords] = useState<string[]>([])
     const [selectedWords, setSelectedWords] = useState<string[]>([])
     const [correct, setCorrect] = useState<boolean|null>(null)
+
+    const { fontSizes, buttonSizes } = useTheme()
 
     useEffect(() => {
         setAvailableWords(chain)
@@ -39,7 +42,7 @@ const completeChain = ({handleNext} : {handleNext: (correct: boolean) => void}) 
 
     return (
         <View style={styles.container}>
-            <Text style={styles.exerciseText}>
+            <Text style={[styles.exerciseText, {fontSize: fontSizes.exerciseTask}]}>
                 Составьте предложение
             </Text>
             <AudioPlayer audioUrl={audio} buttonStyle={styles.wordAudio}>
@@ -54,7 +57,7 @@ const completeChain = ({handleNext} : {handleNext: (correct: boolean) => void}) 
                         onPress={() => handleSelectedPress(word)}
                         style={styles.wordItem}
                     >
-                        <Text style={styles.wordText}>{word}</Text>
+                        <Text style={[styles.wordText, {fontSize: fontSizes.medium}]}>{word}</Text>
                     </TouchableOpacity>
                 ))}
             </View>
@@ -65,7 +68,7 @@ const completeChain = ({handleNext} : {handleNext: (correct: boolean) => void}) 
                         onPress={() => handleWordPress(word)}
                         style={styles.wordItem}
                     >
-                        <Text style={styles.wordText}>{word}</Text>
+                        <Text style={[styles.wordText, {fontSize: fontSizes.medium}]}>{word}</Text>
                     </TouchableOpacity>
                 ))}
             </View>
@@ -74,7 +77,7 @@ const completeChain = ({handleNext} : {handleNext: (correct: boolean) => void}) 
                 correct && { backgroundColor: 'green' },
                 correct == false && { backgroundColor: 'red', borderColor: 'red' }
             ]} onPress={checkChain}>
-                <Text style={styles.checkText}>
+                <Text style={[styles.checkText, {fontSize: fontSizes.medium}]}>
                     Проверить
                 </Text>
                 
@@ -86,12 +89,13 @@ const completeChain = ({handleNext} : {handleNext: (correct: boolean) => void}) 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        gap: 50,
         alignItems: 'center',
+        justifyContent: 'space-between'
     },
     exerciseText: {
         fontSize: 40,
-        color: 'white'
+        color: 'white',
+        textAlign: 'center'
     },
     wordAudio: {
         height: 120,
@@ -105,12 +109,14 @@ const styles = StyleSheet.create({
         borderTopWidth: 2,
         borderBottomWidth: 2,
         borderColor: 'rgba(82, 101, 109, 1)',
-        height: 100,
+        minHeight: 100,
         width: '80%',
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        gap: 30
+        gap: 30,
+        flexWrap: 'wrap',
+        paddingVertical: 20
     },
     wordItem: {
         backgroundColor: 'rgba(73, 192, 248, 0.3)',
@@ -120,11 +126,12 @@ const styles = StyleSheet.create({
     },
     wordText: {
         color: 'white',
-        fontSize: 18,
     },
     wordList: {
         flexDirection: 'row',
-        gap: 30
+        gap: 30,
+        flexWrap: 'wrap',
+        paddingHorizontal: 20
     },
     checkButton: {
         borderRadius: 12,
@@ -134,8 +141,7 @@ const styles = StyleSheet.create({
         paddingVertical: 15
     },
     checkText: {
-        color: 'white',
-        fontSize: 25
+        color: 'white'
     }
 })
 

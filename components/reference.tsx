@@ -7,6 +7,7 @@ import AudioPlayer from "./audioPlayer";
 import MediaViewer from "./mediaViewer";
 import { usePathname } from "expo-router";
 import PlaySound from '@/assets/icons/playSound.svg'
+import { useWindowDimensions } from "@/hooks/useWindowDimensions";
 
 type PhonemeReference = {
     phonema: string;
@@ -26,6 +27,8 @@ const Reference = () => {
     const [phonemeDetails, setPhonemeDetails] = useState<PhonemeReference[]>([])
     const [selectedPhoneme, setSelectedPhoneme] = useState<string | null>(null);
     const flatListRef = useRef<FlatList>(null);
+
+    const { deviceType } = useWindowDimensions();
 
     function parseTranscription(transcription: string) {
         const phonemeOrder: string[] = []; 
@@ -231,10 +234,10 @@ const Reference = () => {
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.header}>
+        <View style={[styles.container, deviceType === 'pc' && {paddingTop: 30}]}>
+            {deviceType === 'pc' && <Text style={styles.header}>
                 Справка
-            </Text>
+            </Text>}
             {addictiveReference()}
         </View>
     )
@@ -243,7 +246,6 @@ const Reference = () => {
 const styles = StyleSheet.create({
     container: {
         height: '50%',
-        paddingTop: 30,
         paddingHorizontal: 20,
         flex: 1,
         flexDirection: 'column',

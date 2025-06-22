@@ -6,6 +6,8 @@ import Manage from "./manage";
 import { getWordTranscrible } from "@/api/api";
 import { setDetectedTranscription } from "@/redux/word";
 import AudioPlayer from "./audioPlayer";
+import { useTheme } from "@/hooks/useThemes";
+import { useWindowDimensions } from "@/hooks/useWindowDimensions";
 
 const PronounceFiew = ({handleNext} : {handleNext: (correct: boolean) => void}) => {
 
@@ -18,7 +20,9 @@ const PronounceFiew = ({handleNext} : {handleNext: (correct: boolean) => void}) 
     const [isCorrect, setIsCorrect] = useState<(boolean | null)[]>(targetWords.map(() => null));
     const [completed, setCompleted] = useState<boolean>(false)
 
+    const { fontSizes, buttonSizes } = useTheme()
 
+    const { deviceType } = useWindowDimensions()
 
     const handleWordPress = (index: number) => {
         setSelectedWord(index);
@@ -62,14 +66,19 @@ const PronounceFiew = ({handleNext} : {handleNext: (correct: boolean) => void}) 
 
     return (
         <View style={styles.container}>
-            <Text style={styles.exerciseText}>
+            <Text style={[styles.exerciseText, {fontSize: fontSizes.exerciseTask}]}>
                 Произнесите два похожих слова
             </Text>
-            <View style={styles.variants}>
+            <View style={[styles.variants, deviceType === 'mobile' && {gap: 20}]}>
                 {targetWords.map((word, index) => (
                     <AudioPlayer audioUrl={targetAudioUrls[index]} 
                     buttonStyle={[
                         styles.wordButton,
+                        {
+                            paddingHorizontal: buttonSizes.horizontalLarge,
+                            paddingVertical: buttonSizes.verticalLarge,
+                            borderRadius: buttonSizes.borderRadius,
+                        },
                         index === selectedWord && { backgroundColor: 'rgba(73, 192, 248, 1)' },
                         isCorrect[index] && { backgroundColor: 'green' },
                         isCorrect[index] === false && { backgroundColor: 'red' }
@@ -77,7 +86,7 @@ const PronounceFiew = ({handleNext} : {handleNext: (correct: boolean) => void}) 
                     onPress={()=>handleWordPress(index)}
                     key={index}
                     disabled={isCorrect[index] === true}>
-                        <Text style={styles.wordButtonText}>
+                        <Text style={{fontSize: fontSizes.medium}}>
                             {word}
                         </Text>
                     </AudioPlayer>
@@ -93,22 +102,19 @@ const PronounceFiew = ({handleNext} : {handleNext: (correct: boolean) => void}) 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        gap: 50,
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'space-between'
     },
     exerciseText: {
-        fontSize: 50,
-        color: 'white'
+        color: 'white',
+        textAlign: 'center',
+        paddingVertical: 10
     },
     variants: {
         flexDirection: 'row',
-        gap: 40,
-        marginBottom: 450
+        gap: 40
     },
     wordButton: {
-        paddingHorizontal: 80,
-        paddingVertical: 15,
-        borderRadius: 12,
         backgroundColor: 'white',
     },
     wordButtonText: {

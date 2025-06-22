@@ -40,10 +40,11 @@ export const BORDER_WIDTH = {
 
 export const getFontSizes = (deviceType: 'pc' | 'tablet' | 'mobile') => {
     const baseSizes = {
-        small: 14,
-        medium: 16,
-        large: 20,
+        small: 16,
+        medium: 20,
+        large: 30,
         xlarge: 60,
+        exerciseTask: 40,
         logo: 30,
         leftDis: 50,
         botDis: 20
@@ -51,13 +52,32 @@ export const getFontSizes = (deviceType: 'pc' | 'tablet' | 'mobile') => {
 
     if (deviceType === 'mobile') {
         return {
-            small: 12,
-            medium: 14,
-            large: 16,
+            small: 16,
+            medium: 20,
+            large: 25,
             xlarge: 40,
+            exerciseTask: 30,
             logo: 26,
             leftDis: 35,
             botDis: 7
+        };
+    }
+
+    return baseSizes;
+};
+
+export const getButtonSizes = (deviceType: 'pc' | 'tablet' | 'mobile') => {
+    const baseSizes = {
+        horizontalLarge: 80,
+        verticalLarge: 15,
+        borderRadius: 12,
+    };
+
+    if (deviceType === 'mobile') {
+        return {
+            horizontalLarge: 30,
+            verticalLarge: 10,
+            borderRadius: 12,
         };
     }
 

@@ -1,6 +1,5 @@
 import { getAIHelp, getAITalk, getAITextHelp, getPhraseTranscrible } from "@/api/api";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import { useWindowDimensions } from "@/hooks/useWindowDimensions";
 import { 
     setShowLoadMessage, 
     writeMessage,
@@ -25,6 +24,7 @@ import {
 import MicOn from '@/assets/icons/micon.svg';
 import MicOff from '@/assets/icons/micoff.svg';
 import AudioRecorder from './aidoRecorder';
+import { useTheme } from "@/hooks/useThemes";
 
 // Тип сообщения
 type Message = {
@@ -51,6 +51,8 @@ const Chat = () => {
     const fullchat = pathname == '/aichat'
 
     const failedRequsetMessage = 'Извините, сервер перегружен'
+
+    const { fontSizes } = useTheme();
 
     let currentMessages, currentLoad, writeFunc, setLoad;
 
@@ -213,7 +215,7 @@ const Chat = () => {
         styles.messageBubble, 
         item.isUser ? styles.userBubble : styles.aiBubble
         ]}>
-        <Text style={styles.messageText}>{item.text}</Text>
+        <Text style={[styles.messageText, {fontSize: fontSizes.small}]}>{item.text}</Text>
         </View>
     );
 
@@ -294,7 +296,7 @@ const Chat = () => {
         ) : (        
             <View style={styles.inputContainer}>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, {fontSize: fontSizes.small}]}
                     value={inputText}
                     onChangeText={setInputText}
                     placeholder="Напишите для получения справки"
@@ -302,7 +304,7 @@ const Chat = () => {
                     onSubmitEditing={handleSend}
                 />
                 <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-                    <Text style={styles.sendButtonText}>➤</Text>
+                    <Text style={[styles.sendButtonText, {fontSize: fontSizes.medium}]}>➤</Text>
                 </TouchableOpacity>
             </View>) }
 
@@ -335,7 +337,6 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
     },
     messageText: {
-        fontSize: 16,
         color: 'white',
         lineHeight: 24
     },
@@ -353,7 +354,6 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         paddingHorizontal: 16,
         paddingVertical: 10,
-        fontSize: 16,
         marginRight: 8,
         color: 'white'
     },
@@ -367,7 +367,6 @@ const styles = StyleSheet.create({
     },
     sendButtonText: {
         color: 'white',
-        fontSize: 18,
     },
     audioInput: {
         alignItems: 'center',

@@ -4,6 +4,7 @@ import Reference from "./reference";
 import { useWindowDimensions } from "@/hooks/useWindowDimensions";
 import { useState } from "react";
 import { COLORS } from "@/constants/theme";
+import { useTheme } from "@/hooks/useThemes";
 
 const ModAndRefs = () => {
 
@@ -18,25 +19,22 @@ const ModAndRefs = () => {
         setIsModalVisible(false);
     };
 
+    const { fontSizes } = useTheme()
+
     if (deviceType !== 'pc') {
         return (
-            // <TouchableOpacity style={styles.refButton}>
-            //     <Text style={styles.refText}>
-            //         Справка
-            //     </Text>
-            // </TouchableOpacity>
             <>
                 <TouchableOpacity 
                     style={styles.refButton}
                     onPress={handleOpenModal}
                 >
-                    <Text style={styles.refText}>
+                    <Text style={[styles.refText, {fontSize: fontSizes.medium}]}>
                         Справка
                     </Text>
                 </TouchableOpacity>
 
                 <Modal
-                    animationType="slide"
+                    animationType="fade"
                     transparent={true}
                     visible={isModalVisible}
                     onRequestClose={handleCloseModal}
@@ -44,12 +42,12 @@ const ModAndRefs = () => {
                     <View style={styles.modalOverlay}>
                         <View style={styles.modalContent}>
                             <View style={styles.modalHeader}>
-                                <Text style={styles.modalTitle}>Справка</Text>
+                                <Text style={[styles.modalTitle, {fontSize: fontSizes.large}]}>Справка</Text>
                                 <TouchableOpacity 
                                     onPress={handleCloseModal}
                                     style={styles.closeButton}
                                 >
-                                    <Text style={styles.closeButtonText}>✕</Text>
+                                    <Text style={[styles.closeButtonText, {fontSize: fontSizes.large}]}>✕</Text>
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.modalBody}>
@@ -87,7 +85,6 @@ const styles = StyleSheet.create({
         right: 20
     },
     refText: {
-        fontSize: 20,
         color: 'white'
     },
     modalOverlay: {
@@ -113,16 +110,14 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
     },
     modalTitle: {
-        fontSize: 24,
         fontWeight: 'bold',
-        color: '#4B4942',
+        color: 'white',
     },
     closeButton: {
         padding: 5,
     },
     closeButtonText: {
-        fontSize: 24,
-        color: '#4B4942',
+        color: 'white',
     },
     modalBody: {
         flex: 1,

@@ -1,4 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/hooks';
+import { useTheme } from '@/hooks/useThemes';
+import { useWindowDimensions } from '@/hooks/useWindowDimensions';
 import { setVisibleMedia } from '@/redux/modal';
 import { RootState } from '@/redux/store';
 import React, { useEffect, useState } from 'react';
@@ -15,6 +17,10 @@ const MediaViewer: React.FC<MediaViewerProps> = ({ mediaUrl, style }) => {
     const dispatch = useAppDispatch();
     const [mediaType, setMediaType] = useState<'image' | 'video' | 'unknown'>('unknown')
     const [isLoading, setIsLoading] = useState(true);
+    const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
+
+    const { fontSizes } = useTheme();
+    const { deviceType } = useWindowDimensions();
 
     useEffect(() => {
         const checkMediaType = async () => {
@@ -58,65 +64,87 @@ const MediaViewer: React.FC<MediaViewerProps> = ({ mediaUrl, style }) => {
 
     return (
         <>
-            <Pressable 
-            style={[styles.previewContainer, style]}
-            onPress={() => dispatch(setVisibleMedia(true))}
+            <Pressable
+                style={[styles.previewContainer, style]}
+                onPress={() => {
+                    if (mediaType === "video") {
+                        if (deviceType === "pc") {
+                            dispatch(setVisibleMedia(true));
+                        } else {
+                            setIsPreviewPlaying(true);
+                        }
+                    } else if (mediaType === "image") {
+                        if (deviceType === "pc") {
+                            dispatch(setVisibleMedia(true));
+                        }
+                    }
+                }}
             >
-            {mediaType === 'image' ? (
-                <Image
-                source={{ uri: mediaUrl }}
-                style={styles.previewMedia}
-                resizeMode="contain"
-                />
-            ) : (
-                <>
-                <Video
-                    source={{ uri: mediaUrl }}
-                    style={styles.previewMedia}
-                    paused={true}
-                    resizeMode="contain"
-                />
-                <View style={styles.playIcon}>
-                    <Text style={styles.playIconText}>▶</Text>
-                </View>
-                </>
-            )}
-            </Pressable>
-  
-            <Modal
-                visible={isVisibleMedia}
-                transparent={true}
-                onRequestClose={() => dispatch(setVisibleMedia(false))}
-                >
-                <Pressable 
-                    style={styles.modalBackdrop}
-                    onPress={() => dispatch(setVisibleMedia(false))}
-                >
-                    {/* Внутренний контейнер, который не закрывает по клику на себя */}
-                    <Pressable 
-                    style={styles.modalContent}
-                    onPress={(e) => e.stopPropagation()} // Останавливаем всплытие
-                    >
-                    {mediaType === 'image' ? (
-                        <Image
+                {mediaType === "image" ? (
+                    <Image
                         source={{ uri: mediaUrl }}
-                        style={styles.fullscreenMedia}
+                        style={styles.previewMedia}
                         resizeMode="contain"
+                    />
+                ) : (
+                    deviceType !== "pc" && isPreviewPlaying ? (
+                        <Video
+                            source={{ uri: mediaUrl }}
+                            style={styles.previewMedia}
+                            controls={true}
+                            resizeMode="contain"
                         />
                     ) : (
-                        <View style={styles.videoWrapper}>
+                        <>
                             <Video
                                 source={{ uri: mediaUrl }}
-                                style={styles.video}
-                                controls={true}
+                                style={styles.previewMedia}
+                                paused={true}
                                 resizeMode="contain"
-                                paused={!isVisibleMedia}
                             />
-                        </View>
-                    )}
+                            <View style={styles.playIcon}>
+                                <Text style={[styles.playIconText, { fontSize: fontSizes.medium }]}>▶</Text>
+                            </View>
+                        </>
+                    )
+                )}
+            </Pressable>
+            
+            {deviceType === "pc" && (
+                <Modal
+                    visible={isVisibleMedia}
+                    transparent={true}
+                    onRequestClose={() => dispatch(setVisibleMedia(false))}
+                >
+                    <Pressable
+                        style={styles.modalBackdrop}
+                        onPress={() => dispatch(setVisibleMedia(false))}
+                    >
+                        <Pressable
+                            style={styles.modalContent}
+                            onPress={(e) => e.stopPropagation()}
+                        >
+                            {mediaType === "image" ? (
+                                <Image
+                                    source={{ uri: mediaUrl }}
+                                    style={styles.fullscreenMedia}
+                                    resizeMode="contain"
+                                />
+                            ) : (
+                                <View style={styles.videoWrapper}>
+                                    <Video
+                                        source={{ uri: mediaUrl }}
+                                        style={styles.video}
+                                        controls={true}
+                                        resizeMode="contain"
+                                        paused={!isVisibleMedia}
+                                    />
+                                </View>
+                            )}
+                        </Pressable>
                     </Pressable>
-                </Pressable>
-            </Modal>
+                </Modal>
+            )}
         </>
     )
 }
@@ -144,13 +172,11 @@ const styles = StyleSheet.create({
     },
     playIconText: {
       color: 'white',
-      fontSize: 20,
     },
     modalBackdrop: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-    //   backgroundColor: 'rgba(0,0,0,0.9)',
     },
     modalContent: {
       width: '50%',
@@ -162,14 +188,13 @@ const styles = StyleSheet.create({
     },
     videoWrapper: {
         width: '100%',
-        aspectRatio: 16/9, // Сохраняем соотношение сторон
+        aspectRatio: 16/9,
         backgroundColor: 'black',
-        overflow: 'hidden', // Важно для ограничения контролов
+        overflow: 'hidden', 
     },
     video: {
         width: '100%',
         height: '100%',
-        // Для Android нужно добавить alignSelf: 'center'
         alignSelf: 'center',
     },
 });

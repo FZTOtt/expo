@@ -4,6 +4,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import AudioPlayer from "./audioPlayer";
 import PlaySound from '@/assets/icons/soundCurrentColor.svg'
 import { useState } from "react";
+import { useWindowDimensions } from "@/hooks/useWindowDimensions";
+import { useTheme } from "@/hooks/useThemes";
 
 const WordGuess = ({handleNext} : {handleNext: (correct: boolean) => void}) => {
 
@@ -15,6 +17,9 @@ const WordGuess = ({handleNext} : {handleNext: (correct: boolean) => void}) => {
     const random = Math.round(Math.random());
     const correctWord = targetWords[random];
 
+    const { deviceType } = useWindowDimensions();
+    const { fontSizes, buttonSizes } = useTheme();
+
     const handleWordPress = (word: string) => {
         if (selectedWord !== null) return;
         
@@ -22,7 +27,6 @@ const WordGuess = ({handleNext} : {handleNext: (correct: boolean) => void}) => {
         setSelectedWord(word)
         setIsCorrect(correct);
         
-        // задержка до следующего задания
         setTimeout(() => {
             handleNext(correct)
         }, 1500);
@@ -30,7 +34,7 @@ const WordGuess = ({handleNext} : {handleNext: (correct: boolean) => void}) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.exerciseText}>
+            <Text style={[styles.exerciseText, {fontSize: fontSizes.exerciseTask}]}>
                 Какое слово звучит?
             </Text>
             <AudioPlayer audioUrl={targetAudioUrls[random]} buttonStyle={styles.wordAudio}>
@@ -38,17 +42,22 @@ const WordGuess = ({handleNext} : {handleNext: (correct: boolean) => void}) => {
                     width={50} height={50}
                 />
             </AudioPlayer>
-            <View style={styles.variants}>
+            <View style={[styles.variants, deviceType === 'mobile' && {marginTop: 300, gap: 20}]}>
                 {targetWords.map((word, index) => (
                     <TouchableOpacity key={index} 
                     style={[
                         styles.wordButton,
+                        {
+                            paddingHorizontal: buttonSizes.horizontalLarge,
+                            paddingVertical: buttonSizes.verticalLarge,
+                            borderRadius: buttonSizes.borderRadius
+                        },
                         word === selectedWord && { backgroundColor: 'rgba(73, 192, 248, 1)' },
                         word === selectedWord && isCorrect && { backgroundColor: 'green' },
                         word === selectedWord && isCorrect === false && { backgroundColor: 'red' }
                     ]}
                     onPress={()=>handleWordPress(word)}>
-                        <Text style={styles.wordButtonText}>
+                        <Text style={{fontSize: fontSizes.medium}}>
                             {word}
                         </Text>
                     </TouchableOpacity>
@@ -66,8 +75,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     exerciseText: {
-        fontSize: 50,
-        color: 'white'
+        color: 'white',
+        textAlign: 'center',
+        paddingVertical: 10
     },
     wordAudio: {
         height: 120,
@@ -83,9 +93,6 @@ const styles = StyleSheet.create({
         marginTop: 400
     },
     wordButton: {
-        paddingHorizontal: 80,
-        paddingVertical: 15,
-        borderRadius: 12,
         backgroundColor: 'white',
     },
     wordButtonText: {

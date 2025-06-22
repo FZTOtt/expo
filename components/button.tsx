@@ -2,12 +2,13 @@ import React from "react";
 import { ButtonProps } from "@/interfaces/componentsProps";
 import { StyleSheet, TouchableOpacity, View, Image, Text } from "react-native";
 import { BORDER_RADIUS, BORDER_WIDTH, COLORS, FONT_SIZES } from "@/constants/theme";
+import { useTheme } from "@/hooks/useThemes";
 
 const Button: React.FC<ButtonProps> = ({mode, active=false, size='lg', Icon, onClick, children, isMobile}) => {
     return (
-        <TouchableOpacity onPress={onClick} style={[styles[size], styles[mode], active && styles[mode+'_active']]}>
+        <TouchableOpacity onPress={onClick} style={[styles[size], styles[mode], active && styles[mode+'_active'], isMobile && {marginVertical: 0}]}>
             {mode === 'navigation' ?
-                <View style={styles.navigationContent}>
+                <View style={[styles.navigationContent, isMobile && {}]}>
                     {Icon && <Icon width={30} height={30}/>}
                     {!isMobile && <Text style={styles.navigationText}>
                         {children}
@@ -31,13 +32,12 @@ const styles = StyleSheet.create({
         fontSize: FONT_SIZES.large,
         color: 'white',
         borderRadius: BORDER_RADIUS.lg,
-        paddingHorizontal: 20
+        paddingHorizontal: 20,
+        paddingVertical: 15
     },
     navigation: {
         borderRadius: BORDER_RADIUS.lg,
         borderColor: COLORS.borderPrimary,
-        // width: '100%',
-        height: 70,
         justifyContent: 'center',
         marginVertical: 15
     },
