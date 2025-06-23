@@ -39,7 +39,9 @@ export const postRequest = async (
             if (response.status === 504) {
                 return [response.status, { error: "Сервер недоступен, попробуйте позже" }];
             }
-            return [response.status, { error: "Ошибка при отправке запроса" }];
+            // console.log(response)
+            const body = await response.json();
+            return [response.status, { error: body.error ? body.error : 'Ошибка при отправке запроса' }];
         }
 
         const body = await response.json();
@@ -51,12 +53,13 @@ export const postRequest = async (
 
 
 
-export const getRequest = async (url:string): Promise<[number, any]> => {
+export const getRequest = async (url:string, headers: Record<string, string> = {}): Promise<[number, any]> => {
     try {
         const response = await fetch(url, {
             method: 'GET',
             mode: 'cors',
             credentials: 'include',
+            headers
         });
         if (!response.ok) {
             return [response.status, { error: "Ошибка при получении данных" }];

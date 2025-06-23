@@ -63,7 +63,6 @@ const ReferenceModal = () => {
                 i++;
             }
         }
-        console.log('разбили на фонемы', phonemeOrder)
         setTranscriptionPhonemes(phonemeOrder);
     } 
     useEffect(() => {

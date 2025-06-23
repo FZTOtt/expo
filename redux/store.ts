@@ -2,12 +2,24 @@ import { configureStore } from "@reduxjs/toolkit";
 import translatedReducer from "./translated";
 import modalReducer from './modal';
 import onboardReducer from './onboard';
+import wordReducer from './word'
+import phrasesReducer from './phrases';
+import exerciseReducer from './exercise';
+import moduleReducer from './module';
+import aiChatReducer from './aichat';
+import userReducer from './user';
 
 const store = configureStore({
     reducer: {
         translated: translatedReducer,
         modal: modalReducer,
         onboard: onboardReducer,
+        word: wordReducer,
+        phrases: phrasesReducer,
+        exercise: exerciseReducer,
+        module: moduleReducer,
+        aiChat: aiChatReducer,
+        user: userReducer,
     },
 });
 

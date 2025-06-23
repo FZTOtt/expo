@@ -19,7 +19,7 @@ const modalSlice = createSlice({
         },
         setVisibleMedia: (state, action: PayloadAction<boolean>) => {
             state.isVisibleMedia = action.payload
-        }
+        },
     }
 });
 
