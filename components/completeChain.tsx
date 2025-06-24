@@ -55,17 +55,36 @@ const completeChain = ({handleNext} : {handleNext: (correct: boolean) => void}) 
                     width={50} height={50}
                 />
             </AudioPlayer>
-            <View style={styles.chainHolder}>
-                {selectedWords.map((wordObj, index) => (
-                    <TouchableOpacity 
-                        key={index} 
-                        onPress={() => handleSelectedPress(wordObj)}
-                        style={styles.wordItem}
+            {deviceType !== 'mobile' ? 
+                <View style={styles.chainHolder}>
+                    {selectedWords.map((wordObj, index) => (
+                        <TouchableOpacity 
+                            key={index} 
+                            onPress={() => handleSelectedPress(wordObj)}
+                            style={styles.wordItem}
+                        >
+                            <Text style={[styles.wordText, {fontSize: fontSizes.medium}]}>{wordObj.word}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            :
+                <View style={styles.chainHolder}>
+                    <ScrollView
+                        style={{maxHeight: 120}}
+                        contentContainerStyle={{flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 10}}
                     >
-                        <Text style={[styles.wordText, {fontSize: fontSizes.medium}]}>{wordObj.word}</Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
+                        {selectedWords.map((wordObj, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                onPress={() => handleSelectedPress(wordObj)}
+                                style={styles.wordItem}
+                            >
+                                <Text style={[styles.wordText, {fontSize: fontSizes.medium}]}>{wordObj.word}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                </View>
+            }
             {deviceType !== 'mobile' ? 
                 <View style={styles.wordList}>
                     {availableWords.map((wordObj, index) => (
