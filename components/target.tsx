@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
     word: {
         marginTop: 10,
         color: 'white',
+        textAlign: 'center'
     },
     wordCorrect: {
         color: 'green',

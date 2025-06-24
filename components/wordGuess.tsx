@@ -71,7 +71,6 @@ const WordGuess = ({handleNext} : {handleNext: (correct: boolean) => void}) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        gap: 50,
         alignItems: 'center'
     },
     exerciseText: {
