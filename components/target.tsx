@@ -5,6 +5,7 @@ import AudioPlayer from './audioPlayer';
 import PlaySound from '@/assets/icons/playSound.svg'
 import { FONT_SIZES } from '@/constants/theme';
 import { useTheme } from '@/hooks/useThemes';
+import { useState } from 'react';
 
 interface TargetProps {
     word?: string;
@@ -19,6 +20,8 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
     const { targetTranscription } = useAppSelector((state: RootState) => state.phrases)
 
     const { fontSizes } = useTheme();
+
+    const [phonemesWidth, setPhonemesWidth] = useState(0);
 
     const CompareWords = ({ targetWords, detectedWords }: { targetWords: string[]; detectedWords: string[] }) => {        
         
@@ -82,21 +85,23 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
         if (detectedPhonemes.length === 0) {
             
             return (
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5 }}>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5 }} onLayout={e => setPhonemesWidth(e.nativeEvent.layout.width)}>
                     {targetPhonemes.map((ph, index) => {
                         return (
                             <Text
                                 key={index}
                                 style={{
                                     color: 'white',
-                                    fontSize: fontSizes.xlarge
+                                    fontSize: fontSizes.xlarge,
+                                    // width: 20,
+                                    // textAlign: 'center'
                                 }}
                             >
                                 {ph}
                             </Text>
                         );
                     })}
-                    <AudioPlayer buttonStyle={[styles.audioButton, {left: phonemeCount * fontSizes.leftDis, bottom: fontSizes.botDis}]} audioUrl={audioUrl}>
+                    <AudioPlayer buttonStyle={[styles.audioButton, {left: phonemesWidth + 5, bottom: fontSizes.botDis}]} audioUrl={audioUrl}>
                         <PlaySound 
                             width={30} height={30}
                         />
@@ -106,7 +111,7 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
         }
     
         return (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5 }} onLayout={e => setPhonemesWidth(e.nativeEvent.layout.width)}>
                 {targetPhonemes.map((ph, index) => {
                     const match = detectedPhonemes[index] === ph;
                     return (
@@ -121,7 +126,7 @@ const Target = ({word, target, answer, audioUrl, mode}: TargetProps) => {
                         </Text>
                     );
                 })}
-                <AudioPlayer buttonStyle={[styles.audioButton, {left: phonemeCount * fontSizes.leftDis, bottom: fontSizes.botDis}]} audioUrl={audioUrl}>
+                <AudioPlayer buttonStyle={[styles.audioButton, {left: phonemesWidth + 5, bottom: fontSizes.botDis}]} audioUrl={audioUrl}>
                     <PlaySound 
                         width={30} height={30}
                     />
