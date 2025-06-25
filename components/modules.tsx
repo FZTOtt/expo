@@ -8,6 +8,7 @@ import { getPhraseModuleExercises, getPhraseModules, getWordModuleExercises, get
 import { setCurrentPhraseModule, setCurrentWordModule } from "@/redux/module";
 import { useExerciseParser } from "@/hooks/exerciseParser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useWindowDimensions } from "@/hooks/useWindowDimensions";
 
 type Module = {
     id: number;
@@ -21,6 +22,8 @@ const Modules = () => {
     const { currentPhraseModuleId, currentWordModuleId } = useAppSelector((state: RootState) => state.module);
 
     const [modules, setModules] = useState<Module[]>([]);
+
+    const { deviceType } = useWindowDimensions();
 
     useEffect(() => {
         let refModules: Module[] = [
@@ -120,7 +123,7 @@ const Modules = () => {
     );
 
     return (
-        <View style={styles.container}>
+        <View style={deviceType === 'pc' ? styles.container : styles.mobileContainer}>
             <FlatList 
             data={modules}
             renderItem={renderModule}
@@ -139,6 +142,10 @@ const styles = StyleSheet.create({
         paddingTop: 60,
         paddingHorizontal: '5%'
     },
+    mobileContainer: {
+        height: '100%',
+        paddingHorizontal: '5%'
+    }
 })
 
 export default Modules;

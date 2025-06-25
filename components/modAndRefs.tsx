@@ -11,6 +11,8 @@ const ModAndRefs = () => {
     const { deviceType } = useWindowDimensions();
     const [isModalVisible, setIsModalVisible] = useState(false);
 
+    const [modalType, setModalType] = useState<null | 'modules' | 'help'>(null);
+
     const handleOpenModal = () => {
         setIsModalVisible(true);
     };
@@ -23,14 +25,18 @@ const ModAndRefs = () => {
 
     if (deviceType !== 'pc') {
         return (
-            <>
+            <View style={{position: 'absolute', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', width: '100%', padding: 15}}>
+                <TouchableOpacity 
+                    style={styles.modButton}
+                    onPress={() => { setModalType('modules'); setIsModalVisible(true); }}
+                >
+                    <Text style={[styles.refText, {fontSize: fontSizes.medium}]}>Модули</Text>
+                </TouchableOpacity>
                 <TouchableOpacity 
                     style={styles.refButton}
-                    onPress={handleOpenModal}
+                    onPress={() => { setModalType('help'); setIsModalVisible(true); }}
                 >
-                    <Text style={[styles.refText, {fontSize: fontSizes.medium}]}>
-                        Справка
-                    </Text>
+                    <Text style={[styles.refText, {fontSize: fontSizes.medium}]}>Справка</Text>
                 </TouchableOpacity>
 
                 <Modal
@@ -42,7 +48,9 @@ const ModAndRefs = () => {
                     <View style={styles.modalOverlay}>
                         <View style={[styles.modalContent, Platform.OS === 'android' && {flex: 1}]}>
                             <View style={styles.modalHeader}>
-                                <Text style={[styles.modalTitle, {fontSize: fontSizes.large}]}>Справка</Text>
+                                <Text style={[styles.modalTitle, {fontSize: fontSizes.large}]}> 
+                                    {modalType === 'modules' ? 'Модули' : 'Справка'}
+                                </Text>
                                 <TouchableOpacity 
                                     onPress={handleCloseModal}
                                     style={styles.closeButton}
@@ -51,12 +59,13 @@ const ModAndRefs = () => {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.modalBody}>
-                                <Reference />
+                                {modalType === 'modules' && <Modules />}
+                                {modalType === 'help' && <Reference />}
                             </View>
                         </View>
                     </View>
                 </Modal>
-            </>
+            </View>
         )
     }
     return (
@@ -80,9 +89,14 @@ const styles = StyleSheet.create({
         height: '50%'
     },
     refButton: {
-        position: 'absolute',
-        top: 20,
-        right: 20
+        // position: 'absolute',
+        // top: 20,
+        // right: 20
+    },
+    modButton: {
+        // position: 'absolute',
+        // top: 20,
+        // left: 20
     },
     refText: {
         color: 'white'
